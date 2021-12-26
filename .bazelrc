@@ -1,0 +1,3 @@
+startup --output_user_root=C:/tmp
+build:vs2019 --cxxopt='/std:c++17'
+build:gcc --cxxopt='-std=c++17'

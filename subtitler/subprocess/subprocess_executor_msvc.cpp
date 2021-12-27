@@ -151,6 +151,9 @@ std::string SubprocessExecutor::WaitUntilFinished() {
         if (!success || amount_read == 0) {
             break;
         }
+        
+        // ensure null termination.
+        buffer[amount_read] = '\0';
         if (capture_stdout_) {
             str << buffer;
         }

@@ -29,6 +29,8 @@ int main(int argc, char **argv) {
 
     subtitler::subprocess::SubprocessExecutor executor;
     executor.SetCommand(FLAGS_ffplay_path + " -version");
+    executor.CaptureStdout(true);
+    
     executor.Start();
     auto output = executor.WaitUntilFinished();
     LOG(INFO) << output;

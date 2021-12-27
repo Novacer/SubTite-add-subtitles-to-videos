@@ -135,11 +135,15 @@ std::string SubprocessExecutor::WaitUntilFinished() {
         if (!success || amount_read == 0) {
             break;
         }
-
         if (capture_stdout_) {
             str << buffer;
         }
     }
+
+    // Cleanup remaining handles
+    CloseHandle(fields->hStdOutPipeRead);
+    CloseHandle(fields->hStdInPipeWrite);
+
     return str.str();
 }
 

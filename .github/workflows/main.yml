@@ -15,7 +15,6 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build_windows:
     # The type of runner that the job will run on
     runs-on: windows-latest
@@ -35,8 +34,10 @@ jobs:
           key: bazel
 
       # Runs a set of commands using the runners shell
-      - name: Build and Test
-        run: |
-          bazel build --config=vs2019 ...
-          bazel test --config=vs2019 ...
+      - name: Bazel build all targets
+        run: bazel build --config=vs2019 ...
+        shell: bash
+      
+      - name: Bazel test all targets
+        run: bazel test --config=vs2019 ...
         shell: bash

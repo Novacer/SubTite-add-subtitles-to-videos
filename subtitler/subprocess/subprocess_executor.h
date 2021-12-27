@@ -22,6 +22,7 @@ public:
 private:
     std::string command_;
     bool capture_stdout_;
+    bool is_running_;
 
     struct PlatformDependentFields;
     std::unique_ptr<PlatformDependentFields> fields;

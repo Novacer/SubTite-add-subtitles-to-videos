@@ -12,3 +12,17 @@ cc_library(
   }),
   deps = [],
 )
+
+cc_test(
+  name = "subprocess_executor_test",
+  size = "small",
+  srcs = select({
+    "@bazel_tools//src/conditions:windows": ["subprocess_executor_msvc_test.cpp"],
+    "@bazel_tools//src/conditions:darwin": ["subprocess_executor_gcc_test.cpp"],
+     "//conditions:default": ["subprocess_executor_gcc_test.cpp"],
+  }),
+  deps = [
+    ":subprocess_executor",
+    "@com_google_googletest//:gtest_main",
+  ],
+)

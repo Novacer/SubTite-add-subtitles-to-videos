@@ -48,6 +48,7 @@ struct SubprocessExecutor::PlatformDependentFields{
 SubprocessExecutor::SubprocessExecutor() :
     command_{},
     capture_stdout_{false},
+    is_running_{false},
     fields{std::make_unique<PlatformDependentFields>()} {}
 
 SubprocessExecutor::~SubprocessExecutor() = default;
@@ -61,6 +62,10 @@ void SubprocessExecutor::CaptureStdout(bool capture) {
 }
 
 void SubprocessExecutor::Start() {
+    if (is_running_) {
+        throw std::runtime_error("You must wait for subprocess to finish before starting again.");
+    }
+
     SECURITY_ATTRIBUTES security_attributes;
     security_attributes.nLength = sizeof(SECURITY_ATTRIBUTES);
     security_attributes.bInheritHandle = TRUE;
@@ -106,6 +111,7 @@ void SubprocessExecutor::Start() {
     if (!success) {
         throw std::runtime_error("Unable to create process to run: " + command_);
     }
+    is_running_ = true;
 
     // Close handles to child process and primary thread.
     // We can use other methods to monitor status.
@@ -117,6 +123,8 @@ void SubprocessExecutor::Start() {
     // Otherwise we get a deadlock waiting for stdout!
     CloseHandle(fields->hStdOutPipeWrite);
     CloseHandle(fields->hStdInPipeRead);
+    fields->hStdOutPipeWrite = NULL;
+    fields->hStdInPipeRead = NULL;
 }
 
 std::string SubprocessExecutor::WaitUntilFinished() {
@@ -127,9 +135,9 @@ std::string SubprocessExecutor::WaitUntilFinished() {
     for (;;) {
         success = ReadFile(
         /* hFile= */ fields->hStdOutPipeRead,
-        /* lpBuffer= */ buffer, 
-        /* nNumberOfBytesToRead= */ BUFFER_SIZE, 
-        /* lpNumberOfBytesRead= */ &amount_read, 
+        /* lpBuffer= */ buffer,
+        /* nNumberOfBytesToRead= */ BUFFER_SIZE,
+        /* lpNumberOfBytesRead= */ &amount_read,
         /* lpOverlapped= */ NULL);
 
         if (!success || amount_read == 0) {
@@ -139,10 +147,13 @@ std::string SubprocessExecutor::WaitUntilFinished() {
             str << buffer;
         }
     }
+    is_running_ = false;
 
     // Cleanup remaining handles
     CloseHandle(fields->hStdOutPipeRead);
     CloseHandle(fields->hStdInPipeWrite);
+    fields->hStdOutPipeRead = NULL;
+    fields->hStdInPipeWrite = NULL;
 
     return str.str();
 }

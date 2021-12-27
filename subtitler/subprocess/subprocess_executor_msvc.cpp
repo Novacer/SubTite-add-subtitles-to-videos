@@ -135,7 +135,7 @@ void SubprocessExecutor::Start() {
 
 std::string SubprocessExecutor::WaitUntilFinished() {
     DWORD amount_read;
-    CHAR buffer[BUFFER_SIZE];
+    CHAR buffer[BUFFER_SIZE + 1]; // Ensure space for null-terminator.
     BOOL success = FALSE;
     std::ostringstream str;
     

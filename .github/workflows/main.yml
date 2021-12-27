@@ -39,5 +39,5 @@ jobs:
         shell: bash
       
       - name: Bazel test all targets
-        run: bazel test --config=vs2019 ...
+        run: bazel test --config=vs2019 --test_output=errors ...
         shell: bash

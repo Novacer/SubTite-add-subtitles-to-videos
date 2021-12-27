@@ -11,7 +11,7 @@ namespace {
 
 const int BUFFER_SIZE = 4096;
 
-std::wstring ConvertStringToWString(const std::string& str) {
+std::wstring ConvertStringToWString(const std::string &str) {
     int num_chars = MultiByteToWideChar(
         /* CodePage= */ CP_UTF8,
         /* dwFlags= */ MB_ERR_INVALID_CHARS,
@@ -51,6 +51,12 @@ SubprocessExecutor::SubprocessExecutor() :
     is_running_{false},
     fields{std::make_unique<PlatformDependentFields>()} {}
 
+SubprocessExecutor::SubprocessExecutor(const std::string &command, bool capture_stdout) :
+    command_{command},
+    capture_stdout_{capture_stdout},
+    is_running_{false},
+    fields{std::make_unique<PlatformDependentFields>()} {}
+
 SubprocessExecutor::~SubprocessExecutor() = default;
 
 void SubprocessExecutor::SetCommand(const std::string& command) {
@@ -63,7 +69,7 @@ void SubprocessExecutor::CaptureStdout(bool capture) {
 
 void SubprocessExecutor::Start() {
     if (is_running_) {
-        throw std::runtime_error("You must wait for subprocess to finish before starting again.");
+        throw std::runtime_error("You must call WaitUntilFinished() before starting again.");
     }
 
     SECURITY_ATTRIBUTES security_attributes;
@@ -132,6 +138,8 @@ std::string SubprocessExecutor::WaitUntilFinished() {
     CHAR buffer[BUFFER_SIZE];
     BOOL success = FALSE;
     std::ostringstream str;
+    
+    // Spin until we are unable to read stdout of child process anymore. 
     for (;;) {
         success = ReadFile(
         /* hFile= */ fields->hStdOutPipeRead,

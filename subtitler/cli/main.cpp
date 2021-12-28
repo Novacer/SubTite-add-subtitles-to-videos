@@ -3,6 +3,8 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include "nlohmann/json.hpp"
+#include "date/date.h"
+
 #include "subtitler/subprocess/subprocess_executor.h"
 
 DEFINE_string(ffplay_path, "", "Required. Path to ffplay binary.");
@@ -34,5 +36,21 @@ int main(int argc, char **argv) {
     executor.Start();
     auto output = executor.WaitUntilFinished();
     LOG(INFO) << output;
+
+    using namespace std::chrono_literals;
+    using namespace date;
+    // format
+    auto halfmin = 30.5s;
+    std::ostringstream sock;
+    to_stream(sock, "%T", halfmin);
+
+    // parse
+    std::istringstream pipe{"0:3:15.234"};
+    std::chrono::minutes minute;
+    from_stream(pipe, "%T", minute);
+
+    LOG(ERROR) << sock.str();
+    LOG(ERROR) << minute;
+
     return 0;
 }

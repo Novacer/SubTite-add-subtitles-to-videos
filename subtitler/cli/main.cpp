@@ -39,9 +39,18 @@ int main(int argc, char **argv) {
 
     using namespace std::chrono_literals;
     using namespace date;
-    auto halfmin = 30s;
+    // format
+    auto halfmin = 30.5s;
     std::ostringstream sock;
-    LOG(ERROR) << halfmin;
+    to_stream(sock, "%T", halfmin);
+
+    // parse
+    std::istringstream pipe{"0:3:15.234"};
+    std::chrono::minutes minute;
+    from_stream(pipe, "%T", minute);
+
+    LOG(ERROR) << sock.str();
+    LOG(ERROR) << minute;
 
     return 0;
 }

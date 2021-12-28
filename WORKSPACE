@@ -29,3 +29,10 @@ http_archive(
   # version 1.10.0
   urls = ["https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip"],
 )
+
+http_archive(
+    name = "howard_hinnant_date",
+    build_file = "//third_party:date.BUILD",
+    strip_prefix = "date-3.0.1",
+    urls = ["https://github.com/HowardHinnant/date/archive/v3.0.1.tar.gz"],
+)

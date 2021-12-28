@@ -8,5 +8,6 @@ cc_binary(
     "@com_github_nlohmann_json//:json",
     "@com_github_gflags_gflags//:gflags",
     "@com_github_google_glog//:glog",
+    "@howard_hinnant_date//:date",
   ],
 )

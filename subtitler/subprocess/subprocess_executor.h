@@ -30,13 +30,13 @@ public:
     // Sets the command to be used upon Start().
     void SetCommand(const std::string &command);
 
-    // Sets whether stdout should be captured.
+    // Sets whether stdout and stderr should be captured.
     void CaptureOutput(bool capture_output);
 
     // Start executing the command. Throws std::runtime_error if unable to Start() the command.
     void Start();
 
-    // Wait until process finishes and return its stdout.
+    // Wait until process finishes and return its stdout and stderr.
     // If capture output is set false, then returns empty string.
     // If timeout is not set then wait forever.
     // If timeout is set, then wait at most 2 * timeout_ms before force terminating the process.

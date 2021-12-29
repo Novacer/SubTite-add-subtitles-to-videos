@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
     LOG(ERROR) << "ffplay: " << FLAGS_ffplay_path;
 
     subtitler::subprocess::SubprocessExecutor executor;
-    executor.SetCommand(FLAGS_ffplay_path + " --version");
+    executor.SetCommand(FLAGS_ffplay_path + " -version");
     executor.CaptureOutput(true);
     
     executor.Start();

@@ -120,6 +120,7 @@ void SubprocessExecutor::Start() {
     STARTUPINFOW start_info;
     ZeroMemory(&start_info, sizeof(STARTUPINFOW));
     start_info.cb = sizeof(STARTUPINFOW);
+    start_info.hStdError = fields->hStdOutPipeWrite;
     start_info.hStdOutput = fields->hStdOutPipeWrite;
     start_info.dwFlags |= STARTF_USESTDHANDLES;
 

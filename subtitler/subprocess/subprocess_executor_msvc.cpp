@@ -159,18 +159,18 @@ void SubprocessExecutor::Start() {
 
     // IMPORTANT! Close handles to stdout and stderr write.
     // Since we will not use these we must close them.
-    // Otherwise we get a deadlock!
+    // Otherwise we get a deadlock since we hold the write pipe, but child needs to write too!
     // https://devblogs.microsoft.com/oldnewthing/20110707-00/?p=10223
     CleanupHandle(fields->hStdOutPipeWrite);
     CleanupHandle(fields->hStdErrPipeWrite);
 
-    auto polling_routine = [](HANDLE handle) {
+    auto polling_routine = [](const HANDLE handle) {
         DWORD amount_read;
         CHAR buffer[BUFFER_SIZE + 1]; // Ensure space for null-terminator.
         BOOL success = FALSE;
         std::ostringstream str;
         
-        // Spin until we are unable to read stdout of child process anymore. 
+        // Spin until we are unable to read the pipe from child process anymore. 
         for (;;) {
             success = ReadFile(
             /* hFile= */ handle,

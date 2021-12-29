@@ -16,10 +16,10 @@ namespace subprocess {
  * Sample Usage:
  * SubprocessExecutor subprocess;
  * subprocess.SetCommand("echo hello world");
- * subprocess.CaptureStdout(true);
+ * subprocess.CaptureOutput(true);
  * subprocess.Start()
  * // Do some work in the meantime...
- * std::string captured_stdout = subprocess.WaitUntilFinished();
+ * auto captured_output = subprocess.WaitUntilFinished();
  */
 class SubprocessExecutor {
 public:
@@ -36,11 +36,16 @@ public:
     // Start executing the command. Throws std::runtime_error if unable to Start() the command.
     void Start();
 
+    struct Output {
+        std::string subproc_stdout;
+        std::string subproc_stderr;
+    };
+
     // Wait until process finishes and return its stdout and stderr.
     // If capture output is set false, then returns empty string.
     // If timeout is not set then wait forever.
     // If timeout is set, then wait at most 2 * timeout_ms before force terminating the process.
-    std::string WaitUntilFinished(std::optional<int> timeout_ms = std::nullopt);
+    Output WaitUntilFinished(std::optional<int> timeout_ms = std::nullopt);
 
 private:
     std::string command_;
@@ -49,8 +54,6 @@ private:
 
     struct PlatformDependentFields;
     std::unique_ptr<PlatformDependentFields> fields;
-
-    static std::string PollChildProcessOutput(const PlatformDependentFields *);
 };
 
 } // namespace subtitler

@@ -35,10 +35,12 @@ int main(int argc, char **argv) {
     
     executor.Start();
 
+    // Simulate main thread being blocked.
     std::cin.get();
 
-    auto output = executor.WaitUntilFinished(5000);
-    LOG(ERROR) << output;
+    auto output = executor.WaitUntilFinished();
+    LOG(ERROR) << output.subproc_stdout;
+    LOG(ERROR) << output.subproc_stderr;
 
     using namespace std::chrono_literals;
     using namespace date;

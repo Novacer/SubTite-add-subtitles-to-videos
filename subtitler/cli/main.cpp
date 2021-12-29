@@ -27,15 +27,18 @@ int main(int argc, char **argv) {
     google::InitGoogleLogging(argv[0]);
     gflags::ParseCommandLineFlags(&argc, &argv, /* remove_flags= */ true);
 
-    LOG(INFO) << "ffplay: " << FLAGS_ffplay_path;
+    LOG(ERROR) << "ffplay: " << FLAGS_ffplay_path;
 
     subtitler::subprocess::SubprocessExecutor executor;
-    executor.SetCommand(FLAGS_ffplay_path + " -version");
-    executor.CaptureStdout(true);
+    executor.SetCommand(FLAGS_ffplay_path + " --version");
+    executor.CaptureOutput(true);
     
     executor.Start();
-    auto output = executor.WaitUntilFinished();
-    LOG(INFO) << output;
+
+    std::cin.get();
+
+    auto output = executor.WaitUntilFinished(5000);
+    LOG(ERROR) << output;
 
     using namespace std::chrono_literals;
     using namespace date;

@@ -8,7 +8,7 @@ using ::testing::IsEmpty;
 TEST(SubprocessExecutorTest, SanityCheck) {
     SubprocessExecutor executor(
         /* command= */ "echo hello world",
-        /* capture_stdout= */ true);
+        /* capture_output= */ true);
 
     executor.Start();
     auto captured_stdout = executor.WaitUntilFinished();
@@ -17,7 +17,7 @@ TEST(SubprocessExecutorTest, SanityCheck) {
 
     executor.SetCommand("echo try again!");
     executor.Start();
-    captured_stdout = executor.WaitUntilFinished();
+    captured_stdout = executor.WaitUntilFinished(5000);
 
     ASSERT_EQ(captured_stdout, "try again!\n");
 }
@@ -25,7 +25,7 @@ TEST(SubprocessExecutorTest, SanityCheck) {
 TEST(SubprocessExecutor, UTF8StringTest) {
     SubprocessExecutor executor;
     executor.SetCommand(u8"echo 你好世界");
-    executor.CaptureStdout(true);
+    executor.CaptureOutput(true);
 
     executor.Start();
     auto captured_stdout = executor.WaitUntilFinished();
@@ -36,7 +36,7 @@ TEST(SubprocessExecutor, UTF8StringTest) {
 TEST(SubprocessExecutorTest, DoNotCaptureStdout) {
     SubprocessExecutor executor;
     executor.SetCommand("echo hello world");
-    executor.CaptureStdout(false);
+    executor.CaptureOutput(false);
 
     executor.Start();
     auto captured_stdout = executor.WaitUntilFinished();

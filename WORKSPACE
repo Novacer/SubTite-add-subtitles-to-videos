@@ -32,6 +32,7 @@ http_archive(
 
 http_archive(
     name = "howard_hinnant_date",
+    sha256 = "7a390f200f0ccd207e8cff6757e04817c1a0aec3e327b006b7eb451c57ee3538",
     build_file = "//third_party:date.BUILD",
     strip_prefix = "date-3.0.1",
     urls = ["https://github.com/HowardHinnant/date/archive/v3.0.1.tar.gz"],

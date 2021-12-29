@@ -153,10 +153,6 @@ void SubprocessExecutor::Start() {
     // https://devblogs.microsoft.com/oldnewthing/20110707-00/?p=10223
     CleanupHandle(fields->hStdOutPipeWrite);
 
-    if (fields->hStdOutPipeWrite != NULL) {
-        throw std::runtime_error("Why?");
-    }
-
     if (capture_output_) {
         fields->captured_output = std::make_unique<std::future<std::string>>(
             std::async(std::launch::async,

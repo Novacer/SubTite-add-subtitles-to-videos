@@ -8,40 +8,45 @@ using ::testing::IsEmpty;
 TEST(SubprocessExecutorTest, SanityCheck) {
     SubprocessExecutor executor(
         /* command= */ "echo hello world",
-        /* capture_stdout= */ true);
+        /* capture_output= */ true);
 
     executor.Start();
-    auto captured_stdout = executor.WaitUntilFinished();
+    auto captured_ouptut = executor.WaitUntilFinished();
 
-    ASSERT_EQ(captured_stdout, "hello world\n");
+    ASSERT_EQ(captured_ouptut.subproc_stdout, "hello world\n");
+    ASSERT_THAT(captured_ouptut.subproc_stderr, IsEmpty());
 
-    executor.SetCommand("echo try again!");
+    executor.SetCommand("cmd /c echo hello world 1>&2");
     executor.Start();
-    captured_stdout = executor.WaitUntilFinished();
+    captured_ouptut = executor.WaitUntilFinished(5000);
 
-    ASSERT_EQ(captured_stdout, "try again!\n");
+    ASSERT_THAT(captured_ouptut.subproc_stdout, IsEmpty());
+    // Since we used cmd it will have carriage return.
+    ASSERT_THAT(captured_ouptut.subproc_stderr, "hello world \r\n");
 }
 
 TEST(SubprocessExecutor, UTF8StringTest) {
     SubprocessExecutor executor;
     executor.SetCommand(u8"echo 你好世界");
-    executor.CaptureStdout(true);
+    executor.CaptureOutput(true);
 
     executor.Start();
-    auto captured_stdout = executor.WaitUntilFinished();
+    auto captured_ouptut = executor.WaitUntilFinished();
 
-    ASSERT_EQ(captured_stdout, u8"你好世界\n");
+    ASSERT_EQ(captured_ouptut.subproc_stdout, u8"你好世界\n");
+    ASSERT_THAT(captured_ouptut.subproc_stderr, IsEmpty());
 }
 
 TEST(SubprocessExecutorTest, DoNotCaptureStdout) {
     SubprocessExecutor executor;
     executor.SetCommand("echo hello world");
-    executor.CaptureStdout(false);
+    executor.CaptureOutput(false);
 
     executor.Start();
-    auto captured_stdout = executor.WaitUntilFinished();
+    auto captured_output = executor.WaitUntilFinished();
 
-    ASSERT_THAT(captured_stdout, IsEmpty());
+    ASSERT_THAT(captured_output.subproc_stdout, IsEmpty());
+    ASSERT_THAT(captured_output.subproc_stderr, IsEmpty());
 }
 
 TEST(SubprocessExecutor, StartTwiceWithoutWaitingThrowsError) {

@@ -3,6 +3,7 @@
 
 #include <string>
 #include <memory>
+#include <optional>
 
 namespace subtitler {
 namespace subprocess {
@@ -15,32 +16,40 @@ namespace subprocess {
  * Sample Usage:
  * SubprocessExecutor subprocess;
  * subprocess.SetCommand("echo hello world");
- * subprocess.CaptureStdout(true);
+ * subprocess.CaptureOutput(true);
  * subprocess.Start()
- * std::string captured_stdout = subprocess.WaitUntilFinished();
+ * // Do some work in the meantime...
+ * auto captured_output = subprocess.WaitUntilFinished();
  */
 class SubprocessExecutor {
 public:
     SubprocessExecutor();
-    SubprocessExecutor(const std::string &command, bool capture_stdout);
+    SubprocessExecutor(const std::string &command, bool capture_output);
     ~SubprocessExecutor();
 
     // Sets the command to be used upon Start().
     void SetCommand(const std::string &command);
 
-    // Sets whether stdout should be captured.
-    void CaptureStdout(bool capture_stdout);
+    // Sets whether stdout and stderr should be captured.
+    void CaptureOutput(bool capture_output);
 
     // Start executing the command. Throws std::runtime_error if unable to Start() the command.
     void Start();
 
-    // Waits for the subprocess to finish, then returns its stdout.
-    // If capture_stdout was set false, then empty string is returned.
-    std::string WaitUntilFinished();
+    struct Output {
+        std::string subproc_stdout;
+        std::string subproc_stderr;
+    };
+
+    // Wait until process finishes and return its stdout and stderr.
+    // If capture output is set false, then returns empty string.
+    // If timeout is not set then wait forever.
+    // If timeout is set, then wait at most 2 * timeout_ms before force terminating the process.
+    Output WaitUntilFinished(std::optional<int> timeout_ms = std::nullopt);
 
 private:
     std::string command_;
-    bool capture_stdout_;
+    bool capture_output_;
     bool is_running_;
 
     struct PlatformDependentFields;

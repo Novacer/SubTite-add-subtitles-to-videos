@@ -57,8 +57,22 @@ TEST(SubprocessExecutor, StartTwiceWithoutWaitingThrowsError) {
     try {
         executor.Start();
         FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
+    } catch (const std::runtime_error &e) {
         ASSERT_STREQ(e.what(), "You must call WaitUntilFinished() before starting again.");
+    }
+}
+
+TEST(SubprocessExecutor, StopTwiceWithoutStartingThrowsError) {
+    SubprocessExecutor executor;
+    executor.SetCommand("echo hello world");
+
+    executor.Start();
+    try {
+        executor.WaitUntilFinished();
+        executor.WaitUntilFinished();
+        FAIL() << "Expected std::runtime_error";
+    } catch (const std::runtime_error &e) {
+        ASSERT_STREQ(e.what(), "You must call Start() before you are able to wait.");
     }
 }
 
@@ -69,7 +83,7 @@ TEST(SubprocessExecutor, InvalidCommandThrowsError_EmptyString) {
     try {
         executor.Start();
         FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
+    } catch (const std::runtime_error &e) {
         ASSERT_STREQ(e.what(), "Unable to create process to run: ");
     }
 }
@@ -81,7 +95,7 @@ TEST(SubprocessExecutor, InvalidCommandThrowsError_CommandDoesNotExist) {
     try {
         executor.Start();
         FAIL() << "Expected std::runtime_error";
-    } catch (const std::runtime_error& e) {
+    } catch (const std::runtime_error &e) {
         ASSERT_STREQ(e.what(), "Unable to create process to run: DoesNotExist");
     }
 }

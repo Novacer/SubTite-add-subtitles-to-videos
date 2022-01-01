@@ -21,6 +21,9 @@ std::string FormatChrono(const std::chrono::milliseconds& chrono) {
 
 FFPlay::FFPlay(const std::string &ffplay_path, std::unique_ptr<subprocess::SubprocessExecutor> executor):
     ffplay_path_{ffplay_path}, executor_{std::move(executor)} {
+    if (ffplay_path_.empty()) {
+        throw std::invalid_argument("FFPlay path provided to ffplay cannot be empty!");
+    }
     if (!executor_) {
         throw std::invalid_argument("Executor provided to ffplay cannot be null!");
     }
@@ -87,13 +90,10 @@ void FFPlay::OpenPlayer(const std::string& video_path) {
 
 std::string FFPlay::ClosePlayer(std::optional<int> timeout_ms) {
     auto ffplay_output = executor_->WaitUntilFinished(timeout_ms);
-    if (!ffplay_output.subproc_stderr.empty()) {
-        // Since we set -loglevel error, only error output surfaced to stderr.
-        // Not going to throw this, since we almost never want FFPlay error
-        // to be a fatal exception.
-        return ffplay_output.subproc_stderr;
-    }
-    return std::string{};
+    // Since we set -loglevel error, only error output surfaced to stderr.
+    // Not going to throw this, since we almost never want FFPlay error
+    // to be a fatal exception.
+    return ffplay_output.subproc_stderr;
 }
 
 } // namespace play_video

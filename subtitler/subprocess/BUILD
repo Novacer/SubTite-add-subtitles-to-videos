@@ -1,6 +1,6 @@
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
-package(default_visibility = ["//subtitler/cli:__subpackages__"])
+package(default_visibility = ["//subtitler:__subpackages__"])
 
 cc_library(
   name = "subprocess_executor",
@@ -25,4 +25,10 @@ cc_test(
     ":subprocess_executor",
     "@com_google_googletest//:gtest_main",
   ],
+)
+
+cc_library(
+  name = "mock_subprocess_executor",
+  hdrs = ["mock_subprocess_executor.h"],
+  deps = ["@com_google_googletest//:gtest"],
 )

@@ -25,16 +25,16 @@ class SubprocessExecutor {
 public:
     SubprocessExecutor();
     SubprocessExecutor(const std::string &command, bool capture_output);
-    ~SubprocessExecutor();
+    virtual ~SubprocessExecutor();
 
     // Sets the command to be used upon Start().
-    void SetCommand(const std::string &command);
+    virtual void SetCommand(const std::string &command);
 
     // Sets whether stdout and stderr should be captured.
-    void CaptureOutput(bool capture_output);
+    virtual void CaptureOutput(bool capture_output);
 
     // Start executing the command. Throws std::runtime_error if unable to Start() the command.
-    void Start();
+    virtual void Start();
 
     struct Output {
         std::string subproc_stdout;
@@ -45,7 +45,7 @@ public:
     // If capture output is set false, then returns empty string.
     // If timeout is not set then wait forever.
     // If timeout is set, then wait at most 2 * timeout_ms before force terminating the process.
-    Output WaitUntilFinished(std::optional<int> timeout_ms = std::nullopt);
+    virtual Output WaitUntilFinished(std::optional<int> timeout_ms = std::nullopt);
 
 private:
     std::string command_;

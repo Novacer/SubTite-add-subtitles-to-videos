@@ -73,14 +73,14 @@ std::vector<std::string> FFPlay::BuildArgs() {
     return args;
 }
 
-void FFPlay::OpenPlayer(const std::string& video_path) {
+void FFPlay::OpenPlayer(const std::string &video_path) {
     if (video_path.empty()) {
         throw std::invalid_argument("Cannot play empty video path!");
     }
     std::ostringstream command;
     command << ffplay_path_ << " " << video_path;
     auto args = BuildArgs();
-    for (const auto& arg: args) {
+    for (const auto &arg: args) {
         command << " " << arg;
     }
     executor_->CaptureOutput(true);

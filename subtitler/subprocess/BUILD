@@ -31,4 +31,5 @@ cc_library(
   name = "mock_subprocess_executor",
   hdrs = ["mock_subprocess_executor.h"],
   deps = ["@com_google_googletest//:gtest"],
+  testonly = True,
 )

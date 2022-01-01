@@ -7,6 +7,9 @@
 namespace subtitler {
 namespace subprocess {
 
+/**
+ * Mock class used to test SubprocessExecutor
+ */
 class MockSubprocessExecutor : public SubprocessExecutor {
 public:
     MOCK_METHOD(void, SetCommand, (const std::string &), (override));

@@ -15,14 +15,30 @@ namespace subtitler::subprocess {
 namespace subtitler {
 namespace play_video {
 
+/**
+ * Wrapper for FFPlay functionality which is used as a video player.
+ * Sample usage:
+ * FFPlay ffplay("path/to/ffplay", std::make_unique<SubprocessExecutor>());
+ * ffplay.width(100)->height(200)->OpenPlayer("path/to/video.mp4");
+ * // In the meantime, can do anything like block to get user input
+ * cin >> something;
+ * // Close the player with 1000ms timeout. If timeout expires, force close it.
+ * ffplay.ClosePlayer(1000);
+ */
 class FFPlay {
 public:
     FFPlay(const std::string &ffplay_path, std::unique_ptr<subprocess::SubprocessExecutor> executor);
     ~FFPlay() = default;
 
-    void OpenPlayer(const std::string& video_path);
+    // Opens a video player in a separate process. Does not block.
+    void OpenPlayer(const std::string &video_path);
+
+    // Close the video player. Returns any output caught from stderr.
+    // Video will be allowed to play for at most timeout_ms before it is closed.
+    // (That is, player may be closed before the video finished playing!)
     std::string ClosePlayer(std::optional<int> timeout_ms = std::nullopt);
 
+    // FFPlay options. Refer to https://ffmpeg.org/ffplay.html#toc-Main-options.
     FFPlay* width(std::optional<int> width) { width_ = width; return this; }
     FFPlay* height(std::optional<int> height) { height_ = height; return this; }
     FFPlay* fullscreen(bool fullscreen) { fullscreen_ = fullscreen; return this; }

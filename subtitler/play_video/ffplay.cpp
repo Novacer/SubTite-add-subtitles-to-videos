@@ -11,7 +11,7 @@ namespace play_video {
 
 namespace {
 
-std::string FormatChrono(const std::chrono::milliseconds& chrono) {
+std::string FormatChrono(const std::chrono::milliseconds &chrono) {
     std::ostringstream stream;
     date::to_stream(stream, "%T", chrono);
     return stream.str();

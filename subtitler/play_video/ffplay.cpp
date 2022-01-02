@@ -29,6 +29,8 @@ FFPlay::FFPlay(const std::string &ffplay_path, std::unique_ptr<subprocess::Subpr
     }
 }
 
+FFPlay::~FFPlay() = default;
+
 std::vector<std::string> FFPlay::BuildArgs() {
     // Consult https://ffmpeg.org/ffplay.html#toc-Main-options
     std::vector<std::string> args;

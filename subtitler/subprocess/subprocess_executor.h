@@ -56,7 +56,7 @@ private:
     std::unique_ptr<PlatformDependentFields> fields;
 };
 
-} // namespace subtitler
 } // namespace subprocess
+} // namespace subtitler
 
 #endif

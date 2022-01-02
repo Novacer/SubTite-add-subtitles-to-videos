@@ -3,15 +3,16 @@
 #include <memory>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
-#include "nlohmann/json.hpp"
-#include "date/date.h"
 
 #include "subtitler/subprocess/subprocess_executor.h"
 #include "subtitler/play_video/ffplay.h"
+#include "subtitler/cli/commands.h"
 
 DEFINE_string(ffplay_path, "ffplay", "Required. Path to ffplay binary.");
 DEFINE_string(ffmpeg_path, "ffmpeg", "Required. Path to ffmpeg binary.");
 DEFINE_string(ffprobe_path, "ffprobe", "Required. Path to ffprobe binary.");
+DEFINE_string(video_path, "", "Optional. Path to the video you want to subtitle. "
+                              "If not provided will be asked from stdin.");
 
 namespace {
 
@@ -42,6 +43,8 @@ DEFINE_validator(ffmpeg_path, &ValidateFlagNonEmpty);
 DEFINE_validator(ffprobe_path, &ValidateFlagNonEmpty);
 
 int main(int argc, char **argv) {
+    using namespace subtitler;
+
     google::InitGoogleLogging(argv[0]);
     gflags::ParseCommandLineFlags(&argc, &argv, /* remove_flags= */ true);
 
@@ -55,38 +58,27 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    using namespace std::chrono_literals;
-    using namespace date;
-    // format
-    auto halfmin = 30.5s;
-    std::ostringstream sock;
-    to_stream(sock, "%T", halfmin);
+    LOG(INFO) << "Successfully detected all binaries!";
 
-    // parse
-    std::istringstream pipe{"0:3:15.234"};
-    std::chrono::minutes minute;
-    from_stream(pipe, "%T", minute);
-
-    LOG(ERROR) << sock.str();
-    LOG(ERROR) << minute;
-
-    subtitler::play_video::FFPlay ffplay(
-        FLAGS_ffplay_path,
-        std::make_unique<subtitler::subprocess::SubprocessExecutor>()
-    );
-
-    ffplay.start_pos(2s)
-        ->duration(10s)
-        ->width(500)
-        ->height(500)
-        ->OpenPlayer("test.mp4");
-    
-    std::cin.get(); // simulate delay for user input
-
-    auto captured_error = ffplay.ClosePlayer(1000);
-    if (!captured_error.empty()) {
-        LOG(ERROR) << captured_error;
+    if (FLAGS_video_path.empty()) {
+        std::cout << "Please provide path to video you want to subtitle:" << std::endl;
+        if (!std::getline(std::cin, FLAGS_video_path)) {
+            LOG(ERROR) << "Unable to get video_path!";
+            return 1;
+        }
     }
 
+    auto executor = std::make_unique<subprocess::SubprocessExecutor>();
+    auto ffplay = std::make_unique<play_video::FFPlay>(FLAGS_ffplay_path, std::move(executor));
+    cli::Commands::Paths paths{FLAGS_video_path};
+    cli::Commands commands{paths, std::move(ffplay), std::cin, std::cout};
+
+    try {
+        commands.MainLoop();
+    } catch (const std::exception &e) {
+        LOG(ERROR) << e.what();
+        return 1;
+    }
+    
     return 0;
 }

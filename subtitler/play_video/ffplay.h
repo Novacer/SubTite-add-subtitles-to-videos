@@ -9,7 +9,9 @@
 
 // Forward declaration
 namespace subtitler::subprocess {
-    class SubprocessExecutor;
+
+class SubprocessExecutor;
+
 } // subtitler::subprocess
 
 namespace subtitler {
@@ -28,7 +30,7 @@ namespace play_video {
 class FFPlay {
 public:
     FFPlay(const std::string &ffplay_path, std::unique_ptr<subprocess::SubprocessExecutor> executor);
-    ~FFPlay() = default;
+    ~FFPlay();
 
     // Opens a video player in a separate process. Does not block.
     void OpenPlayer(const std::string &video_path);

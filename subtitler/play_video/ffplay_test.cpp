@@ -1,0 +1,123 @@
+#include <gtest/gtest.h>
+#include <gmock/gmock.h>
+#include <chrono>
+#include "subtitler/play_video/ffplay.h"
+#include "subtitler/subprocess/mock_subprocess_executor.h"
+
+using subtitler::play_video::FFPlay;
+using subtitler::subprocess::MockSubprocessExecutor;
+using ::testing::IsEmpty;
+using ::testing::NiceMock;
+using ::testing::StrictMock;
+using ::testing::InSequence;
+using ::testing::Return;
+
+
+TEST(FFPlayTest, OpenPlayerWithDefaultArgs) {
+    auto mock_executor = std::make_unique<StrictMock<MockSubprocessExecutor>>();
+    {
+        InSequence sequence;
+        // The following must occur in sequence.
+        EXPECT_CALL(*mock_executor, CaptureOutput(true))
+            .Times(1);
+        EXPECT_CALL(*mock_executor, SetCommand("ffplay video.mp4 -sn -loglevel error"))
+            .Times(1);
+        EXPECT_CALL(*mock_executor, Start())
+            .Times(1);
+    }
+
+    FFPlay ffplay("ffplay", std::move(mock_executor));
+    ffplay.OpenPlayer("video.mp4");
+}
+
+TEST(FFPlayTest, OpenPlayerWithScreenDimensionSettings) {
+    auto mock_executor = std::make_unique<NiceMock<MockSubprocessExecutor>>();
+    EXPECT_CALL(*mock_executor, SetCommand("ffplay video.mp4 -x 100 -y 200 -fs -sn -loglevel error"))
+        .Times(1);
+    
+    FFPlay ffplay("ffplay", std::move(mock_executor));
+    ffplay.width(100)
+        ->height(200)
+        ->fullscreen(true)
+        ->OpenPlayer("video.mp4");
+}
+
+TEST(FFPlayTest, OpenPlayerWithDisableStreamSettings) {
+    auto mock_executor = std::make_unique<NiceMock<MockSubprocessExecutor>>();
+    EXPECT_CALL(*mock_executor, SetCommand("ffplay video.mp4 -vn -an -loglevel error"))
+        .Times(1);
+    
+    FFPlay ffplay("ffplay", std::move(mock_executor));
+    ffplay.disable_video(true)
+        ->disable_audio(true)
+        ->disable_subtitles(false)
+        ->OpenPlayer("video.mp4");
+}
+
+TEST(FFPlayTest, OpenPlayerWithSeekAndDurationSettings) {
+    using namespace std::chrono_literals;
+    auto mock_executor = std::make_unique<NiceMock<MockSubprocessExecutor>>();
+    EXPECT_CALL(*mock_executor,
+        SetCommand("ffplay video.mp4 -sn -ss 00:00:12.345 -t 01:23:45.000 -loglevel error"))
+        .Times(1);
+    
+    FFPlay ffplay("ffplay", std::move(mock_executor));
+    ffplay.start_pos(12s + 345ms)
+        ->duration(1h + 23min + 45s)
+        ->OpenPlayer("video.mp4");
+}
+
+TEST(FFPlayTest, OpenPlayerWithPositionSettings) {
+    auto mock_executor = std::make_unique<NiceMock<MockSubprocessExecutor>>();
+    EXPECT_CALL(*mock_executor,
+        SetCommand("ffplay video.mp4 -sn -left 100 -top -200 -loglevel error"))
+        .Times(1);
+    
+    FFPlay ffplay("ffplay", std::move(mock_executor));
+    ffplay.left_pos(100)
+        ->top_pos(-200)
+        ->OpenPlayer("video.mp4");
+}
+
+TEST(FFPlayTest, InvalidConstructorArgumentsThrowsInvalidArgument) {
+    try {
+        FFPlay ffplay("", std::make_unique<MockSubprocessExecutor>());
+        FAIL() << "Expected std::invalid_argument";
+    } catch (const std::invalid_argument &e) {
+        ASSERT_STREQ(e.what(), "FFPlay path provided to ffplay cannot be empty!");
+    }
+
+    try {
+        FFPlay ffplay("ffplay", nullptr);
+        FAIL() << "Expected std::invalid_argument";
+    } catch (const std::invalid_argument &e) {
+        ASSERT_STREQ(e.what(), "Executor provided to ffplay cannot be null!");
+    }
+}
+
+TEST(FFPlayTest, OpenPlayerWithEmptyVideoPathThrowsInvalidArgument) {
+    FFPlay ffplay("ffplay", std::make_unique<MockSubprocessExecutor>());
+    try {
+        ffplay.OpenPlayer("");
+        FAIL() << "Expected std::invalid_argument";
+    } catch (const std::invalid_argument &e) {
+        ASSERT_STREQ(e.what(), "Cannot play empty video path!");
+    }
+}
+
+TEST(FFPlayTest, ClosePlayerReturnsStderr) {
+    auto mock_executor = std::make_unique<NiceMock<MockSubprocessExecutor>>();
+    {
+        InSequence sequence;
+        EXPECT_CALL(*mock_executor, Start())
+            .Times(1);
+        EXPECT_CALL(*mock_executor, WaitUntilFinished(std::optional<int>(1000)))
+            .Times(1)
+            .WillOnce(Return(MockSubprocessExecutor::Output{"stdout", "stderr"}));
+    }
+
+    FFPlay ffplay("ffplay", std::move(mock_executor));
+    ffplay.OpenPlayer("video.mp4");
+    auto captured_stderr = ffplay.ClosePlayer(1000);
+    ASSERT_EQ(captured_stderr, "stderr");
+}

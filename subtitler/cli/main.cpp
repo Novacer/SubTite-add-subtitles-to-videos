@@ -1,11 +1,13 @@
 #include <iostream>
 #include <stdexcept>
+#include <memory>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include "nlohmann/json.hpp"
 #include "date/date.h"
 
 #include "subtitler/subprocess/subprocess_executor.h"
+#include "subtitler/play_video/ffplay.h"
 
 DEFINE_string(ffplay_path, "ffplay", "Required. Path to ffplay binary.");
 DEFINE_string(ffmpeg_path, "ffmpeg", "Required. Path to ffmpeg binary.");
@@ -53,19 +55,6 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    subtitler::subprocess::SubprocessExecutor executor;
-    executor.SetCommand(FLAGS_ffplay_path + " -version");
-    executor.CaptureOutput(true);
-    
-    executor.Start();
-
-    // Simulate main thread being blocked.
-    std::cin.get();
-
-    auto output = executor.WaitUntilFinished();
-    LOG(ERROR) << output.subproc_stdout;
-    LOG(ERROR) << output.subproc_stderr;
-
     using namespace std::chrono_literals;
     using namespace date;
     // format
@@ -80,6 +69,24 @@ int main(int argc, char **argv) {
 
     LOG(ERROR) << sock.str();
     LOG(ERROR) << minute;
+
+    subtitler::play_video::FFPlay ffplay(
+        FLAGS_ffplay_path,
+        std::make_unique<subtitler::subprocess::SubprocessExecutor>()
+    );
+
+    ffplay.start_pos(2s)
+        ->duration(10s)
+        ->width(500)
+        ->height(500)
+        ->OpenPlayer("test.mp4");
+    
+    std::cin.get(); // simulate delay for user input
+
+    auto captured_error = ffplay.ClosePlayer(1000);
+    if (!captured_error.empty()) {
+        LOG(ERROR) << captured_error;
+    }
 
     return 0;
 }

@@ -209,6 +209,10 @@ void SubprocessExecutor::Start() {
 }
 
 SubprocessExecutor::Output SubprocessExecutor::WaitUntilFinished(std::optional<int> timeout_ms) {
+    if (!is_running_) {
+        throw std::runtime_error("You must call Start() before you are able to wait.");
+    }
+
     // First wait to see if it finishes in time.
     if (timeout_ms && WaitForSingleObject(fields->hProcess, *timeout_ms) == WAIT_TIMEOUT) {
         // If not then ask it nicely to close.

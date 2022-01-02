@@ -7,14 +7,30 @@
 
 #include "subtitler/subprocess/subprocess_executor.h"
 
-DEFINE_string(ffplay_path, "", "Required. Path to ffplay binary.");
-DEFINE_string(ffmpeg_path, "", "Required. Path to ffmpeg binary.");
-DEFINE_string(ffprobe_path, "", "Required. Path to ffprobe binary.");
+DEFINE_string(ffplay_path, "ffplay", "Required. Path to ffplay binary.");
+DEFINE_string(ffmpeg_path, "ffmpeg", "Required. Path to ffmpeg binary.");
+DEFINE_string(ffprobe_path, "ffprobe", "Required. Path to ffprobe binary.");
 
 namespace {
 
+// Checks that the value of the flag is not empty string.
 bool ValidateFlagNonEmpty(const char *flagname, const std::string &value) {
     return !value.empty();
+}
+
+// Checks that binaries FFmpeg, FFplay, FFprobe all exist.
+void ValidateFFBinaries() {
+    subtitler::subprocess::SubprocessExecutor executor;
+    executor.CaptureOutput(true);
+
+    for (const auto &binary: {FLAGS_ffplay_path, FLAGS_ffmpeg_path, FLAGS_ffprobe_path}) {
+        executor.SetCommand(binary + " -version");
+        executor.Start();
+        auto output = executor.WaitUntilFinished(5000);
+        if (output.subproc_stdout.empty() || !output.subproc_stderr.empty()) {
+            throw std::runtime_error("Error trying to detect binary at " + binary);
+        }
+    }
 }
 
 } // namespace
@@ -27,7 +43,15 @@ int main(int argc, char **argv) {
     google::InitGoogleLogging(argv[0]);
     gflags::ParseCommandLineFlags(&argc, &argv, /* remove_flags= */ true);
 
-    LOG(ERROR) << "ffplay: " << FLAGS_ffplay_path;
+    try {
+        ValidateFFBinaries();
+    } catch (const std::runtime_error &e) {
+        LOG(ERROR) << e.what();
+        LOG(ERROR) << "Please verify you have ffmpeg, ffplay, and ffpath installed.";
+        LOG(ERROR) << "You can either add these to your PATH variable and the CLI can detect them automatically.";
+        LOG(ERROR) << "Or you may provide the paths using --ffmpeg_path, --ffprobe_path, --ffplay_path flags";
+        return 1;
+    }
 
     subtitler::subprocess::SubprocessExecutor executor;
     executor.SetCommand(FLAGS_ffplay_path + " -version");

@@ -83,7 +83,10 @@ int main(int argc, char **argv) {
     
     std::cin.get(); // simulate delay for user input
 
-    ffplay.ClosePlayer(1000);
+    auto captured_error = ffplay.ClosePlayer(1000);
+    if (!captured_error.empty()) {
+        LOG(ERROR) << captured_error;
+    }
 
     return 0;
 }

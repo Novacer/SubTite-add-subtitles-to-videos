@@ -18,7 +18,7 @@ public:
     MOCK_METHOD(SubprocessExecutor::Output, WaitUntilFinished, (std::optional<int>), (override));
 };
 
-} // namespace subtitler
 } // namespace subprocess
+} // namespace subtitler
 
 #endif

@@ -40,6 +40,10 @@ public:
     // (That is, player may be closed before the video finished playing!)
     std::string ClosePlayer(std::optional<int> timeout_ms = std::nullopt);
 
+    // Returns true if OpenPlayer() was successful and there is not a matching ClosePlayer() call.
+    // This flag does not reliably convey whether the underlying subprocess is running or not.
+    bool is_playing() const { return is_playing_; }
+
     // FFPlay options. Refer to https://ffmpeg.org/ffplay.html#toc-Main-options.
     FFPlay* width(std::optional<int> width) { width_ = width; return this; }
     FFPlay* height(std::optional<int> height) { height_ = height; return this; }
@@ -58,6 +62,7 @@ public:
 private:
     std::string ffplay_path_;
     std::unique_ptr<subprocess::SubprocessExecutor> executor_;
+    bool is_playing_;
 
     std::optional<int> width_;
     std::optional<int> height_;

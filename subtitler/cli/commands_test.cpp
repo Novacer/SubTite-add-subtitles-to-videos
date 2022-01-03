@@ -12,6 +12,9 @@ using ::testing::Not;
 using ::testing::IsEmpty;
 using ::testing::HasSubstr;
 using ::testing::NiceMock;
+using ::testing::Return;
+using ::testing::_;
+using ::testing::Throw;
 
 class CommandsTest : public ::testing::Test {
 protected:
@@ -127,4 +130,56 @@ TEST_F(CommandsTest, PlayWarnsUserOfIncorrectUsage_UnrecognizedToken) {
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Unrecognized token: wacky"));
+}
+
+TEST_F(CommandsTest, PlayPrintsErrorWhenClosingPlayerReturnsError) {
+    std::istringstream input{"play\nplay"};
+    std::ostringstream output;
+    EXPECT_CALL(*mock_executor, WaitUntilFinished(_))
+        .Times(1)
+        .WillOnce(Return(MockSubprocessExecutor::Output{"stdout", "stderr"}));
+
+    Commands commands{paths, std::move(ffplay), input, output};
+    commands.MainLoop();
+
+    ASSERT_THAT(output.str(), HasSubstr("Error closing player: stderr"));
+}
+
+TEST_F(CommandsTest, PlayPrintsErrorWhenOpeningPlayerReturnsError) {
+    std::istringstream input{"play"};
+    std::ostringstream output;
+    EXPECT_CALL(*mock_executor, Start())
+        .Times(1)
+        .WillOnce(Throw(std::runtime_error("some error message")));
+
+    Commands commands{paths, std::move(ffplay), input, output};
+    commands.MainLoop();
+
+    ASSERT_THAT(output.str(), HasSubstr("Error opening player: some error message"));
+}
+
+TEST_F(CommandsTest, DonePrintsErrorWhenClosingPlayerReturnsError) {
+    std::istringstream input{"play \n done"};
+    std::ostringstream output;
+    EXPECT_CALL(*mock_executor, WaitUntilFinished(_))
+        .Times(1)
+        .WillOnce(Return(MockSubprocessExecutor::Output{"stdout", "stderr"}));
+
+    Commands commands{paths, std::move(ffplay), input, output};
+    commands.MainLoop();
+
+    ASSERT_THAT(output.str(), HasSubstr("Error closing player: stderr"));
+}
+
+TEST_F(CommandsTest, DoneCorrectlyUpdatesNewStartAndDuration) {
+    std::istringstream input{"play start 1 duration 10 \n done"};
+    std::ostringstream output;
+    EXPECT_CALL(*mock_executor, WaitUntilFinished(_))
+        .Times(1)
+        .WillOnce(Return(MockSubprocessExecutor::Output{"stdout", ""}));
+
+    Commands commands{paths, std::move(ffplay), input, output};
+    commands.MainLoop();
+
+    ASSERT_THAT(output.str(), HasSubstr("Updated start=00:00:11.000 duration=00:00:05.000"));
 }

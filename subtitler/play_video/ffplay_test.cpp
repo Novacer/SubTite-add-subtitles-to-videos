@@ -28,6 +28,7 @@ TEST(FFPlayTest, OpenPlayerWithDefaultArgs) {
 
     FFPlay ffplay("ffplay", std::move(mock_executor));
     ffplay.OpenPlayer("video.mp4");
+    ASSERT_TRUE(ffplay.is_playing());
 }
 
 TEST(FFPlayTest, OpenPlayerWithScreenDimensionSettings) {
@@ -103,6 +104,7 @@ TEST(FFPlayTest, OpenPlayerWithEmptyVideoPathThrowsInvalidArgument) {
     } catch (const std::invalid_argument &e) {
         ASSERT_STREQ(e.what(), "Cannot play empty video path!");
     }
+    ASSERT_FALSE(ffplay.is_playing());
 }
 
 TEST(FFPlayTest, ClosePlayerReturnsStderr) {
@@ -118,6 +120,9 @@ TEST(FFPlayTest, ClosePlayerReturnsStderr) {
 
     FFPlay ffplay("ffplay", std::move(mock_executor));
     ffplay.OpenPlayer("video.mp4");
+    ASSERT_TRUE(ffplay.is_playing());
+
     auto captured_stderr = ffplay.ClosePlayer(1000);
+    ASSERT_FALSE(ffplay.is_playing());
     ASSERT_EQ(captured_stderr, "stderr");
 }

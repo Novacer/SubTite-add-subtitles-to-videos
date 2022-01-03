@@ -183,3 +183,22 @@ TEST_F(CommandsTest, DoneCorrectlyUpdatesNewStartAndDuration) {
 
     ASSERT_THAT(output.str(), HasSubstr("Updated start=00:00:11.000 duration=00:00:05.000"));
 }
+
+TEST_F(CommandsTest, QuitClosesOpenPlayersAndBreaksTheLoop) {
+    std::istringstream input{"play start 1 \n quit \n play"};
+    std::ostringstream output;
+    std::ostringstream expected_command;
+    expected_command << ffplay_path << " "
+                     << video_path << " "
+                     << "-sn -ss 00:00:01.000 -t 00:00:05.000 -loglevel error";
+    EXPECT_CALL(*mock_executor, SetCommand(expected_command.str()))
+        .Times(1);
+    EXPECT_CALL(*mock_executor, WaitUntilFinished(_))
+        .Times(1)
+        .WillOnce(Return(MockSubprocessExecutor::Output{"stdout", "I am closed."}));
+
+    Commands commands{paths, std::move(ffplay), input, output};
+    commands.MainLoop();
+
+    ASSERT_THAT(output.str(), HasSubstr("Error closing player: I am closed."));
+}

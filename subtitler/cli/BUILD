@@ -22,3 +22,15 @@ cc_library(
     "@howard_hinnant_date//:date",
   ],
 )
+
+cc_test(
+  name = "commands_test",
+  size = "small",
+  srcs = ["commands_test.cpp"],
+  deps = [
+    ":commands",
+    "//subtitler/subprocess:mock_subprocess_executor",
+    "//subtitler/play_video:ffplay",
+    "@com_google_googletest//:gtest_main",
+  ],
+)

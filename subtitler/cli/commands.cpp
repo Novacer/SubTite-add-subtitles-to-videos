@@ -24,29 +24,42 @@ std::vector<std::string> Tokenize(const std::string &command) {
 
 // TODO: consider placing these functions in util module.
 std::optional<std::chrono::milliseconds> ParseDuration(const std::string &duration) {
-    auto num_colons = std::count(duration.begin(), duration.end(), ':');
-    std::istringstream stream{duration};
-    std::chrono::milliseconds result;
-    switch (num_colons) {
-        case 0: {
-            // Interpret as seconds
-            date::from_stream(stream, "%S", result);
-            return result;
-        }
-        case 1: {
-            // Interpret as minutes:seconds
-            date::from_stream(stream, "%M:%S", result);
-            return result;
-        }
-        case 2: {
-            // Interpret as hours:minutes:seconds
-            date::from_stream(stream, "%T", result);
-            return result;
-        }
-        default: {
+    // Verify allowable characters
+    for (const auto &c: duration) {
+        if (!std::isdigit(c) && c != '.' && c != ':') {
             return std::nullopt;
         }
     }
+
+    auto num_colons = std::count(duration.begin(), duration.end(), ':');
+    std::istringstream stream{duration};
+    std::chrono::milliseconds result;
+    std::string format = "";
+
+    switch (num_colons) {
+        case 0: {
+            // Interpret as seconds
+            format = "%S";
+            break;
+        }
+        case 1: {
+            // Interpret as minutes:seconds
+            format = "%M:%S";
+            break;
+        }
+        case 2: {
+            // Interpret as hours:minutes:seconds
+            format = "%T";
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+    if (date::from_stream(stream, format.c_str(), result)) {
+        return result;
+    }
+    return std::nullopt;
 }
 
 std::string FormatDuration(const std::chrono::milliseconds &duration) {

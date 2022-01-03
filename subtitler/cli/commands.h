@@ -33,6 +33,9 @@ public:
         std::ostream &output);
     
     ~Commands();
+    
+    Commands(const Commands &) = delete;
+    Commands& operator=(const Commands &) = delete;
 
     // Initialize and start reading commands from input stream.
     // Any outputs are written to output stream.

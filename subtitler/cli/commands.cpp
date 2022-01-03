@@ -81,6 +81,11 @@ Commands::Commands(const Paths &paths,
 
 Commands::~Commands() = default;
 
+const char *HELP_COMMAND = "help";
+const char *PLAY_COMMAND = "play";
+const char *END_COMMAND = "end";
+const int WAIT_TIMEOUT_MS = 500;
+
 void Commands::MainLoop() {
     output_ << "Starting interactive mode. Type help for instructions." << std::endl;
     output_ << "Initialized with start=" << FormatDuration(start_)
@@ -92,11 +97,13 @@ void Commands::MainLoop() {
 
         if (tokens.empty()) continue;
 
-        if (tokens.front() == "play") {
+        if (tokens.front() == PLAY_COMMAND) {
             // Handoff remaining tokens to play()
             tokens.erase(tokens.begin());
             Play(tokens);
-        } else if (tokens.front() == "help") {
+        } else if (tokens.front() == END_COMMAND) {
+            End();
+        } else if (tokens.front() == HELP_COMMAND) {
             Help();
         } else {
             output_ << "Command " << command << " not recognized!" << std::endl;
@@ -115,6 +122,8 @@ void Commands::Help() {
             << "        1:23:45 => 1 hour 23 minutes 45 seconds" << std::endl
             << "        sample usage:" << std::endl
             << "        play start 1:30 duration 5.5 will play video from 1m30s to 1m35.5s" << std::endl;
+    output_ << "end  -- Saves the current subtitles and moves the position" << std::endl
+            << "        to the next 5 seconds of video" << std::endl;
 }
 
 void Commands::Play(const std::vector<std::string> &tokens) {
@@ -151,14 +160,37 @@ void Commands::Play(const std::vector<std::string> &tokens) {
         }
     }
 
-    output_ << "Using start=" << FormatDuration(start_) << " duration=" << FormatDuration(duration_) << std::endl;
+    output_ << "Playing start=" << FormatDuration(start_) << " duration=" << FormatDuration(duration_) << std::endl;
+
+    if (ffplay_->is_playing()) {
+        auto captured_error = ffplay_->ClosePlayer(WAIT_TIMEOUT_MS);
+        if (!captured_error.empty()) {
+            output_ << "Error closing player: " << captured_error << std::endl;
+        }
+    }
+
     try {
         ffplay_->start_pos(start_)
             ->duration(duration_)
             ->OpenPlayer(paths_.video_path);
     } catch (const std::exception &e) {
-        output_ << "Error: " << e.what() << std::endl;
+        output_ << "Error opening player: " << e.what() << std::endl;
     }
+}
+
+void Commands::End() {
+    if (ffplay_->is_playing()) {
+        auto captured_error = ffplay_->ClosePlayer(WAIT_TIMEOUT_MS);
+        if (!captured_error.empty()) {
+            output_ << "Error closing player: " << captured_error << std::endl;
+        }
+    }
+
+    // Commit the currently entered subtitles.
+    // Move the current position over
+    start_ += duration_;
+    duration_ = 5s;
+    output_ << "Updated start=" << FormatDuration(start_) << " duration=" << FormatDuration(duration_) << std::endl;
 }
 
 } // namespace cli

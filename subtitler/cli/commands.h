@@ -17,12 +17,16 @@ class FFPlay;
 namespace subtitler {
 namespace cli {
 
+/**
+ * Used to parse and run commands in the CLI.
+ */
 class Commands {
 public:
     struct Paths {
         std::string video_path;
     };
 
+    // Input and output streams must have greater lifetime than this object.
     Commands(const Paths &paths,
         std::unique_ptr<play_video::FFPlay> ffplay,
         std::istream &input,
@@ -30,11 +34,10 @@ public:
     
     ~Commands();
 
+    // Initialize and start reading commands from input stream.
+    // Any outputs are written to output stream.
+    // Use command help to get list of all commands.
     void MainLoop();
-
-    void Help();
-
-    void Play(const std::vector<std::string> &tokens);
 
 private:
     Paths paths_;
@@ -43,6 +46,10 @@ private:
     std::ostream &output_;
     std::chrono::milliseconds start_;
     std::chrono::milliseconds duration_;
+
+    void Help();
+
+    void Play(const std::vector<std::string> &tokens);
 };
 
 } // namespace cli

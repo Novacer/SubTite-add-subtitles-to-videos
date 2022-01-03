@@ -187,11 +187,7 @@ TEST_F(CommandsTest, DoneCorrectlyUpdatesNewStartAndDuration) {
 TEST_F(CommandsTest, QuitClosesOpenPlayersAndBreaksTheLoop) {
     std::istringstream input{"play start 1 \n quit \n play"};
     std::ostringstream output;
-    std::ostringstream expected_command;
-    expected_command << ffplay_path << " "
-                     << video_path << " "
-                     << "-sn -ss 00:00:01.000 -t 00:00:05.000 -loglevel error";
-    EXPECT_CALL(*mock_executor, SetCommand(expected_command.str()))
+    EXPECT_CALL(*mock_executor, Start())
         .Times(1);
     EXPECT_CALL(*mock_executor, WaitUntilFinished(_))
         .Times(1)

@@ -107,7 +107,7 @@ void Commands::MainLoop() {
 void Commands::Help() {
     output_ << "Supported commands:" << std::endl;
     output_ << "help -- prints the supported commands" << std::endl;
-    output_ << "play -- Play a section of video. Use start {time} duration {time} to set" << std::endl
+    output_ << "play -- Play the video at the current position. Use start {time} duration {time} to set" << std::endl
             << "        when to start playing the video and for how long." << std::endl
             << "        {time} can be formatted as:" << std::endl
             << "        123.45 => 123.45 seconds" << std::endl

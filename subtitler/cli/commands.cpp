@@ -83,7 +83,7 @@ Commands::~Commands() = default;
 
 const char *HELP_COMMAND = "help";
 const char *PLAY_COMMAND = "play";
-const char *END_COMMAND = "end";
+const char *DONE_COMMAND = "done";
 const int WAIT_TIMEOUT_MS = 500;
 
 void Commands::MainLoop() {
@@ -101,8 +101,8 @@ void Commands::MainLoop() {
             // Handoff remaining tokens to play()
             tokens.erase(tokens.begin());
             Play(tokens);
-        } else if (tokens.front() == END_COMMAND) {
-            End();
+        } else if (tokens.front() == DONE_COMMAND) {
+            Done();
         } else if (tokens.front() == HELP_COMMAND) {
             Help();
         } else {
@@ -122,7 +122,7 @@ void Commands::Help() {
             << "        1:23:45 => 1 hour 23 minutes 45 seconds" << std::endl
             << "        sample usage:" << std::endl
             << "        play start 1:30 duration 5.5 will play video from 1m30s to 1m35.5s" << std::endl;
-    output_ << "end  -- Saves the current subtitles and moves the position" << std::endl
+    output_ << "done -- Saves the current subtitles and moves the position" << std::endl
             << "        to the next 5 seconds of video" << std::endl;
 }
 
@@ -178,7 +178,7 @@ void Commands::Play(const std::vector<std::string> &tokens) {
     }
 }
 
-void Commands::End() {
+void Commands::Done() {
     if (ffplay_->is_playing()) {
         auto captured_error = ffplay_->ClosePlayer(WAIT_TIMEOUT_MS);
         if (!captured_error.empty()) {

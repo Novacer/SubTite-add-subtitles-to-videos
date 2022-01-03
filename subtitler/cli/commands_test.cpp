@@ -158,8 +158,8 @@ TEST_F(CommandsTest, PlayPrintsErrorWhenOpeningPlayerReturnsError) {
     ASSERT_THAT(output.str(), HasSubstr("Error opening player: some error message"));
 }
 
-TEST_F(CommandsTest, EndPrintsErrorWhenClosingPlayerReturnsError) {
-    std::istringstream input{"play \n end"};
+TEST_F(CommandsTest, DonePrintsErrorWhenClosingPlayerReturnsError) {
+    std::istringstream input{"play \n done"};
     std::ostringstream output;
     EXPECT_CALL(*mock_executor, WaitUntilFinished(_))
         .Times(1)
@@ -171,8 +171,8 @@ TEST_F(CommandsTest, EndPrintsErrorWhenClosingPlayerReturnsError) {
     ASSERT_THAT(output.str(), HasSubstr("Error closing player: stderr"));
 }
 
-TEST_F(CommandsTest, EndCorrectlyUpdatesNewStartAndDuration) {
-    std::istringstream input{"play start 1 duration 10 \n end"};
+TEST_F(CommandsTest, DoneCorrectlyUpdatesNewStartAndDuration) {
+    std::istringstream input{"play start 1 duration 10 \n done"};
     std::ostringstream output;
     EXPECT_CALL(*mock_executor, WaitUntilFinished(_))
         .Times(1)

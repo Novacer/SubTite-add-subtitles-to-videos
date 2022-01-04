@@ -21,3 +21,23 @@ cc_test(
     "@com_google_googletest//:gtest_main",
   ],
 )
+
+cc_library(
+  name = "subrip_file",
+  hdrs = ["subrip_file.h"],
+  srcs = ["subrip_file.cpp"],
+  deps = [
+    ":subrip_item",
+  ],
+)
+
+cc_test(
+  name = "subrip_file_test",
+  size = "small",
+  srcs = ["subrip_file_test.cpp"],
+  deps = [
+    ":subrip_file",
+    ":subrip_item",
+    "@com_google_googletest//:gtest_main",
+  ],
+)

@@ -14,11 +14,16 @@ namespace srt {
 class SubRipItem {
 public:
     SubRipItem() = default;
-
-    void ToStream(std::size_t position, std::ostream &output);
-
+    SubRipItem(const SubRipItem &other);
+    SubRipItem& operator=(const SubRipItem &other);
     // Sort by start and then by duration.
     bool operator<(const SubRipItem &other) const;
+
+    // Outputs the subrip item. Format:
+    // position
+    // start_ --> start + duration
+    // styling and subtitles...
+    void ToStream(std::size_t sequence_number, std::ostream &output) const;
 
     SubRipItem* start(std::chrono::milliseconds start) { start_ = start; return this; }
 
@@ -31,11 +36,14 @@ public:
     // Throws out_of_range if invalid position provided.
     SubRipItem* position(const std::string &position_id) { ass_pos_id_ = pos_to_id.at(position_id); return this; }
 
+    // Used to describe the possible positions.
     static const inline std::string substation_alpha_positions{
         "top-left    top-center    top-right\n"
         "middle-left middle-center middle-right\n"
         "bottom-left bottom-center bottom-right"
     };
+
+    // Maps position to its substation alpha id.
     static const inline std::unordered_map<std::string, int> pos_to_id{
         {"top-left", 7},
         {"top-center", 8},
@@ -53,6 +61,8 @@ private:
     std::chrono::milliseconds duration_;
     std::optional<int> ass_pos_id_;
     std::ostringstream payload_;
+
+    friend class SubRipFile;
 };
 
 } // namespace srt

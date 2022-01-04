@@ -6,10 +6,27 @@
 namespace subtitler {
 namespace srt {
 
-void SubRipItem::ToStream(std::size_t position, std::ostream &output) {
+SubRipItem::SubRipItem(const SubRipItem &other) {
+    start_ = other.start_;
+    duration_ = other.duration_;
+    ass_pos_id_ = other.ass_pos_id_;
+    payload_ << other.payload_.str();
+}
+
+SubRipItem& SubRipItem::operator=(const SubRipItem &other) {
+    start_ = other.start_;
+    duration_ = other.duration_;
+    ass_pos_id_ = other.ass_pos_id_;
+    // Move new one
+    payload_ = std::ostringstream{};
+    payload_ << other.payload_.str();
+    return *this;
+}
+
+void SubRipItem::ToStream(std::size_t sequence_number, std::ostream &output) const {
     // Refer to https://docs.fileformat.com/video/srt/
     // Line 1: the subtitle sequence id.
-    output << position << std::endl;
+    output << sequence_number << std::endl;
     
     // Line 2: The timestamp.
     output << ToSubRipDuration(start_);
@@ -26,8 +43,6 @@ void SubRipItem::ToStream(std::size_t position, std::ostream &output) {
         }
         output << payload;
     }
-    
-    output << std::endl;
 }
 
 bool SubRipItem::operator<(const SubRipItem &other) const {

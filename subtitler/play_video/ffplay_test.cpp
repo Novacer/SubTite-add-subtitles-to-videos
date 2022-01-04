@@ -80,6 +80,19 @@ TEST(FFPlayTest, OpenPlayerWithPositionSettings) {
         ->OpenPlayer("video.mp4");
 }
 
+TEST(FFPlayTest, OpenPlayerWithTimeStampsEnabled) {
+    auto mock_executor = std::make_unique<NiceMock<MockSubprocessExecutor>>();
+    EXPECT_CALL(*mock_executor,
+        SetCommand("ffplay video.mp4 -sn "
+        "-vf \"drawtext=text='%{pts \\: hms}':fontsize=(h/30):fontcolor=white: box=1: boxcolor=black\" "
+        "-loglevel error"))
+        .Times(1);
+    
+    FFPlay ffplay("ffplay", std::move(mock_executor));
+    ffplay.enable_timestamp(true)
+        ->OpenPlayer("video.mp4");
+}
+
 TEST(FFPlayTest, InvalidConstructorArgumentsThrowsInvalidArgument) {
     try {
         FFPlay ffplay("", std::make_unique<MockSubprocessExecutor>());

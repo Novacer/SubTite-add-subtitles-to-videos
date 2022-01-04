@@ -70,6 +70,13 @@ std::vector<std::string> FFPlay::BuildArgs() {
         args.emplace_back("-top");
         args.emplace_back(std::to_string(*top_pos_));
     }
+    if (enable_timestamp_) {
+        args.emplace_back("-vf");
+        // Reference https://stackoverflow.com/questions/67359117
+        // Note that if we want to display subtitles also, we must have the filters separated by comma.
+        // For example: https://stackoverflow.com/questions/6195872
+        args.emplace_back("\"drawtext=text='%{pts \\: hms}':fontsize=(h/30):fontcolor=white: box=1: boxcolor=black\"");
+    }
     args.emplace_back("-loglevel error");
 
     return args;

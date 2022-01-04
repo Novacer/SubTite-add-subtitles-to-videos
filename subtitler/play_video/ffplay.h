@@ -59,6 +59,9 @@ public:
     FFPlay* left_pos(std::optional<int> left_pos) { left_pos_ = left_pos; return this; }
     FFPlay* top_pos(std::optional<int> top_pos) { top_pos_ = top_pos; return this; }
 
+    // While the video is playing, display the current timestamp.
+    FFPlay* enable_timestamp(bool enable_timestamp) { enable_timestamp_ = enable_timestamp; return this; }
+
 private:
     std::string ffplay_path_;
     std::unique_ptr<subprocess::SubprocessExecutor> executor_;
@@ -75,6 +78,7 @@ private:
     std::optional<int> left_pos_;
     std::optional<int> top_pos_;
     std::optional<int> volume_;
+    bool enable_timestamp_ = false;
 
     std::vector<std::string> BuildArgs();
 };

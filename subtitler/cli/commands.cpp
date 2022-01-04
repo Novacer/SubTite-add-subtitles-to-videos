@@ -6,6 +6,7 @@
 #include <optional>
 #include "date/date.h"
 #include "subtitler/play_video/ffplay.h"
+#include "subtitler/util/duration_format.h"
 
 namespace subtitler {
 namespace cli {
@@ -26,52 +27,6 @@ std::vector<std::string> Tokenize(const std::string &command) {
         tokens.emplace_back(token);
     }
     return tokens;
-}
-
-// TODO: consider placing these functions in util module.
-std::optional<std::chrono::milliseconds> ParseDuration(const std::string &duration) {
-    // Verify allowable characters
-    for (const auto &c: duration) {
-        if (!std::isdigit(c) && c != '.' && c != ':') {
-            return std::nullopt;
-        }
-    }
-
-    auto num_colons = std::count(duration.begin(), duration.end(), ':');
-    std::istringstream stream{duration};
-    std::chrono::milliseconds result;
-    std::string format = "";
-
-    switch (num_colons) {
-        case 0: {
-            // Interpret as seconds
-            format = "%S";
-            break;
-        }
-        case 1: {
-            // Interpret as minutes:seconds
-            format = "%M:%S";
-            break;
-        }
-        case 2: {
-            // Interpret as hours:minutes:seconds
-            format = "%T";
-            break;
-        }
-        default: {
-            break;
-        }
-    }
-    if (date::from_stream(stream, format.c_str(), result)) {
-        return result;
-    }
-    return std::nullopt;
-}
-
-std::string FormatDuration(const std::chrono::milliseconds &duration) {
-    std::ostringstream stream;
-    date::to_stream(stream, "%T", duration);
-    return stream.str();
 }
 
 void CloseAnyOpenPlayers(play_video::FFPlay *ffplay, std::ostream &output) {
@@ -131,7 +86,7 @@ void Commands::Help() {
     output_ << "play -- Play the video at the current position. Use start {time} duration {time} to set" << std::endl
             << "        when to start playing the video and for how long." << std::endl
             << "        {time} can be formatted as:" << std::endl
-            << "        123.45 => 123.45 seconds" << std::endl
+            << "        12.345 => 12.345 seconds (can have at most 5 digits)" << std::endl
             << "        12:34.0 => 12 minutes 34 seconds" << std::endl
             << "        1:23:45 => 1 hour 23 minutes 45 seconds" << std::endl
             << "        sample usage:" << std::endl

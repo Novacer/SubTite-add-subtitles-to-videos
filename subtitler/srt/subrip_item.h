@@ -14,8 +14,14 @@ namespace srt {
 class SubRipItem {
 public:
     SubRipItem() = default;
+    
+    // Copy ctor
+    SubRipItem(const SubRipItem &other);
 
-    void ToStream(std::size_t position, std::ostream &output);
+    // Copy assign operator
+    SubRipItem& operator=(const SubRipItem &other);
+
+    void ToStream(std::size_t position, std::ostream &output) const;
 
     // Sort by start and then by duration.
     bool operator<(const SubRipItem &other) const;
@@ -53,6 +59,8 @@ private:
     std::chrono::milliseconds duration_;
     std::optional<int> ass_pos_id_;
     std::ostringstream payload_;
+
+    friend class SubRipFile;
 };
 
 } // namespace srt

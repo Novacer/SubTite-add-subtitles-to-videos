@@ -19,6 +19,7 @@ cc_library(
   srcs = ["commands.cpp"],
   deps = [
     "//subtitler/play_video:ffplay",
+    "//subtitler/util:duration_format",
     "@howard_hinnant_date//:date",
   ],
 )

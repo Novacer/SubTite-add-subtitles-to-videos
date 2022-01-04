@@ -1,6 +1,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <memory>
+#include <fstream>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
@@ -13,6 +14,8 @@ DEFINE_string(ffmpeg_path, "ffmpeg", "Required. Path to ffmpeg binary.");
 DEFINE_string(ffprobe_path, "ffprobe", "Required. Path to ffprobe binary.");
 DEFINE_string(video_path, "", "Optional. Path to the video you want to subtitle. "
                               "If not provided will be asked from stdin.");
+DEFINE_string(output_subtitle_path, "", "Optional. Path to the output srt file. "
+                                        "If not provided will be asked from stdin.");
 
 namespace {
 
@@ -67,10 +70,29 @@ int main(int argc, char **argv) {
             return 1;
         }
     }
+    if (FLAGS_output_subtitle_path.empty()) {
+        std::cout << "Please provide path to the file you want to save the subtitles:" << std::endl;
+        if (!std::getline(std::cin, FLAGS_output_subtitle_path)) {
+            LOG(ERROR) << "Unable to get output_subtitle_path!";
+            return 1;
+        }
+    }
+
+    // Sanity test writing to output path beforehand so we know it works.
+    {
+        // Write empty string in append mode.
+        std::ofstream ofs{FLAGS_output_subtitle_path, std::ios_base::app};
+        if (!ofs) {
+            LOG(ERROR) << "Unable to open file: " << FLAGS_output_subtitle_path;
+            return 1;
+        }
+        ofs << "";
+    }
+    
 
     auto executor = std::make_unique<subprocess::SubprocessExecutor>();
     auto ffplay = std::make_unique<play_video::FFPlay>(FLAGS_ffplay_path, std::move(executor));
-    cli::Commands::Paths paths{FLAGS_video_path};
+    cli::Commands::Paths paths{FLAGS_video_path, FLAGS_output_subtitle_path};
     cli::Commands commands{paths, std::move(ffplay), std::cin, std::cout};
 
     try {

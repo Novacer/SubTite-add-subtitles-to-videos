@@ -20,7 +20,7 @@ std::size_t SubRipFile::NumItems() const {
 
 std::unordered_map<std::size_t, const SubRipItem *> SubRipFile::GetCollisions(
     std::chrono::milliseconds start,
-    std::chrono::milliseconds duration) {
+    std::chrono::milliseconds duration) const {
     // Run linear search to collect intersections. Since we allow overlaps in existing intervals,
     // there is not a trivial binary search that we can do. A better way would be to use interval tree,
     // but until we see an actual need to use one let's Keep it Simple!

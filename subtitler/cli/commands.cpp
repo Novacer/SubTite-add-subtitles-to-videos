@@ -4,19 +4,28 @@
 #include <vector>
 #include <algorithm>
 #include <optional>
+#include <fstream>
 #include "date/date.h"
 #include "subtitler/play_video/ffplay.h"
 #include "subtitler/util/duration_format.h"
+#include "subtitler/srt/subrip_item.h"
 
 namespace subtitler {
 namespace cli {
 
 namespace {
 
-const int WAIT_TIMEOUT_MS = 500;
+const int WAIT_TIMEOUT_MS = 100;
 const char *HELP_COMMAND = "help";
+
 const char *PLAY_COMMAND = "play";
 const char *DONE_COMMAND = "done";
+
+const char *PRINT_SUBS_COMMAND = "printsubs";
+const char *ADD_SUB_COMMAND = "addsub";
+const char *DELETE_SUB_COMMAND = "deletesub";
+const char *SAVE_COMMAND = "save";
+
 const char *QUIT_COMMAND = "quit";
 
 std::vector<std::string> Tokenize(const std::string &command) {
@@ -44,10 +53,17 @@ using namespace std::chrono_literals;
 using namespace date;
 
 Commands::Commands(const Paths &paths,
-    std::unique_ptr<play_video::FFPlay> ffplay,
-    std::istream &input,
-    std::ostream &output):
-    paths_{paths}, ffplay_{std::move(ffplay)}, input_{input}, output_{output}, start_{0ms}, duration_{5s} {}
+        std::unique_ptr<play_video::FFPlay> ffplay,
+        std::istream &input,
+        std::ostream &output):
+    paths_{paths},
+    ffplay_{std::move(ffplay)},
+    input_{input},
+    output_{output},
+    start_{0ms},
+    duration_{5s},
+    srt_file_{},
+    srt_file_has_changed_{false} {}
 
 Commands::~Commands() = default;
 
@@ -68,6 +84,16 @@ void Commands::MainLoop() {
             Play(tokens);
         } else if (tokens.front() == DONE_COMMAND) {
             Done();
+        } else if (tokens.front() == PRINT_SUBS_COMMAND) {
+            PrintSubs();
+        } else if (tokens.front() == ADD_SUB_COMMAND) {
+            tokens.erase(tokens.begin());
+            AddSub(tokens);
+        } else if (tokens.front() == DELETE_SUB_COMMAND) {
+            tokens.erase(tokens.begin());
+            DeleteSub(tokens);
+        } else if (tokens.front() == SAVE_COMMAND) {
+            Save();
         } else if (tokens.front() == HELP_COMMAND) {
             Help();
         } else if (tokens.front() == QUIT_COMMAND) {
@@ -96,10 +122,10 @@ void Commands::Help() {
 }
 
 void Commands::Play(const std::vector<std::string> &tokens) {
-    int i = 0;
+    std::size_t i = 0;
     // Go through the tokens and update start/duration if needed.
     while (i < tokens.size()) {
-        if (tokens.at(i) == "start") {
+        if (tokens.at(i) == "start" || tokens.at(i) == "s") {
             if (i + 1 >= tokens.size()) {
                 output_ << "Missing start time!" << std::endl;
                 return;
@@ -111,7 +137,7 @@ void Commands::Play(const std::vector<std::string> &tokens) {
             }
             start_ = *start_opt;
             i += 2;
-        } else if (tokens.at(i) == "duration") {
+        } else if (tokens.at(i) == "duration" || tokens.at(i) == "d") {
             if (i + 1 >= tokens.size()) {
                 output_ << "Missing duration time!" << std::endl;
                 return;
@@ -150,10 +176,121 @@ void Commands::Done() {
     output_ << "Updated start=" << FormatDuration(start_) << " duration=" << FormatDuration(duration_) << std::endl;
 }
 
+void Commands::PrintSubs() {
+    auto collisions = srt_file_.GetCollisions(start_, duration_);
+    for (const auto &[seq_num, item]: collisions) {
+        item->ToStream(seq_num, output_);
+        output_ << std::endl;
+    }
+}
+
+void Commands::AddSub(const std::vector<std::string> tokens) {
+    std::size_t i = 0;
+    srt::SubRipItem item;
+    item.start(start_)
+        ->duration(duration_);
+
+    while (i < tokens.size()) {
+        if (tokens.at(i) == "position" || tokens.at(i) == "p") {
+            if (i + 1 >= tokens.size()) {
+                output_ << "Missing position id. Valid positions are: " << std::endl;
+                output_ << item.substation_alpha_positions << std::endl;
+                return;
+            }
+            try {
+                item.position(tokens.at(i + 1));
+            } catch (const std::out_of_range &e) {
+                output_ << "Position " << tokens.at(i + 1) << " not recognized. Valid positions are: " << std::endl;
+                output_ << item.substation_alpha_positions << std::endl;
+                return;
+            }
+
+            i += 2;
+        } else {
+            output_ << "Unrecognized token: " << tokens.at(i);
+            return;
+        }
+    }
+
+    output_ << "Enter the subtitles, multiple lines allowed. A blank line (enter) represents end of input." 
+            << std::endl;
+    
+    std::string subtitle;
+    while (std::getline(input_, subtitle)) {
+        if (subtitle.empty()) {
+            break;
+        }
+        item.append_line(subtitle);
+    }
+    srt_file_.AddItem(std::move(item));
+    srt_file_has_changed_ = true;
+
+    output_ << "Enter next command:" << std::endl;
+}
+
+void Commands::DeleteSub(const std::vector<std::string> tokens) {
+    std::size_t i = 0;
+    const auto collisions = srt_file_.GetCollisions(start_, duration_);
+    bool force = false;
+    std::size_t sequence_num = 0;
+    bool sequence_num_set = false;
+
+    while (i < tokens.size()) {
+        if (tokens.at(i) == "--force") {
+            force = true;
+        } else if (std::istringstream stream{tokens.at(i)}; stream >> sequence_num) {
+            if (sequence_num_set) {
+                output_ << "Can only provide one sequence number to delete!" << std::endl;
+                return;
+            }
+            sequence_num_set = true;
+        } else {
+            output_ << "Unrecognized token: " << tokens.at(i) << std::endl;
+            return;
+        }
+
+        i += 1;
+    }
+    if (!sequence_num_set) {
+        output_ << "Missing sequence num. Check help for usage." << std::endl;
+        return;
+    }
+    if (auto it = collisions.find(sequence_num); it == collisions.end() && !force) {
+        output_ << "The subtitle you want to delete is not at the current position." << std::endl;
+        output_ << "Either change position using play or use deletesub --force {sequence_num}" << std::endl;
+        return;
+    }
+    
+    try {
+        srt_file_.RemoveItem(sequence_num);
+    } catch (const std::out_of_range &e) {
+        output_ << "Error while deleting sequence num: " << sequence_num;
+        return;
+    }
+
+    srt_file_has_changed_ = true;
+}
+
+void Commands::Save() {
+    std::ofstream file{paths_.output_subtitle_path, std::ofstream::out | std::ofstream::trunc};
+    if (!file) {
+        throw std::runtime_error("Could not open file " + paths_.output_subtitle_path);
+    }
+    srt_file_.ToStream(file);
+    srt_file_has_changed_ = false;
+    output_ << "Saved!" << std::endl;
+}
+
 void Commands::Quit() {
     CloseAnyOpenPlayers(ffplay_.get(), output_);
-    // This is the normal exit.
-    // TODO: Could output any srt files here. But not guaranteed to run if exception thrown or user hits Ctrl-C.
+    if (srt_file_has_changed_) {
+        output_ << "Save before closing? Input: [Y/n]" << std::endl;
+        std::string response;
+        std::getline(input_, response);
+        if (response == "Y") {
+            Save();
+        }
+    }
 }
 
 } // namespace cli

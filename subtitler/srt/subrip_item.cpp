@@ -39,7 +39,7 @@ void SubRipItem::ToStream(std::size_t sequence_number, std::ostream &output) con
     auto payload = payload_.str();
     if (!payload.empty()) {
         if (ass_pos_id_) {
-            output << "{an" << *ass_pos_id_ << "} ";
+            output << "{\\an" << *ass_pos_id_ << "} ";
         }
         output << payload;
     }

@@ -6,6 +6,7 @@
 #include <chrono>
 #include <vector>
 #include <memory>
+#include "subtitler/srt/subrip_file.h"
 
 // Forward declaration
 namespace subtitler::play_video {
@@ -24,6 +25,7 @@ class Commands {
 public:
     struct Paths {
         std::string video_path;
+        std::string output_subtitle_path;
     };
 
     // Input and output streams must have greater lifetime than this object.
@@ -49,12 +51,18 @@ private:
     std::ostream &output_;
     std::chrono::milliseconds start_;
     std::chrono::milliseconds duration_;
+    srt::SubRipFile srt_file_;
+    bool srt_file_has_changed_;
 
     void Help();
 
     void Play(const std::vector<std::string> &tokens);
-
     void Done();
+
+    void PrintSubs();
+    void AddSub(const std::vector<std::string> tokens);
+    void DeleteSub(const std::vector<std::string> tokens);
+    void Save();
 
     void Quit();
 };

@@ -30,7 +30,7 @@ public:
     // Worst case this is a linear search.
     std::unordered_map<std::size_t, const SubRipItem *> GetCollisions(
         std::chrono::milliseconds start,
-        std::chrono::milliseconds duration);
+        std::chrono::milliseconds duration) const;
 
     // Add a SubRipItem. Maintains sorted order by start time.
     // Overlapping intervals are allowed.

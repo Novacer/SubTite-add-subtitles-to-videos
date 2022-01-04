@@ -25,8 +25,12 @@ std::unordered_map<std::size_t, const SubRipItem *> SubRipFile::GetCollisions(
     std::unordered_map<std::size_t, const SubRipItem *> intersections;
     for (std::size_t i = 0; i < items_.size(); ++i) {
         const auto &item = items_.at(i);
+        // Assume items are sorted by start time. If the next interval starts after I end
+        // then none of the remaining items can overlap with me.
+        if (item.start_ > end) {
+            break;
+        }
         auto item_end = item.start_ + item.duration_;
-
         // Reference https://stackoverflow.com/questions/3269434
         auto does_overlap = start <= item_end && item.start_ <= end;
         if (does_overlap) {

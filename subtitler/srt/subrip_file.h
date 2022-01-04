@@ -19,18 +19,27 @@ class SubRipFile {
 public:
     SubRipFile() = default;
 
+    // Prints the entire SubRipFile to the stream.
     void ToStream(std::ostream &output) const;
 
+    // Return the number of SubRipItems.
     std::size_t NumItems() const;
 
-    // Just do linear search for all items with this.end < other.start. If other starts after I end,
-    // then no way we can intersect. Note that existing intervals may overlap, so direct binary search won't work.
-    // Other solution is to use interval tree, but until we actually need O(log n) time let's Keep It Simple.
+    // Returns the SubRipItems which have start and ends intersecting with the given interval.
+    // SubRipItems are keyed by sequence number.
+    // Worst case this is a linear search.
     std::unordered_map<std::size_t, const SubRipItem *> GetCollisions(
         std::chrono::milliseconds start,
         std::chrono::milliseconds duration);
 
+    // Add a SubRipItem. Maintains sorted order by start time.
+    // Overlapping intervals are allowed.
     void AddItem(const SubRipItem &item);
+
+    // Remove the SubRipItem with sequence number and returns the removed one.
+    // Throws std::out_of_range if invalid sequence is provided.
+    // Note that indices start at 1, as per SRT file format spec.
+    SubRipItem RemoveItem(std::size_t sequence_number);
 
 private:
     // SRT items should be ordered by start time to allow for overlapping subtitles.

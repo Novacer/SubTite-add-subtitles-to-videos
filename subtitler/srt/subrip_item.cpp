@@ -23,10 +23,10 @@ SubRipItem& SubRipItem::operator=(const SubRipItem &other) {
     return *this;
 }
 
-void SubRipItem::ToStream(std::size_t position, std::ostream &output) const {
+void SubRipItem::ToStream(std::size_t sequence_number, std::ostream &output) const {
     // Refer to https://docs.fileformat.com/video/srt/
     // Line 1: the subtitle sequence id.
-    output << position << std::endl;
+    output << sequence_number << std::endl;
     
     // Line 2: The timestamp.
     output << ToSubRipDuration(start_);

@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <chrono>
+#include <stdexcept>
 #include "subtitler/srt/subrip_item.h"
 
 using namespace std::chrono_literals;
@@ -66,6 +67,19 @@ TEST(SubRipItemTest, SetPosition) {
         "\n",
         output.str()
     );
+}
+
+TEST(SubRipItemTest, SetPositionThrowsOutOfRange) {
+    try {
+        SubRipItem item;
+            item.start(1s + 123ms)
+                ->duration(5s)
+                ->position("blahblah")
+                ->append_line("Hello World!")
+                ->append_line("Foo bar baz.");
+        
+        FAIL() << "Expected std::out_of_range exception";
+    } catch (const std::out_of_range &e) {}
 }
 
 TEST(SubRipItemTest, Compare) {

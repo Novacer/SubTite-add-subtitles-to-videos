@@ -55,6 +55,8 @@ private:
     void Play(const std::vector<std::string> &tokens);
 
     void Done();
+
+    void Quit();
 };
 
 } // namespace cli

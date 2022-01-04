@@ -12,6 +12,12 @@ namespace cli {
 
 namespace {
 
+const int WAIT_TIMEOUT_MS = 500;
+const char *HELP_COMMAND = "help";
+const char *PLAY_COMMAND = "play";
+const char *DONE_COMMAND = "done";
+const char *QUIT_COMMAND = "quit";
+
 std::vector<std::string> Tokenize(const std::string &command) {
     std::vector<std::string> tokens;
     std::istringstream splitter{command};
@@ -68,6 +74,15 @@ std::string FormatDuration(const std::chrono::milliseconds &duration) {
     return stream.str();
 }
 
+void CloseAnyOpenPlayers(play_video::FFPlay *ffplay, std::ostream &output) {
+    if (ffplay->is_playing()) {
+        auto captured_error = ffplay->ClosePlayer(WAIT_TIMEOUT_MS);
+        if (!captured_error.empty()) {
+            output << "Error closing player: " << captured_error << std::endl;
+        }
+    }
+}
+
 } // namespace
 
 using namespace std::chrono_literals;
@@ -80,11 +95,6 @@ Commands::Commands(const Paths &paths,
     paths_{paths}, ffplay_{std::move(ffplay)}, input_{input}, output_{output}, start_{0ms}, duration_{5s} {}
 
 Commands::~Commands() = default;
-
-const char *HELP_COMMAND = "help";
-const char *PLAY_COMMAND = "play";
-const char *DONE_COMMAND = "done";
-const int WAIT_TIMEOUT_MS = 500;
 
 void Commands::MainLoop() {
     output_ << "Starting interactive mode. Type help for instructions." << std::endl;
@@ -105,6 +115,10 @@ void Commands::MainLoop() {
             Done();
         } else if (tokens.front() == HELP_COMMAND) {
             Help();
+        } else if (tokens.front() == QUIT_COMMAND) {
+            Quit();
+            // Exit the loop.
+            break;
         } else {
             output_ << "Command " << command << " not recognized!" << std::endl;
         }
@@ -161,13 +175,7 @@ void Commands::Play(const std::vector<std::string> &tokens) {
     }
 
     output_ << "Playing start=" << FormatDuration(start_) << " duration=" << FormatDuration(duration_) << std::endl;
-
-    if (ffplay_->is_playing()) {
-        auto captured_error = ffplay_->ClosePlayer(WAIT_TIMEOUT_MS);
-        if (!captured_error.empty()) {
-            output_ << "Error closing player: " << captured_error << std::endl;
-        }
-    }
+    CloseAnyOpenPlayers(ffplay_.get(), output_);
 
     try {
         ffplay_->start_pos(start_)
@@ -179,18 +187,18 @@ void Commands::Play(const std::vector<std::string> &tokens) {
 }
 
 void Commands::Done() {
-    if (ffplay_->is_playing()) {
-        auto captured_error = ffplay_->ClosePlayer(WAIT_TIMEOUT_MS);
-        if (!captured_error.empty()) {
-            output_ << "Error closing player: " << captured_error << std::endl;
-        }
-    }
-
+    CloseAnyOpenPlayers(ffplay_.get(), output_);
     // Commit the currently entered subtitles.
     // Move the current position over
     start_ += duration_;
     duration_ = 5s;
     output_ << "Updated start=" << FormatDuration(start_) << " duration=" << FormatDuration(duration_) << std::endl;
+}
+
+void Commands::Quit() {
+    CloseAnyOpenPlayers(ffplay_.get(), output_);
+    // This is the normal exit.
+    // TODO: Could output any srt files here. But not guaranteed to run if exception thrown or user hits Ctrl-C.
 }
 
 } // namespace cli

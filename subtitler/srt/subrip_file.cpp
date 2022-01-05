@@ -52,7 +52,7 @@ void SubRipFile::AddItem(const SubRipItem &item) {
 }
 
 SubRipItem SubRipFile::RemoveItem(std::size_t sequence_number) {
-    if (sequence_number == 0 || sequence_number >= NumItems()) {
+    if (sequence_number == 0 || sequence_number > NumItems()) {
         throw std::out_of_range("invalid index passed to RemoveItem()");
     }
     auto vector_position = sequence_number - 1;

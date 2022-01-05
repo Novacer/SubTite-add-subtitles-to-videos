@@ -28,7 +28,7 @@ cc_library(
 
 cc_test(
   name = "commands_test",
-  size = "small",
+  size = "medium",
   srcs = ["commands_test.cpp"],
   deps = [
     ":commands",
@@ -36,4 +36,6 @@ cc_test(
     "//subtitler/play_video:ffplay",
     "@com_google_googletest//:gtest_main",
   ],
+  # Run serially since there are file system dependencies.
+  tags = ["exclusive"],
 )

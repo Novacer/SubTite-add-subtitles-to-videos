@@ -108,8 +108,9 @@ void Commands::MainLoop() {
 
 void Commands::Help() {
     output_ << "Supported commands:" << std::endl;
-    output_ << "help -- prints the supported commands" << std::endl;
-    output_ << "play -- Play the video at the current position. Use start {time} duration {time} to set" << std::endl
+    output_ << "help -- Prints the supported commands." << std::endl;
+    output_ << "play -- Play the video at the current position." << std::endl
+            << "        Use start or s {time} duration or d {time} to set" << std::endl
             << "        when to start playing the video and for how long." << std::endl
             << "        {time} can be formatted as:" << std::endl
             << "        12.345 => 12.345 seconds (can have at most 5 digits)" << std::endl
@@ -119,6 +120,16 @@ void Commands::Help() {
             << "        play start 1:30 duration 5.5 will play video from 1m30s to 1m35.5s" << std::endl;
     output_ << "done -- Saves the current subtitles and moves the position" << std::endl
             << "        to the next 5 seconds of video" << std::endl;
+    output_ << "quit -- Optionally saves and exits." << std::endl;
+    output_ << std::endl;
+    output_ << "printsubs -- Prints the all subtitles at the current player position." << std::endl;
+    output_ << "addsub    -- Adds a subtitle block. Use position or p {position} to set the position." << std::endl
+            << "             valid position are: bottom-left, middle-center, top-right and so on." << std::endl
+            << "             It is possible to add multiple subtitles to the same section of video." << std::endl;
+    output_ << "deletesub -- Removes the subtitle. Use deletesub {seq_num} to identify the subtitle." << std::endl
+            << "             Normally, you can only delete subtitles at the current player position." << std::endl
+            << "             However deletesub --force {seq_num} enables deleting any subtitle." << std::endl;
+    output_ << "save      -- Saves the current SRT to the output file." << std::endl;
 }
 
 void Commands::Play(const std::vector<std::string> &tokens) {
@@ -256,13 +267,16 @@ void Commands::DeleteSub(const std::vector<std::string> tokens) {
         return;
     }
     if (auto it = collisions.find(sequence_num); it == collisions.end() && !force) {
-        output_ << "The subtitle you want to delete is not at the current position." << std::endl;
+        output_ << "The subtitle you want to delete is not within the current player position." << std::endl;
         output_ << "Either change position using play or use deletesub --force {sequence_num}" << std::endl;
         return;
     }
     
     try {
-        srt_file_.RemoveItem(sequence_num);
+        auto deleted_item = srt_file_.RemoveItem(sequence_num);
+        output_ << "Deleted: ";
+        deleted_item.ToStream(sequence_num, output_);
+        output_ << std::endl;
     } catch (const std::out_of_range &e) {
         output_ << "Error while deleting sequence num: " << sequence_num;
         return;
@@ -287,7 +301,10 @@ void Commands::Quit() {
         output_ << "Save before closing? Input: [Y/n]" << std::endl;
         std::string response;
         std::getline(input_, response);
-        if (response == "Y") {
+        // Tokenize to remove whitespace
+        auto tokens = Tokenize(response);
+        if (tokens.empty() || tokens.front() == "Y" || tokens.front() == "y") {
+            // If nothing provided then still prefer to Save().
             Save();
         }
     }

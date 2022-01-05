@@ -69,7 +69,7 @@ TEST_F(CommandsTest, PlayCorrectlySetsStartAndDuration) {
     expected_command << ffplay_path << " "
                      << video_path << " "
                      << "-sn -ss 00:01:30.500 -t 00:00:45.000 -vf "
-                     <<  "drawtext=text='%{pts\\:hms}':fontsize=(h/30):fontcolor=white:box=1:boxcolor=black:fontfile='"
+                     << "drawtext=text='%{pts\\:hms}':fontsize=(h/30):fontcolor=white:box=1:boxcolor=black:fontfile='"
                      << subtitler::get_font_path()
                      << "' -loglevel error";
     EXPECT_CALL(*mock_executor, SetCommand(expected_command.str()))

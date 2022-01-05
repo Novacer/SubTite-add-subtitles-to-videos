@@ -5,16 +5,26 @@
 
 namespace subtitler {
 
-// A Simple wrapper for writing data to a temp file and ensuring it is deleted.
-// Constructor takes in the string data to write, and handles creating the temp data.
-// When this object is destroyed, the temp file will be deleted.
+
+/**
+ * Simple wrapper for writing data to a temp file and ensuring it is deleted.
+ * There are various security implications to creating and managing temp files.
+ * For simplicity this does not defend against those attacks. Do not use this code with sensitive data.
+ * A more secure implementation would be to use platform specific APIs to restrict file access.
+ */
 class TempFile {
 public:
+    // Constructor takes in the string data to write, and handles creating a temp file with this data.
+    // Throws std::runtime_error if something goes.
     explicit TempFile(const std::string &data);
+    
+    // When this object is destroyed, the temp file will be deleted.
     ~TempFile();
+
     TempFile(const TempFile &other) = delete;
     TempFile& operator=(const TempFile& other) = delete;
 
+    // Returns the temporary file name.
     std::string FileName() const { return temp_file_name_; }
 
 private:

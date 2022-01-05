@@ -10,6 +10,11 @@ TempFile::TempFile(const std::string &data) {
     FILE* fp = nullptr;
     char random_file_name[L_tmpnam_s];
     while (!fp) {
+        // Generate a random & currently unique file name.
+        // However due to TOCTOU this is not guaranteed to be unique at time of file creation.
+        // Furthermore, symlink attack is also possible.
+        // We attempt to mitigate this by opening in x mode, which fails if file already exists.
+        // Detailed discussion: https://stackoverflow.com/questions/14230886
         auto err = tmpnam_s(random_file_name, L_tmpnam_s);
         if (err) {
             throw std::runtime_error("Unable to create unique temp file");

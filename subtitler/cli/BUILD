@@ -19,6 +19,8 @@ cc_library(
   srcs = ["commands.cpp"],
   deps = [
     "//subtitler/play_video:ffplay",
+    "//subtitler/srt:subrip_file",
+    "//subtitler/srt:subrip_item",
     "//subtitler/util:duration_format",
     "@howard_hinnant_date//:date",
   ],
@@ -26,7 +28,7 @@ cc_library(
 
 cc_test(
   name = "commands_test",
-  size = "small",
+  size = "medium",
   srcs = ["commands_test.cpp"],
   deps = [
     ":commands",
@@ -34,4 +36,6 @@ cc_test(
     "//subtitler/play_video:ffplay",
     "@com_google_googletest//:gtest_main",
   ],
+  # Run serially since there are file system dependencies.
+  tags = ["exclusive"],
 )

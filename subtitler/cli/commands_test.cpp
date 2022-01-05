@@ -1,6 +1,8 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <sstream>
+#include <fstream>
+#include <streambuf>
 #include "subtitler/cli/commands.h"
 #include "subtitler/subprocess/mock_subprocess_executor.h"
 #include "subtitler/play_video/ffplay.h"
@@ -23,13 +25,18 @@ protected:
         mock_executor = executor.get();
         video_path = "path/to/test.mp4";
         ffplay_path = "path/to/ffplay";
+        srt_path = "test.srt";
+        // Clear the file beforehand.
+        std::ofstream file{srt_path, std::ofstream::out | std::ofstream::trunc};
+
         ffplay = std::make_unique<FFPlay>(ffplay_path, std::move(executor));
-        paths = Commands::Paths{video_path};
+        paths = Commands::Paths{video_path, srt_path};
     }
 
     MockSubprocessExecutor *mock_executor;
     std::string video_path;
     std::string ffplay_path;
+    std::string srt_path;
     std::unique_ptr<FFPlay> ffplay;
     Commands::Paths paths;
 };
@@ -41,7 +48,7 @@ TEST_F(CommandsTest, HelpReturnsNonEmptyMessage) {
     Commands commands{paths, std::move(ffplay), input, output};
     commands.MainLoop();
 
-    ASSERT_THAT(output.str(), HasSubstr("help -- prints the supported commands"));
+    ASSERT_THAT(output.str(), HasSubstr("help -- Prints the supported commands"));
 }
 
 TEST_F(CommandsTest, CommandNotRecognizedPrintsToStdout) {
@@ -197,4 +204,130 @@ TEST_F(CommandsTest, QuitClosesOpenPlayersAndBreaksTheLoop) {
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Error closing player: I am closed."));
+}
+
+TEST_F(CommandsTest, AddedSubtitleIsThenPrintable) {
+    std::istringstream input{"addsub p middle-right \nsome subtitle\n\n printsubs"};
+    std::ostringstream output;
+
+    Commands commands{paths, std::move(ffplay), input, output};
+    commands.MainLoop();
+
+    ASSERT_THAT(output.str(), HasSubstr(
+        "1\n"
+        "00:00:00,000 --> 00:00:05,000\n"
+        "{\\an6} some subtitle\n"
+        "\n"
+    ));
+}
+
+TEST_F(CommandsTest, AddedSubtitleIsThenSaveable) {
+    std::istringstream input{"addsub p middle-right \nsome subtitle\n\n save"};
+    std::ostringstream output;
+
+    Commands commands{paths, std::move(ffplay), input, output};
+    commands.MainLoop();
+
+    std::ifstream ifs{srt_path};
+    std::string file((std::istreambuf_iterator<char>(ifs)),
+                     std::istreambuf_iterator<char>());
+
+    ASSERT_EQ(file,
+        "1\n"
+        "00:00:00,000 --> 00:00:05,000\n"
+        "{\\an6} some subtitle\n"
+        "\n"
+    );
+}
+
+TEST_F(CommandsTest, AddedSubtitleCanBeSavedWhileQuitting) {
+    std::istringstream input{"addsub p top-center \nsome subtitle\n\n quit \n Y"};
+    std::ostringstream output;
+
+    Commands commands{paths, std::move(ffplay), input, output};
+    commands.MainLoop();
+
+    std::ifstream ifs{srt_path};
+    std::string file((std::istreambuf_iterator<char>(ifs)),
+                     std::istreambuf_iterator<char>());
+
+    ASSERT_THAT(output.str(), HasSubstr("Save before closing? Input: [Y/n]"));
+    ASSERT_EQ(file,
+        "1\n"
+        "00:00:00,000 --> 00:00:05,000\n"
+        "{\\an8} some subtitle\n"
+        "\n"
+    );
+}
+
+TEST_F(CommandsTest, AddSubInvalidCommandsPrintsErrorMessages) {
+    std::istringstream input{"addsub position \n addsub position invalid \n addsub random stuff"};
+    std::ostringstream output;
+
+    Commands commands{paths, std::move(ffplay), input, output};
+    commands.MainLoop();
+
+    ASSERT_THAT(output.str(), HasSubstr("Missing position id. Valid positions are:"));
+    ASSERT_THAT(output.str(), HasSubstr("Position invalid not recognized. Valid positions are: "));
+    ASSERT_THAT(output.str(), HasSubstr("Unrecognized token: random"));
+}
+
+TEST_F(CommandsTest, DeleteSubInRangeCanBeDoneWithoutForce) {
+    std::istringstream input{"addsub p top-center \nsome subtitle\n\n deletesub 1"};
+    std::ostringstream output;
+
+    Commands commands{paths, std::move(ffplay), input, output};
+    commands.MainLoop();
+
+    ASSERT_THAT(output.str(), HasSubstr(
+        "Deleted: 1\n"
+        "00:00:00,000 --> 00:00:05,000\n"
+        "{\\an8} some subtitle\n"
+        "\n"
+    ));
+}
+
+TEST_F(CommandsTest, DeleteSubOutOfRangeCannotBeDoneWithoutForce) {
+    std::istringstream input{"addsub p top-center \nsome subtitle\n\n done \n done \n deletesub 1"};
+    std::ostringstream output;
+
+    Commands commands{paths, std::move(ffplay), input, output};
+    commands.MainLoop();
+
+    ASSERT_THAT(output.str(), HasSubstr(
+        "The subtitle you want to delete is not within the current player position."
+    ));
+    ASSERT_THAT(output.str(), Not(HasSubstr(
+        "Deleted: 1\n"
+        "00:00:00,000 --> 00:00:05,000\n"
+        "{\\an8} some subtitle\n"
+        "\n"
+    )));
+}
+
+TEST_F(CommandsTest, DeleteSubOutOfRangeWithForce) {
+    std::istringstream input{"addsub p top-center \nsome subtitle\n\n deletesub 1 --force"};
+    std::ostringstream output;
+
+    Commands commands{paths, std::move(ffplay), input, output};
+    commands.MainLoop();
+
+    ASSERT_THAT(output.str(), HasSubstr(
+        "Deleted: 1\n"
+        "00:00:00,000 --> 00:00:05,000\n"
+        "{\\an8} some subtitle\n"
+        "\n"
+    ));
+}
+
+TEST_F(CommandsTest, DeleteSubInvalidCommandsPrintErrorMessages) {
+    std::istringstream input{"deletesub 1 2 \n deletesub --force \n deletesub invalid"};
+    std::ostringstream output;
+
+    Commands commands{paths, std::move(ffplay), input, output};
+    commands.MainLoop();
+
+    ASSERT_THAT(output.str(), HasSubstr("Can only provide one sequence number to delete!"));
+    ASSERT_THAT(output.str(), HasSubstr("Missing sequence num. Check help for usage."));
+    ASSERT_THAT(output.str(), HasSubstr("Unrecognized token: invalid"));
 }

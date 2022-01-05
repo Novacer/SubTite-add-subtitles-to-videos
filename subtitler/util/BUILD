@@ -11,6 +11,16 @@ cc_library(
   ],
 )
 
+cc_test(
+  name = "duration_format_test",
+  size = "small",
+  srcs = ["duration_format_test.cpp"],
+  deps = [
+    ":duration_format",
+    "@com_google_googletest//:gtest_main",
+  ],
+)
+
 cc_library(
   name = "font_config",
   hdrs = ["font_config.h"],
@@ -22,12 +32,19 @@ cc_library(
   deps = [],
 )
 
+cc_library(
+  name = "temp_file",
+  hdrs = ["temp_file.h"],
+  srcs = ["temp_file.cpp"],
+  deps = [],
+)
+
 cc_test(
-  name = "duration_format_test",
+  name = "temp_file_test",
   size = "small",
-  srcs = ["duration_format_test.cpp"],
+  srcs = ["temp_file_test.cpp"],
   deps = [
-    ":duration_format",
+    ":temp_file",
     "@com_google_googletest//:gtest_main",
   ],
 )

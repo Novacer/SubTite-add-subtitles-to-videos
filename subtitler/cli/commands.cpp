@@ -68,9 +68,9 @@ Commands::Commands(const Paths &paths,
 Commands::~Commands() = default;
 
 void Commands::MainLoop() {
-    output_ << "Starting interactive mode. Type help for instructions." << std::endl;
     output_ << "Initialized with start=" << FormatDuration(start_)
             << " duration=" << FormatDuration(duration_) << std::endl;
+    output_ << "Starting interactive mode. Type help for instructions." << std::endl;
     
     std::string command;
     while (std::getline(input_, command)) {
@@ -172,6 +172,7 @@ void Commands::Play(const std::vector<std::string> &tokens) {
     try {
         ffplay_->start_pos(start_)
             ->duration(duration_)
+            ->enable_timestamp(true)
             ->OpenPlayer(paths_.video_path);
     } catch (const std::exception &e) {
         output_ << "Error opening player: " << e.what() << std::endl;

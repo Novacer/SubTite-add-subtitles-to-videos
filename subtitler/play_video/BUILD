@@ -8,6 +8,7 @@ cc_library(
   srcs = ["ffplay.cpp"],
   deps = [
     "//subtitler/subprocess:subprocess_executor",
+    "//subtitler/util:font_config",
     "@howard_hinnant_date//:date",
   ],
 )
@@ -19,6 +20,7 @@ cc_test(
   deps = [
     ":ffplay",
     "//subtitler/subprocess:mock_subprocess_executor",
+    "//subtitler/util:font_config",
     "@com_google_googletest//:gtest_main",
   ],
 )

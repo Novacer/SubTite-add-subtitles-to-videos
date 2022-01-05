@@ -6,6 +6,7 @@
 #include "subtitler/cli/commands.h"
 #include "subtitler/subprocess/mock_subprocess_executor.h"
 #include "subtitler/play_video/ffplay.h"
+#include "subtitler/util/font_config.h"
 
 using subtitler::play_video::FFPlay;
 using subtitler::subprocess::MockSubprocessExecutor;
@@ -67,7 +68,10 @@ TEST_F(CommandsTest, PlayCorrectlySetsStartAndDuration) {
     std::ostringstream expected_command;
     expected_command << ffplay_path << " "
                      << video_path << " "
-                     << "-sn -ss 00:01:30.500 -t 00:00:45.000 -loglevel error";
+                     << "-sn -ss 00:01:30.500 -t 00:00:45.000 -vf "
+                     <<  "drawtext=text='%{pts\\:hms}':fontsize=(h/30):fontcolor=white:box=1:boxcolor=black:fontfile='"
+                     << subtitler::get_font_path()
+                     << "' -loglevel error";
     EXPECT_CALL(*mock_executor, SetCommand(expected_command.str()))
         .Times(1);
 
@@ -81,7 +85,10 @@ TEST_F(CommandsTest, PlayCorrectlySetsStartAndDuration_Swapped) {
     std::ostringstream expected_command;
     expected_command << ffplay_path << " "
                      << video_path << " "
-                     << "-sn -ss 01:23:45.000 -t 00:00:45.120 -loglevel error";
+                     << "-sn -ss 01:23:45.000 -t 00:00:45.120 -vf "
+                     <<  "drawtext=text='%{pts\\:hms}':fontsize=(h/30):fontcolor=white:box=1:boxcolor=black:fontfile='"
+                     << subtitler::get_font_path()
+                     << "' -loglevel error";
     EXPECT_CALL(*mock_executor, SetCommand(expected_command.str()))
         .Times(1);
 

@@ -3,6 +3,7 @@
 #include <chrono>
 #include "subtitler/play_video/ffplay.h"
 #include "subtitler/subprocess/mock_subprocess_executor.h"
+#include "subtitler/util/font_config.h"
 
 using subtitler::play_video::FFPlay;
 using subtitler::subprocess::MockSubprocessExecutor;
@@ -77,6 +78,21 @@ TEST(FFPlayTest, OpenPlayerWithPositionSettings) {
     FFPlay ffplay("ffplay", std::move(mock_executor));
     ffplay.left_pos(100)
         ->top_pos(-200)
+        ->OpenPlayer("video.mp4");
+}
+
+TEST(FFPlayTest, OpenPlayerWithTimeStampsEnabled) {
+    auto mock_executor = std::make_unique<NiceMock<MockSubprocessExecutor>>();
+    EXPECT_CALL(*mock_executor,
+        SetCommand("ffplay video.mp4 -sn "
+        "-vf drawtext=text='%{pts\\:hms}':"
+        "fontsize=(h/30):fontcolor=white:box=1:boxcolor=black:"
+        "fontfile='" + subtitler::get_font_path() + "' "
+        "-loglevel error"))
+        .Times(1);
+    
+    FFPlay ffplay("ffplay", std::move(mock_executor));
+    ffplay.enable_timestamp(true)
         ->OpenPlayer("video.mp4");
 }
 

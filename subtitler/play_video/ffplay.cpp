@@ -5,6 +5,8 @@
 #include <stdexcept>
 #include "date/date.h"
 #include "subtitler/subprocess/subprocess_executor.h"
+#include "subtitler/util/font_config.h"
+#include <iostream>
 
 namespace subtitler {
 namespace play_video {
@@ -69,6 +71,21 @@ std::vector<std::string> FFPlay::BuildArgs() {
     if (top_pos_) {
         args.emplace_back("-top");
         args.emplace_back(std::to_string(*top_pos_));
+    }
+    if (enable_timestamp_) {
+        args.emplace_back("-vf");
+        // Reference https://stackoverflow.com/questions/67359117
+        // Note that if we want to display subtitles also, we must have the filters separated by comma.
+        // For example: https://stackoverflow.com/questions/6195872
+        std::ostringstream draw_text;
+        draw_text << "drawtext=text='%{pts\\:hms}':"
+                  << "fontsize=(h/30):fontcolor=white:"
+                  << "box=1:boxcolor=black";
+        auto font_path = get_font_path();
+        if (!font_path.empty()) {
+            draw_text << ":fontfile='" << get_font_path() << "'";
+        }
+        args.emplace_back(draw_text.str());
     }
     args.emplace_back("-loglevel error");
 

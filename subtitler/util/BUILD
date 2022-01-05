@@ -11,6 +11,17 @@ cc_library(
   ],
 )
 
+cc_library(
+  name = "font_config",
+  hdrs = ["font_config.h"],
+  srcs = select({
+    "@bazel_tools//src/conditions:windows": ["font_config_msvc.cpp"],
+    "@bazel_tools//src/conditions:darwin": ["font_config_gcc.cpp"],
+     "//conditions:default": ["font_config_gcc.cpp"],
+  }),
+  deps = [],
+)
+
 cc_test(
   name = "duration_format_test",
   size = "small",

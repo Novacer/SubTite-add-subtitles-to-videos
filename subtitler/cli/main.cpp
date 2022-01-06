@@ -39,6 +39,15 @@ void ValidateFFBinaries() {
     }
 }
 
+void FixInputPath(std::string &path) {
+    // Any input paths with a space in them needs to be wrapped in quotes.
+    if (path.find(' ') != std::string::npos) {
+        std::ostringstream stream;
+        stream << '"' << path << '"';
+        path = stream.str();
+    }
+}
+
 } // namespace
 
 DEFINE_validator(ffplay_path, &ValidateFlagNonEmpty);
@@ -88,7 +97,10 @@ int main(int argc, char **argv) {
         }
         ofs << "";
     }
-    
+
+    // Make sure input file path is wrapped in quotes if it has a space.
+    // TODO: determine what to do if path to FF binaries has a space.
+    FixInputPath(FLAGS_video_path);
 
     auto executor = std::make_unique<subprocess::SubprocessExecutor>();
     auto ffplay = std::make_unique<play_video::FFPlay>(FLAGS_ffplay_path, std::move(executor));

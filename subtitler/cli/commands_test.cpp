@@ -195,7 +195,7 @@ TEST_F(CommandsTest, DoneCorrectlyUpdatesNewStartAndDuration) {
     Commands commands{paths, std::move(ffplay), input, output};
     commands.MainLoop();
 
-    ASSERT_THAT(output.str(), HasSubstr("Updated start=00:00:11.000 duration=00:00:05.000"));
+    ASSERT_THAT(output.str(), HasSubstr("Updated start=00:00:11.000 duration=00:00:10.000"));
 }
 
 TEST_F(CommandsTest, QuitClosesOpenPlayersAndBreaksTheLoop) {
@@ -214,7 +214,7 @@ TEST_F(CommandsTest, QuitClosesOpenPlayersAndBreaksTheLoop) {
 }
 
 TEST_F(CommandsTest, AddedSubtitleIsThenPrintable) {
-    std::istringstream input{"addsub p middle-right \nsome subtitle\n\n printsubs"};
+    std::istringstream input{"add p middle-right \nsome subtitle\n\n printsubs"};
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), input, output};
@@ -222,14 +222,58 @@ TEST_F(CommandsTest, AddedSubtitleIsThenPrintable) {
 
     ASSERT_THAT(output.str(), HasSubstr(
         "1\n"
-        "00:00:00,000 --> 00:00:05,000\n"
+        "00:00:00,000 --> 00:00:10,000\n"
         "{\\an6} some subtitle\n"
         "\n"
     ));
 }
 
+TEST_F(CommandsTest, EmptySubtitleIsNotAdded) {
+    std::istringstream input{"add p bottom-left \n\n printsubs"};
+    std::ostringstream output;
+
+    Commands commands{paths, std::move(ffplay), input, output};
+    commands.MainLoop();
+
+    ASSERT_THAT(output.str(), Not(HasSubstr(" --> ")));
+}
+
+TEST_F(CommandsTest, AddSubCanBeCancelledInFlight) {
+    std::istringstream input{"add p bottom-left \nHello world!\n/cancel \n printsubs"};
+    std::ostringstream output;
+
+    Commands commands{paths, std::move(ffplay), input, output};
+    commands.MainLoop();
+
+    ASSERT_THAT(output.str(), Not(HasSubstr("Hello world!")));
+    ASSERT_THAT(output.str(), HasSubstr("Enter next command:"));
+}
+
+TEST_F(CommandsTest, AddedSubtitleCanReplayVideoDuringInput) {
+    std::istringstream input{"add p middle-right \nline 1\n/play \nline 2\n\n printsubs"};
+    std::ostringstream output;
+
+    Commands commands{paths, std::move(ffplay), input, output};
+    commands.MainLoop();
+
+    // Use output log to check if play was called.
+    // Other way is to test SetCommand param, but this will contain the temp file path which is hard to predict.
+    // Either way this test might be a bit brittle, so just do the easier one for now.
+    ASSERT_THAT(output.str(), HasSubstr(
+        "Playing start=00:00:00.000 duration=00:00:10.000\n"
+    ));
+
+    ASSERT_THAT(output.str(), HasSubstr(
+        "1\n"
+        "00:00:00,000 --> 00:00:10,000\n"
+        "{\\an6} line 1\n"
+        "line 2\n"
+        "\n"
+    ));
+}
+
 TEST_F(CommandsTest, AddedSubtitleIsThenSaveable) {
-    std::istringstream input{"addsub p middle-right \nsome subtitle\n\n save"};
+    std::istringstream input{"add p middle-right \nsome subtitle\n\n save"};
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), input, output};
@@ -241,14 +285,14 @@ TEST_F(CommandsTest, AddedSubtitleIsThenSaveable) {
 
     ASSERT_EQ(file,
         "1\n"
-        "00:00:00,000 --> 00:00:05,000\n"
+        "00:00:00,000 --> 00:00:10,000\n"
         "{\\an6} some subtitle\n"
         "\n"
     );
 }
 
 TEST_F(CommandsTest, AddedSubtitleCanBeSavedWhileQuitting) {
-    std::istringstream input{"addsub p top-center \nsome subtitle\n\n quit \n Y"};
+    std::istringstream input{"add p top-center \nsome subtitle\n\n quit \n Y"};
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), input, output};
@@ -261,14 +305,14 @@ TEST_F(CommandsTest, AddedSubtitleCanBeSavedWhileQuitting) {
     ASSERT_THAT(output.str(), HasSubstr("Save before closing? Input: [Y/n]"));
     ASSERT_EQ(file,
         "1\n"
-        "00:00:00,000 --> 00:00:05,000\n"
+        "00:00:00,000 --> 00:00:10,000\n"
         "{\\an8} some subtitle\n"
         "\n"
     );
 }
 
 TEST_F(CommandsTest, AddSubInvalidCommandsPrintsErrorMessages) {
-    std::istringstream input{"addsub position \n addsub position invalid \n addsub random stuff"};
+    std::istringstream input{"add position \n add position invalid \n add random stuff"};
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), input, output};
@@ -280,7 +324,7 @@ TEST_F(CommandsTest, AddSubInvalidCommandsPrintsErrorMessages) {
 }
 
 TEST_F(CommandsTest, DeleteSubInRangeCanBeDoneWithoutForce) {
-    std::istringstream input{"addsub p top-center \nsome subtitle\n\n deletesub 1"};
+    std::istringstream input{"add p top-center \nsome subtitle\n\n delete 1"};
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), input, output};
@@ -288,14 +332,14 @@ TEST_F(CommandsTest, DeleteSubInRangeCanBeDoneWithoutForce) {
 
     ASSERT_THAT(output.str(), HasSubstr(
         "Deleted: 1\n"
-        "00:00:00,000 --> 00:00:05,000\n"
+        "00:00:00,000 --> 00:00:10,000\n"
         "{\\an8} some subtitle\n"
         "\n"
     ));
 }
 
 TEST_F(CommandsTest, DeleteSubOutOfRangeCannotBeDoneWithoutForce) {
-    std::istringstream input{"addsub p top-center \nsome subtitle\n\n done \n done \n deletesub 1"};
+    std::istringstream input{"add p top-center \nsome subtitle\n\n done \n done \n delete 1"};
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), input, output};
@@ -306,14 +350,14 @@ TEST_F(CommandsTest, DeleteSubOutOfRangeCannotBeDoneWithoutForce) {
     ));
     ASSERT_THAT(output.str(), Not(HasSubstr(
         "Deleted: 1\n"
-        "00:00:00,000 --> 00:00:05,000\n"
+        "00:00:00,000 --> 00:00:10,000\n"
         "{\\an8} some subtitle\n"
         "\n"
     )));
 }
 
 TEST_F(CommandsTest, DeleteSubOutOfRangeWithForce) {
-    std::istringstream input{"addsub p top-center \nsome subtitle\n\n deletesub 1 --force"};
+    std::istringstream input{"add p top-center \nsome subtitle\n\n delete 1 --force"};
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), input, output};
@@ -321,14 +365,14 @@ TEST_F(CommandsTest, DeleteSubOutOfRangeWithForce) {
 
     ASSERT_THAT(output.str(), HasSubstr(
         "Deleted: 1\n"
-        "00:00:00,000 --> 00:00:05,000\n"
+        "00:00:00,000 --> 00:00:10,000\n"
         "{\\an8} some subtitle\n"
         "\n"
     ));
 }
 
 TEST_F(CommandsTest, DeleteSubInvalidCommandsPrintErrorMessages) {
-    std::istringstream input{"deletesub 1 2 \n deletesub --force \n deletesub invalid"};
+    std::istringstream input{"delete 1 2 \n delete --force \n delete invalid"};
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), input, output};

@@ -23,8 +23,8 @@ const char *PLAY_COMMAND = "play";
 const char *DONE_COMMAND = "done";
 
 const char *PRINT_SUBS_COMMAND = "printsubs";
-const char *ADD_SUB_COMMAND = "addsub";
-const char *DELETE_SUB_COMMAND = "deletesub";
+const char *ADD_SUB_COMMAND = "add";
+const char *DELETE_SUB_COMMAND = "delete";
 const char *SAVE_COMMAND = "save";
 
 const char *QUIT_COMMAND = "quit";
@@ -62,7 +62,7 @@ Commands::Commands(const Paths &paths,
     input_{input},
     output_{output},
     start_{0ms},
-    duration_{5s},
+    duration_{10s},
     srt_file_{},
     srt_file_has_changed_{false} {}
 
@@ -90,6 +90,9 @@ void Commands::MainLoop() {
         } else if (tokens.front() == ADD_SUB_COMMAND) {
             tokens.erase(tokens.begin());
             AddSub(tokens);
+            // Prompt user for next command after add sub,
+            // to make it obvious that add mode has been exited.
+            output_ << "Enter next command:" << std::endl;
         } else if (tokens.front() == DELETE_SUB_COMMAND) {
             tokens.erase(tokens.begin());
             DeleteSub(tokens);
@@ -124,12 +127,13 @@ void Commands::Help() {
     output_ << "quit -- Optionally saves and exits." << std::endl;
     output_ << std::endl;
     output_ << "printsubs -- Prints the all subtitles at the current player position." << std::endl;
-    output_ << "addsub    -- Adds a subtitle block. Use position or p {position} to set the position." << std::endl
+    output_ << "add       -- Adds a subtitle block. Use position or p {position} to set the position." << std::endl
             << "             valid position are: bottom-left, middle-center, top-right and so on." << std::endl
-            << "             It is possible to add multiple subtitles to the same section of video." << std::endl;
-    output_ << "deletesub -- Removes the subtitle. Use deletesub {seq_num} to identify the subtitle." << std::endl
+            << "             It is possible to add multiple subtitles to the same section of video." << std::endl
+            << "             Use /play in this mode to replay the video using the same current position." << std::endl;
+    output_ << "delete    -- Removes the subtitle. Use delete {seq_num} to identify the subtitle." << std::endl
             << "             Normally, you can only delete subtitles at the current player position." << std::endl
-            << "             However deletesub --force {seq_num} enables deleting any subtitle." << std::endl;
+            << "             However delete --force {seq_num} enables deleting any subtitle." << std::endl;
     output_ << "save      -- Saves the current SRT to the output file." << std::endl;
 }
 
@@ -191,7 +195,7 @@ void Commands::Done() {
     // Commit the currently entered subtitles.
     // Move the current position over.
     start_ += duration_;
-    duration_ = 5s;
+    duration_ = 10s;
     output_ << "Updated start=" << FormatDuration(start_) << " duration=" << FormatDuration(duration_) << std::endl;
 }
 
@@ -203,7 +207,7 @@ void Commands::PrintSubs() {
     }
 }
 
-void Commands::AddSub(const std::vector<std::string> tokens) {
+void Commands::AddSub(const std::vector<std::string> &tokens) {
     std::size_t i = 0;
     srt::SubRipItem item;
     item.start(start_)
@@ -231,7 +235,10 @@ void Commands::AddSub(const std::vector<std::string> tokens) {
         }
     }
 
-    output_ << "Enter the subtitles, multiple lines allowed. A blank line (enter) represents end of input." 
+    output_ << "Enter the subtitles, multiple lines allowed. A blank line (enter) represents end of input."
+            << std::endl
+            << "Use /play to replay the video, /cancel to discard all input."
+            << "Or, add blank line (enter) immediately to exit out of this mode."
             << std::endl;
     
     std::string subtitle;
@@ -239,15 +246,24 @@ void Commands::AddSub(const std::vector<std::string> tokens) {
         if (subtitle.empty()) {
             break;
         }
-        item.append_line(subtitle);
+        // /play replays the video while in addsub mode.
+        if (subtitle.rfind("/play", 0) == 0) {
+            // Ignore rest of input the line and play video with no other params.
+            std::vector<std::string> temp;
+            Play(temp);
+        } else if (subtitle.rfind("/cancel", 0) == 0) {
+            return;
+        } else {
+            item.append_line(subtitle);
+        }
     }
-    srt_file_.AddItem(std::move(item));
-    srt_file_has_changed_ = true;
-
-    output_ << "Enter next command:" << std::endl;
+    if (item.num_lines() > 0) {
+        srt_file_.AddItem(std::move(item));
+        srt_file_has_changed_ = true;
+    }
 }
 
-void Commands::DeleteSub(const std::vector<std::string> tokens) {
+void Commands::DeleteSub(const std::vector<std::string> &tokens) {
     std::size_t i = 0;
     const auto collisions = srt_file_.GetCollisions(start_, duration_);
     bool force = false;
@@ -276,7 +292,7 @@ void Commands::DeleteSub(const std::vector<std::string> tokens) {
     }
     if (auto it = collisions.find(sequence_num); it == collisions.end() && !force) {
         output_ << "The subtitle you want to delete is not within the current player position." << std::endl;
-        output_ << "Either change position using play or use deletesub --force {sequence_num}" << std::endl;
+        output_ << "Either change position using play or use delete --force {sequence_num}" << std::endl;
         return;
     }
     

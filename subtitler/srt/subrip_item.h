@@ -29,12 +29,14 @@ public:
 
     SubRipItem* duration(std::chrono::milliseconds duration) { duration_ = duration; return this; }
 
-    SubRipItem* append_line(const std::string &payload) { payload_ << payload << std::endl; return this; }
+    SubRipItem* append_line(const std::string &payload);
 
-    SubRipItem* clear_payload() { payload_ = std::ostringstream{}; return this; }
+    SubRipItem* clear_payload();
 
     // Throws out_of_range if invalid position provided.
     SubRipItem* position(const std::string &position_id) { ass_pos_id_ = pos_to_id.at(position_id); return this; }
+
+    int num_lines() const { return num_lines_; }
 
     // Used to describe the possible positions.
     static const inline std::string substation_alpha_positions{
@@ -61,6 +63,7 @@ private:
     std::chrono::milliseconds duration_;
     std::optional<int> ass_pos_id_;
     std::ostringstream payload_;
+    int num_lines_ = 0;
 
     friend class SubRipFile;
 };

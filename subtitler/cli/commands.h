@@ -64,7 +64,6 @@ private:
     void Help();
 
     void Play(const std::vector<std::string> &tokens);
-    void Done();
 
     void PrintSubs();
     void AddSub(const std::vector<std::string> &tokens);

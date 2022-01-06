@@ -9,6 +9,7 @@
 #include "subtitler/play_video/ffplay.h"
 #include "subtitler/util/duration_format.h"
 #include "subtitler/srt/subrip_item.h"
+#include "subtitler/util/temp_file.h"
 
 namespace subtitler {
 namespace cli {
@@ -170,6 +171,22 @@ void Commands::Play(const std::vector<std::string> &tokens) {
     CloseAnyOpenPlayers(ffplay_.get(), output_);
 
     try {
+        // If there are subtitles at this player position, we should display them.
+        std::ostringstream temp_subtitles_stream;
+        srt_file_.ToStream(temp_subtitles_stream, start_, duration_);
+        std::string temp_subtitles = temp_subtitles_stream.str();
+        if (!temp_subtitles.empty()) {
+            temp_file_ = std::make_unique<TempFile>(temp_subtitles);
+        } else {
+            temp_file_.reset();
+        }
+        if (temp_file_) {
+            ffplay_->disable_subtitles(false)
+                ->subtitles_path(temp_file_->FileName());
+        } else {
+            ffplay_->disable_subtitles(true)
+                ->subtitles_path("");
+        }
         ffplay_->start_pos(start_)
             ->duration(duration_)
             ->enable_timestamp(true)

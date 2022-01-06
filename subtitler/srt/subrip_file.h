@@ -2,11 +2,10 @@
 #define SUBTITLER_SRT_SUBRIP_FILE_H
 
 #include <chrono>
-#include <optional>
 #include <sstream>
 #include <vector>
-#include <map>
 #include <unordered_map>
+#include <functional>
 
 namespace subtitler {
 namespace srt {
@@ -21,6 +20,13 @@ public:
 
     // Prints the entire SubRipFile to the stream.
     void ToStream(std::ostream &output) const;
+
+    // Prints a valid SRT file with only the SubRipItems
+    // that have non-empty intersections with [start, start + end].
+    void ToStream(
+        std::ostream &output,
+        std::chrono::milliseconds start,
+        std::chrono::milliseconds duration) const;
 
     // Return the number of SubRipItems.
     std::size_t NumItems() const;
@@ -44,6 +50,13 @@ public:
 private:
     // SRT items should be ordered by start time to allow for overlapping subtitles.
     std::vector<SubRipItem> items_;
+
+    // Find all intervals with non-empty intersection with [start, start + duration]
+    // For each item found, call on_find(index_of_item, item).
+    void ForEachOverlappingItem(
+        std::chrono::milliseconds start,
+        std::chrono::milliseconds duration,
+        std::function<void(std::size_t, const SubRipItem &)> on_find) const;
 };
 
 } // namespace srt

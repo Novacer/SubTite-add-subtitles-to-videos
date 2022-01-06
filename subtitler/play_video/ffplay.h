@@ -62,6 +62,8 @@ public:
     // While the video is playing, display the current timestamp.
     FFPlay* enable_timestamp(bool enable_timestamp) { enable_timestamp_ = enable_timestamp; return this; }
 
+    FFPlay* subtitles_path(const std::string &path) { subtitles_path_ = path; return this; }
+
 private:
     std::string ffplay_path_;
     std::unique_ptr<subprocess::SubprocessExecutor> executor_;
@@ -79,6 +81,7 @@ private:
     std::optional<int> top_pos_;
     std::optional<int> volume_;
     bool enable_timestamp_ = false;
+    std::string subtitles_path_;
 
     std::vector<std::string> BuildArgs();
 };

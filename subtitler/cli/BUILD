@@ -22,6 +22,7 @@ cc_library(
     "//subtitler/srt:subrip_file",
     "//subtitler/srt:subrip_item",
     "//subtitler/util:duration_format",
+    "//subtitler/util:temp_file",
     "@howard_hinnant_date//:date",
   ],
 )

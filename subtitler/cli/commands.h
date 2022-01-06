@@ -16,6 +16,12 @@ class FFPlay;
 } // subtitler::play_video
 
 namespace subtitler {
+
+class TempFile;
+
+} // subtitler::play_video
+
+namespace subtitler {
 namespace cli {
 
 /**
@@ -53,6 +59,7 @@ private:
     std::chrono::milliseconds duration_;
     srt::SubRipFile srt_file_;
     bool srt_file_has_changed_;
+    std::unique_ptr<TempFile> temp_file_;
 
     void Help();
 

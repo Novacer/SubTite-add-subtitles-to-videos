@@ -238,6 +238,17 @@ TEST_F(CommandsTest, EmptySubtitleIsNotAdded) {
     ASSERT_THAT(output.str(), Not(HasSubstr(" --> ")));
 }
 
+TEST_F(CommandsTest, AddSubCanBeCancelledInFlight) {
+    std::istringstream input{"add p bottom-left \nHello world!\n/cancel \n printsubs"};
+    std::ostringstream output;
+
+    Commands commands{paths, std::move(ffplay), input, output};
+    commands.MainLoop();
+
+    ASSERT_THAT(output.str(), Not(HasSubstr("Hello world!")));
+    ASSERT_THAT(output.str(), HasSubstr("Enter next command:"));
+}
+
 TEST_F(CommandsTest, AddedSubtitleCanReplayVideoDuringInput) {
     std::istringstream input{"add p middle-right \nline 1\n/play \nline 2\n\n printsubs"};
     std::ostringstream output;

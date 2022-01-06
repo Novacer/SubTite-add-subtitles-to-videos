@@ -90,6 +90,9 @@ void Commands::MainLoop() {
         } else if (tokens.front() == ADD_SUB_COMMAND) {
             tokens.erase(tokens.begin());
             AddSub(tokens);
+            // Prompt user for next command after add sub,
+            // to make it obvious that add mode has been exited.
+            output_ << "Enter next command:" << std::endl;
         } else if (tokens.front() == DELETE_SUB_COMMAND) {
             tokens.erase(tokens.begin());
             DeleteSub(tokens);
@@ -234,7 +237,7 @@ void Commands::AddSub(const std::vector<std::string> &tokens) {
 
     output_ << "Enter the subtitles, multiple lines allowed. A blank line (enter) represents end of input."
             << std::endl
-            << "Use /play to replay the video. "
+            << "Use /play to replay the video, /cancel to discard all input."
             << "Or, add blank line (enter) immediately to exit out of this mode."
             << std::endl;
     
@@ -248,6 +251,8 @@ void Commands::AddSub(const std::vector<std::string> &tokens) {
             // Ignore rest of input the line and play video with no other params.
             std::vector<std::string> temp;
             Play(temp);
+        } else if (subtitle.rfind("/cancel", 0) == 0) {
+            return;
         } else {
             item.append_line(subtitle);
         }
@@ -256,7 +261,6 @@ void Commands::AddSub(const std::vector<std::string> &tokens) {
         srt_file_.AddItem(std::move(item));
         srt_file_has_changed_ = true;
     }
-    output_ << "Enter next command:" << std::endl;
 }
 
 void Commands::DeleteSub(const std::vector<std::string> &tokens) {

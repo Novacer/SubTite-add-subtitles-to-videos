@@ -17,10 +17,7 @@ TEST(TempFileTest, CreateTempFileGetsDeleted) {
         std::string contents((std::istreambuf_iterator<char>(ifs)),
                             std::istreambuf_iterator<char>());
         
-        ASSERT_EQ(contents,
-            "hello world!\n"
-            "this is a test :)\n"
-        );
+        ASSERT_EQ(contents, data);
     }
     // File goes out of scope, test if it still exists.
     ASSERT_FALSE(std::filesystem::exists(file_name));

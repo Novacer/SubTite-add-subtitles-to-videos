@@ -171,22 +171,12 @@ void Commands::Play(const std::vector<std::string> &tokens) {
     CloseAnyOpenPlayers(ffplay_.get(), output_);
 
     try {
-        // If there are subtitles at this player position, we should display them.
-        std::ostringstream temp_subtitles_stream;
-        srt_file_.ToStream(temp_subtitles_stream, start_, duration_);
-        std::string temp_subtitles = temp_subtitles_stream.str();
-        if (!temp_subtitles.empty()) {
-            temp_file_ = std::make_unique<TempFile>(temp_subtitles);
-        } else {
-            temp_file_.reset();
-        }
-        if (temp_file_) {
-            ffplay_->disable_subtitles(false)
-                ->subtitles_path(temp_file_->FileName());
-        } else {
-            ffplay_->disable_subtitles(true)
-                ->subtitles_path("");
-        }
+        // Error generating preview does not block the player from opening.
+        _GeneratePreviewSubs();
+    } catch (const std::exception &e) {
+        output_ << "Error generating preview subs:" << e.what() << std::endl; 
+    }
+    try {
         ffplay_->start_pos(start_)
             ->duration(duration_)
             ->enable_timestamp(true)
@@ -199,7 +189,7 @@ void Commands::Play(const std::vector<std::string> &tokens) {
 void Commands::Done() {
     CloseAnyOpenPlayers(ffplay_.get(), output_);
     // Commit the currently entered subtitles.
-    // Move the current position over
+    // Move the current position over.
     start_ += duration_;
     duration_ = 5s;
     output_ << "Updated start=" << FormatDuration(start_) << " duration=" << FormatDuration(duration_) << std::endl;
@@ -325,6 +315,25 @@ void Commands::Quit() {
             // If nothing provided then still prefer to Save().
             Save();
         }
+    }
+}
+
+// If there are subtitles at this player position, generate a temp file with those subs.
+// Then set the player to display them.
+void Commands::_GeneratePreviewSubs() {
+    std::ostringstream temp_subtitles_stream;
+    srt_file_.ToStream(temp_subtitles_stream, start_, duration_);
+    std::string temp_subtitles = temp_subtitles_stream.str();
+    if (!temp_subtitles.empty()) {
+        temp_file_ = std::make_unique<TempFile>(temp_subtitles);
+        if (!temp_file_) {
+            throw std::runtime_error("Could not make a temp file for the subs");
+        }
+        ffplay_->subtitles_path(temp_file_->EscapedFileName());
+    } else {
+        // Also deletes the temp file if it is not null.
+        temp_file_.reset();
+        ffplay_->subtitles_path("");
     }
 }
 

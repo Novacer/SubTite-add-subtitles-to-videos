@@ -36,7 +36,9 @@ cc_library(
   name = "temp_file",
   hdrs = ["temp_file.h"],
   srcs = ["temp_file.cpp"],
-  deps = [],
+  deps = [
+    "@com_github_google_glog//:glog",
+  ],
 )
 
 cc_test(

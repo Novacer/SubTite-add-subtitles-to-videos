@@ -72,6 +72,8 @@ private:
     void Save();
 
     void Quit();
+
+    void _GeneratePreviewSubs();
 };
 
 } // namespace cli

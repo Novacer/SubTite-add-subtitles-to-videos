@@ -5,7 +5,6 @@
 
 namespace subtitler {
 
-
 /**
  * Simple wrapper for writing data to a temp file and ensuring it is deleted.
  * There are various security implications to creating and managing temp files.
@@ -27,8 +26,14 @@ public:
     // Returns the temporary file name.
     std::string FileName() const { return temp_file_name_; }
 
+    // The filename but with windows backslash and colon escaped.
+    // Ex. C:\Windows\fonts becomes C\:/Windows/fonts.
+    // This is needed to pass this filename as an argument to FFPlay etc.
+    std::string EscapedFileName() const { return escaped_temp_file_name_; }
+
 private:
     std::string temp_file_name_;
+    std::string escaped_temp_file_name_;
 };
 
 } // namespace subtitler

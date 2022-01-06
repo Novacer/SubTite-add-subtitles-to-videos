@@ -4,6 +4,7 @@
 #include <stdexcept>
 #include <filesystem>
 #include <sstream>
+#include <glog/logging.h>
 
 namespace subtitler {
 
@@ -50,13 +51,18 @@ TempFile::TempFile(const std::string &data) {
         throw std::runtime_error("Failed to write to temp file");
     }
     fclose(fp);
-    temp_file_name_ = FixPath(random_file_name);
+    temp_file_name_ = random_file_name;
+    escaped_temp_file_name_ = FixPath(temp_file_name_);
 }
 
 TempFile::~TempFile() {
     // Must use non-throwing version.
     std::error_code ec;
     std::filesystem::remove(temp_file_name_, ec);
+    if (ec) {
+        LOG(ERROR) << "Failed to delete temp file: " << temp_file_name_
+                   << "with error " << ec;
+    }
 }
 
 } // namespace subtitler

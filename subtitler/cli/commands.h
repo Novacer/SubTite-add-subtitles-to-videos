@@ -67,8 +67,8 @@ private:
     void Done();
 
     void PrintSubs();
-    void AddSub(const std::vector<std::string> tokens);
-    void DeleteSub(const std::vector<std::string> tokens);
+    void AddSub(const std::vector<std::string> &tokens);
+    void DeleteSub(const std::vector<std::string> &tokens);
     void Save();
 
     void Quit();

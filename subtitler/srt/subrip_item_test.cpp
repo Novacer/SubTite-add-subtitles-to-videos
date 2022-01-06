@@ -18,6 +18,7 @@ TEST(SubRipItemTest, MultiLineSubtitle) {
     std::ostringstream output;
     item.ToStream(123, output);
 
+    ASSERT_EQ(2, item.num_lines());
     ASSERT_EQ(
         "123\n"
         "00:00:01,123 --> 00:00:06,123\n"
@@ -38,6 +39,7 @@ TEST(SubRipItemTest, ClearSubtitle) {
     std::ostringstream output;
     item.ToStream(123, output);
 
+    ASSERT_EQ(1, item.num_lines());
     ASSERT_EQ(
         "123\n"
         "00:00:01,123 --> 00:00:06,123\n"
@@ -57,6 +59,7 @@ TEST(SubRipItemTest, SetPosition) {
     std::ostringstream output;
     item.ToStream(123, output);
 
+    ASSERT_EQ(2, item.num_lines());
     ASSERT_EQ(
         "123\n"
         "00:00:01,123 --> 00:00:06,123\n"

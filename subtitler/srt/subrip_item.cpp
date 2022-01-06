@@ -11,6 +11,7 @@ SubRipItem::SubRipItem(const SubRipItem &other) {
     duration_ = other.duration_;
     ass_pos_id_ = other.ass_pos_id_;
     payload_ << other.payload_.str();
+    num_lines_ = other.num_lines_;
 }
 
 SubRipItem& SubRipItem::operator=(const SubRipItem &other) {
@@ -20,6 +21,7 @@ SubRipItem& SubRipItem::operator=(const SubRipItem &other) {
     // Move new one
     payload_ = std::ostringstream{};
     payload_ << other.payload_.str();
+    num_lines_ = other.num_lines_;
     return *this;
 }
 
@@ -50,6 +52,18 @@ bool SubRipItem::operator<(const SubRipItem &other) const {
         return start_ < other.start_;
     }
     return duration_ < other.duration_;
+}
+
+SubRipItem* SubRipItem::append_line(const std::string &payload) {
+    payload_ << payload << std::endl;
+    ++num_lines_;
+    return this;
+}
+
+SubRipItem* SubRipItem::clear_payload() {
+    payload_ = std::ostringstream{};
+    num_lines_ = 0;
+    return this;
 }
 
 } // namespace srt

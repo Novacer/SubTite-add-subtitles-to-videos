@@ -1,4 +1,4 @@
-build:vs2019 --cxxopt='/std:c++17'
+build:vs2019 --cxxopt='/std:c++17' --cxxopt='/WX'
 build:vs2019-prod --cxxopt='/std:c++17' -c opt
-build:gcc --cxxopt='-std=c++17'
+build:gcc --cxxopt='-std=c++17' --cxxopt='-Werror'
 build:gcc-prod --cxxopt='-std=c++17' -c opt

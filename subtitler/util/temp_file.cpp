@@ -3,8 +3,30 @@
 #include <cstdio>
 #include <stdexcept>
 #include <filesystem>
+#include <sstream>
+#include <glog/logging.h>
 
 namespace subtitler {
+
+namespace {
+
+// Replaces backwards slashes with forward slashes
+// Replaces C: with C\:. Needed to make windows file paths work with ffmpeg.
+std::string FixPath(const std::string &path) {
+    std::ostringstream output;
+    for (const auto &c: path) {
+        if (c == '\\') {
+            output << '/';
+        } else if (c == ':') {
+            output << "\\:";
+        } else {
+            output << c;
+        }
+    }
+    return output.str();
+}
+
+} // namespace
 
 TempFile::TempFile(const std::string &data) {
     FILE* fp = nullptr;
@@ -30,12 +52,17 @@ TempFile::TempFile(const std::string &data) {
     }
     fclose(fp);
     temp_file_name_ = random_file_name;
+    escaped_temp_file_name_ = FixPath(temp_file_name_);
 }
 
 TempFile::~TempFile() {
     // Must use non-throwing version.
     std::error_code ec;
     std::filesystem::remove(temp_file_name_, ec);
+    if (ec) {
+        LOG(ERROR) << "Failed to delete temp file: " << temp_file_name_
+                   << "with error " << ec;
+    }
 }
 
 } // namespace subtitler

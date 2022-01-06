@@ -121,3 +121,20 @@ TEST_F(SubRipFileTest, AddRemoveThenReadd) {
         output.str()
     );
 }
+
+TEST_F(SubRipFileTest, ToStreamRangeFilterPreservesSequentialNumbers) {
+    std::ostringstream output;
+    file.ToStream(output, /* start= */ 6s + 100ms, /* duration= */ 3s);
+    
+    ASSERT_EQ(
+        "1\n"
+        "00:00:00,000 --> 00:00:20,000\n"
+        "first\n"
+        "\n"
+        "2\n"
+        "00:00:02,000 --> 00:00:07,000\n"
+        "fourth\n"
+        "\n",
+        output.str()
+    );
+}

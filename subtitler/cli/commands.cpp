@@ -20,7 +20,6 @@ const int WAIT_TIMEOUT_MS = 100;
 const char *HELP_COMMAND = "help";
 
 const char *PLAY_COMMAND = "play";
-const char *DONE_COMMAND = "done";
 
 const char *PRINT_SUBS_COMMAND = "printsubs";
 const char *ADD_SUB_COMMAND = "add";
@@ -62,7 +61,7 @@ Commands::Commands(const Paths &paths,
     input_{input},
     output_{output},
     start_{0ms},
-    duration_{10s},
+    duration_{5s},
     srt_file_{},
     srt_file_has_changed_{false} {}
 
@@ -83,9 +82,7 @@ void Commands::MainLoop() {
             // Handoff remaining tokens to play()
             tokens.erase(tokens.begin());
             Play(tokens);
-        } else if (tokens.front() == DONE_COMMAND) {
-            Done();
-        } else if (tokens.front() == PRINT_SUBS_COMMAND) {
+        }  else if (tokens.front() == PRINT_SUBS_COMMAND) {
             PrintSubs();
         } else if (tokens.front() == ADD_SUB_COMMAND) {
             tokens.erase(tokens.begin());
@@ -114,26 +111,26 @@ void Commands::Help() {
     output_ << "Supported commands:" << std::endl;
     output_ << "help -- Prints the supported commands." << std::endl;
     output_ << "play -- Play the video at the current position." << std::endl
-            << "        Use start or s {time} duration or d {time} to set" << std::endl
-            << "        when to start playing the video and for how long." << std::endl
-            << "        {time} can be formatted as:" << std::endl
-            << "        12.345 => 12.345 seconds (can have at most 5 digits)" << std::endl
-            << "        12:34.0 => 12 minutes 34 seconds" << std::endl
-            << "        1:23:45 => 1 hour 23 minutes 45 seconds" << std::endl
-            << "        sample usage:" << std::endl
-            << "        play start 1:30 duration 5.5 will play video from 1m30s to 1m35.5s" << std::endl;
-    output_ << "done -- Saves the current subtitles and moves the position" << std::endl
-            << "        to the next 5 seconds of video" << std::endl;
+            << "          Use start or s {time} duration or d {time} to set" << std::endl
+            << "          when to start playing the video and for how long." << std::endl
+            << "          {time} can be formatted as:" << std::endl
+            << "          12.345 => 12.345 seconds (can have at most 5 digits)" << std::endl
+            << "          12:34.0 => 12 minutes 34 seconds" << std::endl
+            << "          1:23:45 => 1 hour 23 minutes 45 seconds" << std::endl
+            << "          sample usage:" << std::endl
+            << "          play start 1:30 duration 5.5 will play video from 1m30s to 1m35.5s" << std::endl
+            << "          Use play next to move the player position to the next 10s" << std::endl;
     output_ << "quit -- Optionally saves and exits." << std::endl;
     output_ << std::endl;
     output_ << "printsubs -- Prints the all subtitles at the current player position." << std::endl;
     output_ << "add       -- Adds a subtitle block. Use position or p {position} to set the position." << std::endl
-            << "             valid position are: bottom-left, middle-center, top-right and so on." << std::endl
-            << "             It is possible to add multiple subtitles to the same section of video." << std::endl
-            << "             Use /play in this mode to replay the video using the same current position." << std::endl;
+            << "               valid position are: bottom-left, middle-center, top-right and so on." << std::endl
+            << "               It is possible to add multiple subtitles to the same section of video." << std::endl
+            << "               Use /play to replay the video using the same current position." << std::endl
+            << "               Use /cancel to discard any subtitles." << std::endl;
     output_ << "delete    -- Removes the subtitle. Use delete {seq_num} to identify the subtitle." << std::endl
-            << "             Normally, you can only delete subtitles at the current player position." << std::endl
-            << "             However delete --force {seq_num} enables deleting any subtitle." << std::endl;
+            << "               Normally, you can only delete subtitles at the current player position." << std::endl
+            << "               However delete --force {seq_num} enables deleting any subtitle." << std::endl;
     output_ << "save      -- Saves the current SRT to the output file." << std::endl;
 }
 
@@ -141,7 +138,11 @@ void Commands::Play(const std::vector<std::string> &tokens) {
     std::size_t i = 0;
     // Go through the tokens and update start/duration if needed.
     while (i < tokens.size()) {
-        if (tokens.at(i) == "start" || tokens.at(i) == "s") {
+        if (tokens.at(i) == "next" || tokens.at(i) == "n") {
+            start_ += duration_;
+            duration_ = 5s;
+            i += 1;
+        } else if (tokens.at(i) == "start" || tokens.at(i) == "s") {
             if (i + 1 >= tokens.size()) {
                 output_ << "Missing start time!" << std::endl;
                 return;
@@ -188,15 +189,6 @@ void Commands::Play(const std::vector<std::string> &tokens) {
     } catch (const std::exception &e) {
         output_ << "Error opening player: " << e.what() << std::endl;
     }
-}
-
-void Commands::Done() {
-    CloseAnyOpenPlayers(ffplay_.get(), output_);
-    // Commit the currently entered subtitles.
-    // Move the current position over.
-    start_ += duration_;
-    duration_ = 10s;
-    output_ << "Updated start=" << FormatDuration(start_) << " duration=" << FormatDuration(duration_) << std::endl;
 }
 
 void Commands::PrintSubs() {

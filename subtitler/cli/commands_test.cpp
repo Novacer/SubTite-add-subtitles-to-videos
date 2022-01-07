@@ -172,8 +172,8 @@ TEST_F(CommandsTest, PlayPrintsErrorWhenOpeningPlayerReturnsError) {
     ASSERT_THAT(output.str(), HasSubstr("Error opening player: some error message"));
 }
 
-TEST_F(CommandsTest, DonePrintsErrorWhenClosingPlayerReturnsError) {
-    std::istringstream input{"play \n done"};
+TEST_F(CommandsTest, PlayNextPrintsErrorWhenClosingPlayerReturnsError) {
+    std::istringstream input{"play \n play next"};
     std::ostringstream output;
     EXPECT_CALL(*mock_executor, WaitUntilFinished(_))
         .Times(1)
@@ -185,8 +185,8 @@ TEST_F(CommandsTest, DonePrintsErrorWhenClosingPlayerReturnsError) {
     ASSERT_THAT(output.str(), HasSubstr("Error closing player: stderr"));
 }
 
-TEST_F(CommandsTest, DoneCorrectlyUpdatesNewStartAndDuration) {
-    std::istringstream input{"play start 1 duration 10 \n done"};
+TEST_F(CommandsTest, PlayNextCorrectlyUpdatesNewStartAndDuration) {
+    std::istringstream input{"play start 1 duration 10 \n play next"};
     std::ostringstream output;
     EXPECT_CALL(*mock_executor, WaitUntilFinished(_))
         .Times(1)
@@ -195,7 +195,7 @@ TEST_F(CommandsTest, DoneCorrectlyUpdatesNewStartAndDuration) {
     Commands commands{paths, std::move(ffplay), input, output};
     commands.MainLoop();
 
-    ASSERT_THAT(output.str(), HasSubstr("Updated start=00:00:11.000 duration=00:00:10.000"));
+    ASSERT_THAT(output.str(), HasSubstr("Playing start=00:00:11.000 duration=00:00:05.000"));
 }
 
 TEST_F(CommandsTest, QuitClosesOpenPlayersAndBreaksTheLoop) {
@@ -222,7 +222,7 @@ TEST_F(CommandsTest, AddedSubtitleIsThenPrintable) {
 
     ASSERT_THAT(output.str(), HasSubstr(
         "1\n"
-        "00:00:00,000 --> 00:00:10,000\n"
+        "00:00:00,000 --> 00:00:05,000\n"
         "{\\an6} some subtitle\n"
         "\n"
     ));
@@ -260,12 +260,12 @@ TEST_F(CommandsTest, AddedSubtitleCanReplayVideoDuringInput) {
     // Other way is to test SetCommand param, but this will contain the temp file path which is hard to predict.
     // Either way this test might be a bit brittle, so just do the easier one for now.
     ASSERT_THAT(output.str(), HasSubstr(
-        "Playing start=00:00:00.000 duration=00:00:10.000\n"
+        "Playing start=00:00:00.000 duration=00:00:05.000\n"
     ));
 
     ASSERT_THAT(output.str(), HasSubstr(
         "1\n"
-        "00:00:00,000 --> 00:00:10,000\n"
+        "00:00:00,000 --> 00:00:05,000\n"
         "{\\an6} line 1\n"
         "line 2\n"
         "\n"
@@ -285,7 +285,7 @@ TEST_F(CommandsTest, AddedSubtitleIsThenSaveable) {
 
     ASSERT_EQ(file,
         "1\n"
-        "00:00:00,000 --> 00:00:10,000\n"
+        "00:00:00,000 --> 00:00:05,000\n"
         "{\\an6} some subtitle\n"
         "\n"
     );
@@ -305,7 +305,7 @@ TEST_F(CommandsTest, AddedSubtitleCanBeSavedWhileQuitting) {
     ASSERT_THAT(output.str(), HasSubstr("Save before closing? Input: [Y/n]"));
     ASSERT_EQ(file,
         "1\n"
-        "00:00:00,000 --> 00:00:10,000\n"
+        "00:00:00,000 --> 00:00:05,000\n"
         "{\\an8} some subtitle\n"
         "\n"
     );
@@ -332,14 +332,14 @@ TEST_F(CommandsTest, DeleteSubInRangeCanBeDoneWithoutForce) {
 
     ASSERT_THAT(output.str(), HasSubstr(
         "Deleted: 1\n"
-        "00:00:00,000 --> 00:00:10,000\n"
+        "00:00:00,000 --> 00:00:05,000\n"
         "{\\an8} some subtitle\n"
         "\n"
     ));
 }
 
 TEST_F(CommandsTest, DeleteSubOutOfRangeCannotBeDoneWithoutForce) {
-    std::istringstream input{"add p top-center \nsome subtitle\n\n done \n done \n delete 1"};
+    std::istringstream input{"add p top-center \nsome subtitle\n\n play next \n play next \n delete 1"};
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), input, output};
@@ -350,7 +350,7 @@ TEST_F(CommandsTest, DeleteSubOutOfRangeCannotBeDoneWithoutForce) {
     ));
     ASSERT_THAT(output.str(), Not(HasSubstr(
         "Deleted: 1\n"
-        "00:00:00,000 --> 00:00:10,000\n"
+        "00:00:00,000 --> 00:00:05,000\n"
         "{\\an8} some subtitle\n"
         "\n"
     )));
@@ -365,7 +365,7 @@ TEST_F(CommandsTest, DeleteSubOutOfRangeWithForce) {
 
     ASSERT_THAT(output.str(), HasSubstr(
         "Deleted: 1\n"
-        "00:00:00,000 --> 00:00:10,000\n"
+        "00:00:00,000 --> 00:00:05,000\n"
         "{\\an8} some subtitle\n"
         "\n"
     ));

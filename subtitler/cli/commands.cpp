@@ -61,7 +61,7 @@ Commands::Commands(const Paths &paths,
     input_{input},
     output_{output},
     start_{0ms},
-    duration_{10s},
+    duration_{5s},
     srt_file_{},
     srt_file_has_changed_{false} {}
 
@@ -140,7 +140,7 @@ void Commands::Play(const std::vector<std::string> &tokens) {
     while (i < tokens.size()) {
         if (tokens.at(i) == "next" || tokens.at(i) == "n") {
             start_ += duration_;
-            duration_ = 10s;
+            duration_ = 5s;
             i += 1;
         } else if (tokens.at(i) == "start" || tokens.at(i) == "s") {
             if (i + 1 >= tokens.size()) {

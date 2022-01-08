@@ -48,14 +48,23 @@ public:
     // Maps position to its substation alpha id.
     static const inline std::unordered_map<std::string, int> pos_to_id{
         {"top-left", 7},
+        {"tl", 7},
         {"top-center", 8},
+        {"tc", 8},
         {"top-right", 9},
+        {"tr", 9},
         {"middle-left", 4},
+        {"ml", 4},
         {"middle-center", 5},
+        {"mc", 5},
         {"middle-right", 6},
+        {"mr", 6},
         {"bottom-left", 1},
+        {"bl", 1},
         {"bottom-center", 2},
-        {"bottom-right", 3}
+        {"bc", 2},
+        {"bottom-right", 3},
+        {"br", 3}
     };
 
 private:

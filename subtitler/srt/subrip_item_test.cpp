@@ -7,6 +7,7 @@
 using namespace std::chrono_literals;
 using namespace subtitler;
 using namespace subtitler::srt;
+using ::testing::HasSubstr;
 
 TEST(SubRipItemTest, MultiLineSubtitle) {
     SubRipItem item;
@@ -52,21 +53,34 @@ TEST(SubRipItemTest, SetPosition) {
     SubRipItem item;
     item.start(1s + 123ms)
         ->duration(5s)
-        ->position("top-left")
-        ->append_line("Hello World!")
-        ->append_line("Foo bar baz.");
+        ->append_line("Hello World!");
 
-    std::ostringstream output;
-    item.ToStream(123, output);
+    ASSERT_EQ(1, item.num_lines());
+    
+    std::vector<std::string> positions = {
+        "bottom-left", "bottom-center", "bottom-right",
+        "middle-left", "middle-center", "middle-right",
+        "top-left", "top-center", "top-right"
+    };
+    std::vector<std::string> abbrev_positions = {
+        "bl", "bc", "br",
+        "ml", "mc", "mr",
+        "tl", "tc", "tr"
+    };
 
-    ASSERT_EQ(2, item.num_lines());
-    ASSERT_EQ(
-        "123\n"
-        "00:00:01,123 --> 00:00:06,123\n"
-        "{\\an7} Hello World!\n"
-        "Foo bar baz.\n",
-        output.str()
-    );
+    auto verify_position_ids = [item](const std::vector<std::string> &positions) mutable {
+        int expected_pos_id = 1;
+        for (const auto &position: positions) {
+            std::ostringstream output;
+            item.position(position)
+                ->ToStream(402, output);
+            ASSERT_THAT(output.str(), HasSubstr("{\\an" + std::to_string(expected_pos_id) + "}"));
+            ++expected_pos_id;
+        }
+    };
+
+    verify_position_ids(positions);
+    verify_position_ids(abbrev_positions);
 }
 
 TEST(SubRipItemTest, SetPositionThrowsOutOfRange) {

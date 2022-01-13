@@ -39,12 +39,25 @@ void ValidateFFBinaries() {
     }
 }
 
-void FixInputPath(std::string &path) {
-    // Any input paths with a space in them needs to be wrapped in quotes.
-    if (path.find(' ') != std::string::npos) {
-        std::ostringstream stream;
-        stream << '"' << path << '"';
-        path = stream.str();
+// Make a best effort to fix otherwise valid input paths.
+// For example, in some cases we need quotes when passing input paths like "path/to some/folder"
+// as a command line argument. While in some other cases (opening file directly) we don't want to use quotes.
+void FixInputPath(std::string &path, bool should_have_quotes) {
+    if (path.empty() || path.length() < 2) {
+        return;
+    }
+    bool already_in_quotes = path.front() == '"' && path.back() == '"';
+    if (should_have_quotes && !already_in_quotes) {
+        // Any input paths with a space in them needs to be wrapped in quotes.
+        bool contains_space = path.find(' ') != std::string::npos;
+        if (contains_space) {
+            std::ostringstream stream;
+            stream << '"' << path << '"';
+            path = stream.str();
+        }
+    } else if (!should_have_quotes && already_in_quotes) {
+        // Have to strip the quotes.
+        path = path.substr(1, path.length() - 2);
     }
 }
 
@@ -87,6 +100,13 @@ int main(int argc, char **argv) {
         }
     }
 
+    // Make sure input file path is wrapped/unwrapped with quotes as needed.
+    // Paths passed to command args should have quotes
+    // Paths opened directly should not have quotes.
+    // TODO: determine whether the FF binaries should have quotes or not.
+    FixInputPath(FLAGS_video_path, /* should_have_quotes= */ true);
+    FixInputPath(FLAGS_output_subtitle_path, /* should_have_quotes= */ false);
+
     // Sanity test writing to output path beforehand so we know it works.
     {
         // Write empty string in append mode.
@@ -97,10 +117,6 @@ int main(int argc, char **argv) {
         }
         ofs << "";
     }
-
-    // Make sure input file path is wrapped in quotes if it has a space.
-    // TODO: determine what to do if path to FF binaries has a space.
-    FixInputPath(FLAGS_video_path);
 
     auto executor = std::make_unique<subprocess::SubprocessExecutor>();
     auto ffplay = std::make_unique<play_video::FFPlay>(FLAGS_ffplay_path, std::move(executor));

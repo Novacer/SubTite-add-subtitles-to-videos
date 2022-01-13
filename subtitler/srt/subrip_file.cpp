@@ -54,13 +54,22 @@ void SubRipFile::AddItem(const SubRipItem &item) {
 }
 
 SubRipItem SubRipFile::RemoveItem(std::size_t sequence_number) {
-    if (sequence_number == 0 || sequence_number > NumItems()) {
+    if (sequence_number <= 0 || sequence_number > NumItems()) {
         throw std::out_of_range("invalid index passed to RemoveItem()");
     }
     auto vector_position = sequence_number - 1;
     auto backup = items_.at(vector_position);
     items_.erase(items_.begin() + vector_position);
     return backup;
+}
+
+void SubRipFile::EditItemPosition(std::size_t sequence_number, const std::string &position) {
+    if (sequence_number <= 0 || sequence_number > NumItems()) {
+        throw std::out_of_range("invalid index passed to EditItemPosition()");
+    }
+    auto vector_position = sequence_number - 1;
+    auto &item = items_.at(vector_position);
+    item.position(position);
 }
 
 

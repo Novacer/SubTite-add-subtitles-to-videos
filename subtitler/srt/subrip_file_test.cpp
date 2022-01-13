@@ -138,3 +138,30 @@ TEST_F(SubRipFileTest, ToStreamRangeFilterPreservesSequentialNumbers) {
         output.str()
     );
 }
+
+TEST_F(SubRipFileTest, ChangePosition) {
+    std::ostringstream output;
+    file.EditItemPosition(1, "bottom-left");
+    file.EditItemPosition(3, "top-right");
+    file.ToStream(output);
+
+    ASSERT_EQ(
+        "1\n"
+        "00:00:00,000 --> 00:00:20,000\n"
+        "{\\an1} first\n"
+        "\n"
+        "2\n"
+        "00:00:01,000 --> 00:00:05,000\n"
+        "second\n"
+        "\n"
+        "3\n"
+        "00:00:01,000 --> 00:00:06,000\n"
+        "{\\an9} third\n"
+        "\n"
+        "4\n"
+        "00:00:02,000 --> 00:00:07,000\n"
+        "fourth\n"
+        "\n",
+        output.str()
+    );
+}

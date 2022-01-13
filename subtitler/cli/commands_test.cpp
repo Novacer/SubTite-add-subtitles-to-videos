@@ -382,3 +382,34 @@ TEST_F(CommandsTest, DeleteSubInvalidCommandsPrintErrorMessages) {
     ASSERT_THAT(output.str(), HasSubstr("Missing sequence num. Check help for usage."));
     ASSERT_THAT(output.str(), HasSubstr("Unrecognized token: invalid"));
 }
+
+TEST_F(CommandsTest, EditSubPositionAfterAdding) {
+    std::istringstream input{"add p top-center \nsome subtitle\n\n edit 1 position bottom-left \n printsubs"};
+    std::ostringstream output;
+
+    Commands commands{paths, std::move(ffplay), input, output};
+    commands.MainLoop();
+
+    ASSERT_THAT(output.str(), HasSubstr(
+        "1\n"
+        "00:00:00,000 --> 00:00:05,000\n"
+        "{\\an1} some subtitle\n"
+        "\n"
+    ));
+}
+
+TEST_F(CommandsTest, EditSubPositionInvalidCommandsPrintErrorMessages) {
+    std::istringstream input{"add p tc \nsubtitle\n\n edit \n edit invalid \n"
+                             "edit 1 invalid \n edit 1 p \n edit 1 p invalid \n edit 9999 p middle-center"};
+    std::ostringstream output;
+
+    Commands commands{paths, std::move(ffplay), input, output};
+    commands.MainLoop();
+
+    ASSERT_THAT(output.str(), HasSubstr("Missing sequence num. Check help for usage."));
+    ASSERT_THAT(output.str(), HasSubstr("Unable to parse invalid as sequence number!"));
+    ASSERT_THAT(output.str(), HasSubstr("Unrecognized token: invalid"));
+    ASSERT_THAT(output.str(), HasSubstr("Missing position id. Valid positions are:"));
+    ASSERT_THAT(output.str(), HasSubstr("Unable to edit position of 1. Valid positions are:"));
+    ASSERT_THAT(output.str(), HasSubstr("Unable to edit position of 9999. Valid positions are:"));
+}

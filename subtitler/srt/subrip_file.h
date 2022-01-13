@@ -47,6 +47,11 @@ public:
     // Note that indices start at 1, as per SRT file format spec.
     SubRipItem RemoveItem(std::size_t sequence_number);
 
+    // Edits the positioning of an existing SubRipItem.
+    // Reference SubRipItem::pos_to_id for valid positions.
+    // Throws std::out_of_range if invalid sequence or position is provided.
+    void EditItemPosition(std::size_t sequence_number, const std::string &position);
+
 private:
     // SRT items should be ordered by start time to allow for overlapping subtitles.
     std::vector<SubRipItem> items_;

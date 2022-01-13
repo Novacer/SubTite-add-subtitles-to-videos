@@ -24,6 +24,7 @@ const char *PLAY_COMMAND = "play";
 const char *PRINT_SUBS_COMMAND = "printsubs";
 const char *ADD_SUB_COMMAND = "add";
 const char *DELETE_SUB_COMMAND = "delete";
+const char *EDIT_SUB_COMMAND = "edit";
 const char *SAVE_COMMAND = "save";
 
 const char *QUIT_COMMAND = "quit";
@@ -93,6 +94,9 @@ void Commands::MainLoop() {
         } else if (tokens.front() == DELETE_SUB_COMMAND) {
             tokens.erase(tokens.begin());
             DeleteSub(tokens);
+        } else if (tokens.front() == EDIT_SUB_COMMAND) {
+            tokens.erase(tokens.begin());
+            EditSub(tokens);
         } else if (tokens.front() == SAVE_COMMAND) {
             Save();
         } else if (tokens.front() == HELP_COMMAND) {
@@ -124,13 +128,16 @@ void Commands::Help() {
     output_ << std::endl;
     output_ << "printsubs -- Prints the all subtitles at the current player position." << std::endl;
     output_ << "add       -- Adds a subtitle block. Use position or p {position} to set the position." << std::endl
-            << "               valid position are: bottom-left, middle-center, top-right and so on." << std::endl
+            << "               valid positions are: bottom-left, middle-center, top-right and so on." << std::endl
+            << "               You can also abbreviate as: bl, mc, tr etc." << std::endl
             << "               It is possible to add multiple subtitles to the same section of video." << std::endl
             << "               Use /play to replay the video using the same current position." << std::endl
             << "               Use /cancel to discard any subtitles." << std::endl;
     output_ << "delete    -- Removes the subtitle. Use delete {seq_num} to identify the subtitle." << std::endl
             << "               Normally, you can only delete subtitles at the current player position." << std::endl
             << "               However delete --force {seq_num} enables deleting any subtitle." << std::endl;
+    output_ << "edit      -- Edit an existing subtitle. Currently supports changing position." << std::endl
+            << "               Use edit {seq_num} position or p {position} to set the new position." << std::endl;
     output_ << "save      -- Saves the current SRT to the output file." << std::endl;
 }
 
@@ -209,20 +216,20 @@ void Commands::AddSub(const std::vector<std::string> &tokens) {
         if (tokens.at(i) == "position" || tokens.at(i) == "p") {
             if (i + 1 >= tokens.size()) {
                 output_ << "Missing position id. Valid positions are: " << std::endl;
-                output_ << item.substation_alpha_positions << std::endl;
+                output_ << srt::SubRipItem::substation_alpha_positions << std::endl;
                 return;
             }
             try {
                 item.position(tokens.at(i + 1));
             } catch (const std::out_of_range &e) {
                 output_ << "Position " << tokens.at(i + 1) << " not recognized. Valid positions are: " << std::endl;
-                output_ << item.substation_alpha_positions << std::endl;
+                output_ << srt::SubRipItem::substation_alpha_positions << std::endl;
                 return;
             }
 
             i += 2;
         } else {
-            output_ << "Unrecognized token: " << tokens.at(i);
+            output_ << "Unrecognized token: " << tokens.at(i) << std::endl;
             return;
         }
     }
@@ -296,6 +303,45 @@ void Commands::DeleteSub(const std::vector<std::string> &tokens) {
     } catch (const std::out_of_range &e) {
         output_ << "Error while deleting sequence num: " << sequence_num;
         return;
+    }
+
+    srt_file_has_changed_ = true;
+}
+
+void Commands::EditSub(const std::vector<std::string> &tokens) {
+    std::size_t sequence_num = 0;
+    // First token must be number representing sequence number.
+    if (tokens.size() < 1) {
+        output_ << "Missing sequence num. Check help for usage." << std::endl;
+        return;
+    }
+
+    if (std::istringstream stream{tokens.front()}; !(stream >> sequence_num)) {
+        output_ << "Unable to parse " << tokens.front() << " as sequence number!" << std::endl;
+        return;
+    }
+
+    std::size_t i = 1;
+    while (i < tokens.size()) {
+        if (tokens.at(i) == "position" || tokens.at(i) == "p") {
+            if (i + 1 >= tokens.size()) {
+                output_ << "Missing position id. Valid positions are:" << std::endl;
+                output_ << srt::SubRipItem::substation_alpha_positions << std::endl;
+                return;
+            }
+            try {
+                srt_file_.EditItemPosition(sequence_num, tokens.at(i + 1));
+            } catch (const std::out_of_range &e) {
+                output_ << "Unable to edit position of " << sequence_num << ". Valid positions are:" << std::endl;
+                output_ << srt::SubRipItem::substation_alpha_positions << std::endl;
+                return;
+            }
+
+            i += 2;
+        } else {
+            output_ << "Unrecognized token: " << tokens.at(i) << std::endl;
+            return;
+        }
     }
 
     srt_file_has_changed_ = true;

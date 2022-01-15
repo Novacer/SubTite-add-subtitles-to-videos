@@ -11,7 +11,6 @@
 #include "subtitler/util/duration_format.h"
 #include "subtitler/srt/subrip_item.h"
 #include "subtitler/util/temp_file.h"
-#include <iostream>
 
 namespace subtitler {
 namespace cli {
@@ -249,7 +248,6 @@ void Commands::AddSub(const std::vector<std::string> &tokens) {
         if (subtitle.empty()) {
             break;
         }
-        std::cout << subtitle << std::endl;
         // /play replays the video while in addsub mode.
         if (subtitle.rfind("/play", 0) == 0) {
             // Ignore rest of input the line and play video with no other params.

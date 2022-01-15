@@ -68,7 +68,7 @@ TEST_F(CommandsTest, PlayCorrectlySetsStartAndDuration) {
     std::ostringstream expected_command;
     expected_command << ffplay_path << " "
                      << video_path << " "
-                     << "-sn -ss 00:01:30.500 -t 00:00:45.000 -vf "
+                     << "-sn -ss 00:01:30.500 -t 00:00:45.000 -left 0 -top 0 -vf "
                      << "drawtext=text='%{pts\\:hms}':fontsize=(h/30):fontcolor=white:box=1:boxcolor=black:fontfile='"
                      << subtitler::get_font_path()
                      << "' -loglevel error";
@@ -85,7 +85,7 @@ TEST_F(CommandsTest, PlayCorrectlySetsStartAndDuration_Swapped) {
     std::ostringstream expected_command;
     expected_command << ffplay_path << " "
                      << video_path << " "
-                     << "-sn -ss 01:23:45.000 -t 00:00:45.120 -vf "
+                     << "-sn -ss 01:23:45.000 -t 00:00:45.120 -left 0 -top 0 -vf "
                      <<  "drawtext=text='%{pts\\:hms}':fontsize=(h/30):fontcolor=white:box=1:boxcolor=black:fontfile='"
                      << subtitler::get_font_path()
                      << "' -loglevel error";

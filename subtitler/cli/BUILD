@@ -9,8 +9,10 @@ cc_binary(
   }),
   deps = [
     ":commands",
+    "//subtitler/cli/io:input",
     "//subtitler/play_video:ffplay",
     "//subtitler/subprocess:subprocess_executor",
+    "//subtitler/util:unicode",
     "@com_github_nlohmann_json//:json",
     "@com_github_gflags_gflags//:gflags",
     "@com_github_google_glog//:glog",
@@ -27,6 +29,7 @@ cc_library(
     "//subtitler/srt:subrip_item",
     "//subtitler/util:duration_format",
     "//subtitler/util:temp_file",
+    "//subtitler/cli/io:input",
     "@howard_hinnant_date//:date",
   ],
 )

@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <sstream>
 #include <future>
+#include "subtitler/util/unicode.h"
 
 namespace subtitler {
 namespace subprocess {
@@ -14,31 +15,6 @@ namespace {
 
 const int BUFFER_SIZE = 1024;
 const int TIMEOUT_MS = 5000;
-
-std::wstring ConvertStringToWString(const std::string &str) {
-    int num_chars = MultiByteToWideChar(
-        /* CodePage= */ CP_UTF8,
-        /* dwFlags= */ MB_ERR_INVALID_CHARS,
-        /* lpMultiByteStr= */ str.c_str(),
-        /* cbMultiByte= */ str.length(),
-        /* lpWideCharStr= */ NULL,
-        /* cchWideChar= */ 0);
-
-    if (num_chars <= 0) {
-        return std::wstring();
-    }
-
-    std::wstring result;
-    result.resize(num_chars);
-    MultiByteToWideChar(
-        /* CodePage= */ CP_UTF8,
-        /* dwFlags= */ MB_ERR_INVALID_CHARS,
-        /* lpMultiByteStr= */ str.c_str(),
-        /* cbMultiByte= */ str.length(),
-        /* lpWideCharStr= */ &result[0],
-        /* cchWideChar= */ num_chars);
-    return result;
-}
 
 void CleanupHandle(HANDLE &handle) {
     if (handle) {
@@ -134,7 +110,7 @@ void SubprocessExecutor::Start() {
     start_info.hStdOutput = fields->hStdOutPipeWrite;
     start_info.dwFlags |= STARTF_USESTDHANDLES;
 
-    std::wstring command = ConvertStringToWString(command_);
+    std::wstring command = ConvertToWString(command_);
     BOOL success = CreateProcessW(
         /* lpApplicationName= */NULL,
         /* lpCommandLine= */ &command[0],

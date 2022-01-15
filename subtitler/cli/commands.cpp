@@ -11,6 +11,7 @@
 #include "subtitler/util/duration_format.h"
 #include "subtitler/srt/subrip_item.h"
 #include "subtitler/util/temp_file.h"
+#include "subtitler/cli/io/input.h"
 
 namespace subtitler {
 namespace cli {
@@ -56,11 +57,11 @@ using namespace date;
 
 Commands::Commands(const Paths &paths,
         std::unique_ptr<play_video::FFPlay> ffplay,
-        std::istream &input,
+        std::unique_ptr<io::InputGetter> input_getter,
         std::ostream &output):
     paths_{paths},
     ffplay_{std::move(ffplay)},
-    input_{input},
+    input_getter_{std::move(input_getter)},
     output_{output},
     start_{0ms},
     duration_{5s},
@@ -75,7 +76,7 @@ void Commands::MainLoop() {
     output_ << "Starting interactive mode. Type help for instructions." << std::endl;
     
     std::string command;
-    while (std::getline(input_, command)) {
+    while (input_getter_->getline(command)) {
         auto tokens = Tokenize(command);
 
         if (tokens.empty()) continue;
@@ -244,7 +245,7 @@ void Commands::AddSub(const std::vector<std::string> &tokens) {
             << std::endl;
     
     std::string subtitle;
-    while (std::getline(input_, subtitle)) {
+    while (input_getter_->getline(subtitle)) {
         if (subtitle.empty()) {
             break;
         }
@@ -367,7 +368,7 @@ void Commands::Quit() {
     if (srt_file_has_changed_) {
         output_ << "Save before closing? Input: [Y/n]" << std::endl;
         std::string response;
-        std::getline(input_, response);
+        input_getter_->getline(response);
         // Tokenize to remove whitespace
         auto tokens = Tokenize(response);
         if (tokens.empty() || tokens.front() == "Y" || tokens.front() == "y") {

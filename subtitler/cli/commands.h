@@ -13,13 +13,19 @@ namespace subtitler::play_video {
 
 class FFPlay;
 
-} // subtitler::play_video
+} // namespace subtitler::play_video
+
+namespace subtitler::cli::io {
+
+class InputGetter;
+
+} // namespace subtitler::cli::io
 
 namespace subtitler {
 
 class TempFile;
 
-} // subtitler::play_video
+} // namespace subtitler::play_video
 
 namespace subtitler {
 namespace cli {
@@ -34,10 +40,9 @@ public:
         std::string output_subtitle_path;
     };
 
-    // Input and output streams must have greater lifetime than this object.
     Commands(const Paths &paths,
         std::unique_ptr<play_video::FFPlay> ffplay,
-        std::istream &input,
+        std::unique_ptr<io::InputGetter> input_getter,
         std::ostream &output);
     
     ~Commands();
@@ -53,13 +58,13 @@ public:
 private:
     Paths paths_;
     std::unique_ptr<play_video::FFPlay> ffplay_;
-    std::istream &input_;
     std::ostream &output_;
     std::chrono::milliseconds start_;
     std::chrono::milliseconds duration_;
     srt::SubRipFile srt_file_;
     bool srt_file_has_changed_;
     std::unique_ptr<TempFile> temp_file_;
+    std::unique_ptr<io::InputGetter> input_getter_;
 
     void Help();
 

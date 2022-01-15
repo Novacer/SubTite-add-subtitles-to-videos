@@ -5,6 +5,8 @@
 #include <filesystem>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
+#include <io.h>
+#include <fcntl.h>
 
 #pragma comment(lib, "comdlg32.lib")
 #include <windows.h>
@@ -12,6 +14,8 @@
 #include "subtitler/subprocess/subprocess_executor.h"
 #include "subtitler/play_video/ffplay.h"
 #include "subtitler/cli/commands.h"
+#include "subtitler/cli/io/input.h"
+#include "subtitler/util/unicode.h"
 
 DEFINE_string(ffplay_path, "ffplay", "Required. Path to ffplay binary.");
 DEFINE_string(ffmpeg_path, "ffmpeg", "Required. Path to ffmpeg binary.");
@@ -61,19 +65,6 @@ void FixInputPath(std::string &path, bool should_have_quotes) {
     }
 }
 
-// Converts a wide str (utf-16 on windows) to a narrow multi-byte string (utf-8).
-// We don't use wstring everywhere to retain some cross-compatibility with linux.
-// See http://utf8everywhere.org/
-std::string ConvertFromWStr(const std::wstring &wstr) {
-    int num_chars = WideCharToMultiByte(CP_UTF8, WC_COMPOSITECHECK, wstr.c_str(), wstr.length(), NULL, 0, NULL, NULL);
-    std::string result;
-    if (num_chars > 0) {
-        result.resize(num_chars);
-        WideCharToMultiByte(CP_UTF8, WC_COMPOSITECHECK, wstr.c_str(), wstr.length(), &result[0], num_chars, NULL, NULL);
-    }
-    return result;
-}
-
 // Opens a window file dialog to get the file paths.
 // This is the preferred method, since typing the path through terminal
 // may mess up the character encodings.
@@ -113,6 +104,10 @@ int main(int argc, char **argv) {
     google::InitGoogleLogging(argv[0]);
     gflags::ParseCommandLineFlags(&argc, &argv, /* remove_flags= */ true);
 
+    // Needed to receive unicode input from terminal.
+    // TODO: clients need chcp 65001 to see unicode output in terminal.
+    _setmode(_fileno(stdin), _O_U16TEXT);
+    
     try {
         ValidateFFBinaries();
     } catch (const std::runtime_error &e) {
@@ -167,7 +162,11 @@ int main(int argc, char **argv) {
     auto executor = std::make_unique<subprocess::SubprocessExecutor>();
     auto ffplay = std::make_unique<play_video::FFPlay>(FLAGS_ffplay_path, std::move(executor));
     cli::Commands::Paths paths{video_path, output_subtitle_path};
-    cli::Commands commands{paths, std::move(ffplay), std::cin, std::cout};
+    cli::Commands commands{
+        paths,
+        std::move(ffplay),
+        std::make_unique<cli::io::WideInputGetter>(std::wcin),
+        std::cout};
 
     try {
         commands.MainLoop();

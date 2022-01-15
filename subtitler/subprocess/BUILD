@@ -10,7 +10,9 @@ cc_library(
     "@bazel_tools//src/conditions:darwin": ["subprocess_executor_gcc.cpp"],
      "//conditions:default": ["subprocess_executor_gcc.cpp"],
   }),
-  deps = [],
+  deps = [
+    "//subtitler/util:unicode",
+  ],
 )
 
 cc_test(

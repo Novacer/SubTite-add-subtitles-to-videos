@@ -58,8 +58,8 @@ private:
  */
 class WideInputGetter : public InputGetter {
 public:
-    // Note: trying to construct this class will throw an exception
-    // if you are not using MSVC. Indeed, on Unix systems you shouldn't be using this anyways.
+    // Note: trying to construct this class will throw an exception if you are not using MSVC.
+    // Indeed, on Unix systems you shouldn't be using this anyways.
     WideInputGetter(std::wistream &stream);
 
     bool getline(std::string &line) override;

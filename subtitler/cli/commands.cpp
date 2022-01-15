@@ -5,11 +5,13 @@
 #include <algorithm>
 #include <optional>
 #include <fstream>
+#include <filesystem>
 #include "date/date.h"
 #include "subtitler/play_video/ffplay.h"
 #include "subtitler/util/duration_format.h"
 #include "subtitler/srt/subrip_item.h"
 #include "subtitler/util/temp_file.h"
+#include <iostream>
 
 namespace subtitler {
 namespace cli {
@@ -192,6 +194,8 @@ void Commands::Play(const std::vector<std::string> &tokens) {
         ffplay_->start_pos(start_)
             ->duration(duration_)
             ->enable_timestamp(true)
+            ->left_pos(0)
+            ->top_pos(0)
             ->OpenPlayer(paths_.video_path);
     } catch (const std::exception &e) {
         output_ << "Error opening player: " << e.what() << std::endl;
@@ -245,6 +249,7 @@ void Commands::AddSub(const std::vector<std::string> &tokens) {
         if (subtitle.empty()) {
             break;
         }
+        std::cout << subtitle << std::endl;
         // /play replays the video while in addsub mode.
         if (subtitle.rfind("/play", 0) == 0) {
             // Ignore rest of input the line and play video with no other params.
@@ -348,7 +353,9 @@ void Commands::EditSub(const std::vector<std::string> &tokens) {
 }
 
 void Commands::Save() {
-    std::ofstream file{paths_.output_subtitle_path, std::ofstream::out | std::ofstream::trunc};
+    namespace fs = std::filesystem;
+    auto path_wrapper = fs::path(fs::u8path(paths_.output_subtitle_path));
+    std::ofstream file{path_wrapper, std::ofstream::out | std::ofstream::trunc};
     if (!file) {
         throw std::runtime_error("Could not open file " + paths_.output_subtitle_path);
     }

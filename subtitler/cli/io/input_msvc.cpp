@@ -10,7 +10,7 @@ bool WideInputGetter::getline(std::string &line) {
     if (!std::getline(stream_, temp)) {
         return false;
     }
-    line = ConvertFromWStr(temp);
+    line = ConvertFromWString(temp);
     return true;
 }
 

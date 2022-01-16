@@ -5,7 +5,7 @@
 
 namespace subtitler {
 
-std::string ConvertFromWStr(const std::wstring &wstr) {
+std::string ConvertFromWString(const std::wstring &wstr) {
     int num_chars = WideCharToMultiByte(
         /* CodePage= */ CP_UTF8,
         /* dwFlags= */ WC_COMPOSITECHECK,

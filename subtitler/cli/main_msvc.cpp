@@ -137,8 +137,8 @@ int main(int argc, char **argv) {
         return 1;
     }
     
-    auto video_path = ConvertFromWStr(video_path_buffer);
-    auto output_subtitle_path = ConvertFromWStr(output_subtitle_path_buffer);
+    auto video_path = ConvertFromWString(video_path_buffer);
+    auto output_subtitle_path = ConvertFromWString(output_subtitle_path_buffer);
 
     // Make sure input file path is wrapped/unwrapped with quotes as needed.
     // Paths passed to command args should have quotes

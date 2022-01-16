@@ -7,10 +7,12 @@
 #include "subtitler/subprocess/mock_subprocess_executor.h"
 #include "subtitler/play_video/ffplay.h"
 #include "subtitler/util/font_config.h"
+#include "subtitler/cli/io/input.h"
 
 using subtitler::play_video::FFPlay;
 using subtitler::subprocess::MockSubprocessExecutor;
 using subtitler::cli::Commands;
+using subtitler::cli::io::NarrowInputGetter;
 using ::testing::Not;
 using ::testing::IsEmpty;
 using ::testing::HasSubstr;
@@ -18,6 +20,10 @@ using ::testing::NiceMock;
 using ::testing::Return;
 using ::testing::_;
 using ::testing::Throw;
+
+std::unique_ptr<NarrowInputGetter> CreateInputGetter(std::istream &stream) {
+    return std::make_unique<NarrowInputGetter>(stream);
+}
 
 class CommandsTest : public ::testing::Test {
 protected:
@@ -46,7 +52,7 @@ TEST_F(CommandsTest, HelpReturnsNonEmptyMessage) {
     std::istringstream input{"\n \n  help"};
     std::ostringstream output;
     
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("help -- Prints the supported commands"));
@@ -56,7 +62,7 @@ TEST_F(CommandsTest, CommandNotRecognizedPrintsToStdout) {
     std::istringstream input{"something123"};
     std::ostringstream output;
     
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Command something123 not recognized!"));
@@ -75,7 +81,7 @@ TEST_F(CommandsTest, PlayCorrectlySetsStartAndDuration) {
     EXPECT_CALL(*mock_executor, SetCommand(expected_command.str()))
         .Times(1);
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 }
 
@@ -92,7 +98,7 @@ TEST_F(CommandsTest, PlayCorrectlySetsStartAndDuration_Swapped) {
     EXPECT_CALL(*mock_executor, SetCommand(expected_command.str()))
         .Times(1);
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 }
 
@@ -100,7 +106,7 @@ TEST_F(CommandsTest, PlayWarnsUserOfIncorrectUsage_MissingStartTime) {
     std::istringstream input{"play start"};
     std::ostringstream output;
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Missing start time!"));
@@ -110,7 +116,7 @@ TEST_F(CommandsTest, PlayWarnsUserOfIncorrectUsage_UnableToParseStartTime) {
     std::istringstream input{"play start duration 123"};
     std::ostringstream output;
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Unable to parse start time!"));
@@ -120,7 +126,7 @@ TEST_F(CommandsTest, PlayWarnsUserOfIncorrectUsage_MissingDurationTime) {
     std::istringstream input{"play duration"};
     std::ostringstream output;
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Missing duration time!"));
@@ -130,7 +136,7 @@ TEST_F(CommandsTest, PlayWarnsUserOfIncorrectUsage_UnableToParseDurationTime) {
     std::istringstream input{"play duration 123abc"};
     std::ostringstream output;
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Unable to parse duration time!"));
@@ -140,7 +146,7 @@ TEST_F(CommandsTest, PlayWarnsUserOfIncorrectUsage_UnrecognizedToken) {
     std::istringstream input{"play start 123 duration 456 wacky"};
     std::ostringstream output;
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Unrecognized token: wacky"));
@@ -153,7 +159,7 @@ TEST_F(CommandsTest, PlayPrintsErrorWhenClosingPlayerReturnsError) {
         .Times(1)
         .WillOnce(Return(MockSubprocessExecutor::Output{"stdout", "stderr"}));
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Error closing player: stderr"));
@@ -166,7 +172,7 @@ TEST_F(CommandsTest, PlayPrintsErrorWhenOpeningPlayerReturnsError) {
         .Times(1)
         .WillOnce(Throw(std::runtime_error("some error message")));
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Error opening player: some error message"));
@@ -179,7 +185,7 @@ TEST_F(CommandsTest, PlayNextPrintsErrorWhenClosingPlayerReturnsError) {
         .Times(1)
         .WillOnce(Return(MockSubprocessExecutor::Output{"stdout", "stderr"}));
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Error closing player: stderr"));
@@ -192,7 +198,7 @@ TEST_F(CommandsTest, PlayNextCorrectlyUpdatesNewStartAndDuration) {
         .Times(1)
         .WillOnce(Return(MockSubprocessExecutor::Output{"stdout", ""}));
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Playing start=00:00:11.000 duration=00:00:05.000"));
@@ -207,7 +213,7 @@ TEST_F(CommandsTest, QuitClosesOpenPlayersAndBreaksTheLoop) {
         .Times(1)
         .WillOnce(Return(MockSubprocessExecutor::Output{"stdout", "I am closed."}));
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Error closing player: I am closed."));
@@ -217,7 +223,7 @@ TEST_F(CommandsTest, AddedSubtitleIsThenPrintable) {
     std::istringstream input{"add p middle-right \nsome subtitle\n\n printsubs"};
     std::ostringstream output;
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr(
@@ -232,7 +238,7 @@ TEST_F(CommandsTest, EmptySubtitleIsNotAdded) {
     std::istringstream input{"add p bottom-left \n\n printsubs"};
     std::ostringstream output;
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), Not(HasSubstr(" --> ")));
@@ -242,7 +248,7 @@ TEST_F(CommandsTest, AddSubCanBeCancelledInFlight) {
     std::istringstream input{"add p bottom-left \nHello world!\n/cancel \n printsubs"};
     std::ostringstream output;
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), Not(HasSubstr("Hello world!")));
@@ -253,7 +259,7 @@ TEST_F(CommandsTest, AddedSubtitleCanReplayVideoDuringInput) {
     std::istringstream input{"add p middle-right \nline 1\n/play \nline 2\n\n printsubs"};
     std::ostringstream output;
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     // Use output log to check if play was called.
@@ -276,7 +282,7 @@ TEST_F(CommandsTest, AddedSubtitleIsThenSaveable) {
     std::istringstream input{"add p middle-right \nsome subtitle\n\n save"};
     std::ostringstream output;
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     std::ifstream ifs{srt_path};
@@ -295,7 +301,7 @@ TEST_F(CommandsTest, AddedSubtitleCanBeSavedWhileQuitting) {
     std::istringstream input{"add p top-center \nsome subtitle\n\n quit \n Y"};
     std::ostringstream output;
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     std::ifstream ifs{srt_path};
@@ -315,7 +321,7 @@ TEST_F(CommandsTest, AddSubInvalidCommandsPrintsErrorMessages) {
     std::istringstream input{"add position \n add position invalid \n add random stuff"};
     std::ostringstream output;
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Missing position id. Valid positions are:"));
@@ -327,7 +333,7 @@ TEST_F(CommandsTest, DeleteSubInRangeCanBeDoneWithoutForce) {
     std::istringstream input{"add p top-center \nsome subtitle\n\n delete 1"};
     std::ostringstream output;
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr(
@@ -342,7 +348,7 @@ TEST_F(CommandsTest, DeleteSubOutOfRangeCannotBeDoneWithoutForce) {
     std::istringstream input{"add p top-center \nsome subtitle\n\n play next \n play next \n delete 1"};
     std::ostringstream output;
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr(
@@ -360,7 +366,7 @@ TEST_F(CommandsTest, DeleteSubOutOfRangeWithForce) {
     std::istringstream input{"add p top-center \nsome subtitle\n\n delete 1 --force"};
     std::ostringstream output;
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr(
@@ -375,7 +381,7 @@ TEST_F(CommandsTest, DeleteSubInvalidCommandsPrintErrorMessages) {
     std::istringstream input{"delete 1 2 \n delete --force \n delete invalid"};
     std::ostringstream output;
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Can only provide one sequence number to delete!"));
@@ -387,7 +393,7 @@ TEST_F(CommandsTest, EditSubPositionAfterAdding) {
     std::istringstream input{"add p top-center \nsome subtitle\n\n edit 1 position bottom-left \n printsubs"};
     std::ostringstream output;
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr(
@@ -403,7 +409,7 @@ TEST_F(CommandsTest, EditSubPositionInvalidCommandsPrintErrorMessages) {
                              "edit 1 invalid \n edit 1 p \n edit 1 p invalid \n edit 9999 p middle-center"};
     std::ostringstream output;
 
-    Commands commands{paths, std::move(ffplay), input, output};
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input), output};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Missing sequence num. Check help for usage."));

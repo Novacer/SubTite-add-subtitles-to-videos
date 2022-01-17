@@ -1,4 +1,4 @@
-#include "subtitler/play_video/ffplay.h"
+#include "subtitler/video/player/ffplay.h"
 
 #include <vector>
 #include <sstream>
@@ -9,7 +9,8 @@
 #include <iostream>
 
 namespace subtitler {
-namespace play_video {
+namespace video {
+namespace player {
 
 namespace {
 
@@ -127,5 +128,6 @@ std::string FFPlay::ClosePlayer(std::optional<int> timeout_ms) {
     return ffplay_output.subproc_stderr;
 }
 
-} // namespace play_video
+} // namespace player
+} // namespace video
 } // namespace subtitler

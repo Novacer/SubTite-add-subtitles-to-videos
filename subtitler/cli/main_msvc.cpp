@@ -12,7 +12,7 @@
 #include <windows.h>
 
 #include "subtitler/subprocess/subprocess_executor.h"
-#include "subtitler/play_video/ffplay.h"
+#include "subtitler/video/player/ffplay.h"
 #include "subtitler/cli/commands.h"
 #include "subtitler/cli/io/input.h"
 #include "subtitler/util/unicode.h"
@@ -159,13 +159,15 @@ int main(int argc, char **argv) {
         ofs << "";
     }
 
-    auto executor = std::make_unique<subprocess::SubprocessExecutor>();
-    auto ffplay = std::make_unique<play_video::FFPlay>(FLAGS_ffplay_path, std::move(executor));
     cli::Commands::Paths paths{video_path, output_subtitle_path};
+    auto executor = std::make_unique<subprocess::SubprocessExecutor>();
+    auto ffplay = std::make_unique<video::player::FFPlay>(FLAGS_ffplay_path, std::move(executor));
+    auto wide_input_getter = std::make_unique<cli::io::WideInputGetter>(std::wcin);
+    
     cli::Commands commands{
         paths,
         std::move(ffplay),
-        std::make_unique<cli::io::WideInputGetter>(std::wcin),
+        std::move(wide_input_getter),
         std::cout};
 
     try {

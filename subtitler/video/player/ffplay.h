@@ -1,5 +1,5 @@
-#ifndef _SUBTITLER_PLAY_VIDEO_FFPLAY_H
-#define _SUBTITLER_PLAY_VIDEO_FFPLAY_H
+#ifndef SUBTITLER_VIDEO_PLAYER_FFPLAY_H
+#define SUBTITLER_VIDEO_PLAYER_FFPLAY_H
 
 #include <string>
 #include <optional>
@@ -15,7 +15,8 @@ class SubprocessExecutor;
 } // subtitler::subprocess
 
 namespace subtitler {
-namespace play_video {
+namespace video {
+namespace player {
 
 /**
  * Wrapper for FFPlay functionality which is used as a video player.
@@ -86,7 +87,8 @@ private:
     std::vector<std::string> BuildArgs();
 };
 
-} // namespace play_video
+} // namespace player
+} // namespace video
 } // namespace subtitler
 
 #endif

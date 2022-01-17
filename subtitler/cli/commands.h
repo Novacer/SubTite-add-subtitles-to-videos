@@ -9,7 +9,7 @@
 #include "subtitler/srt/subrip_file.h"
 
 // Forward declaration
-namespace subtitler::play_video {
+namespace subtitler::video::player {
 
 class FFPlay;
 
@@ -41,7 +41,7 @@ public:
     };
 
     Commands(const Paths &paths,
-        std::unique_ptr<play_video::FFPlay> ffplay,
+        std::unique_ptr<video::player::FFPlay> ffplay,
         std::unique_ptr<io::InputGetter> input_getter,
         std::ostream &output);
     
@@ -57,7 +57,7 @@ public:
 
 private:
     Paths paths_;
-    std::unique_ptr<play_video::FFPlay> ffplay_;
+    std::unique_ptr<video::player::FFPlay> ffplay_;
     std::ostream &output_;
     std::chrono::milliseconds start_;
     std::chrono::milliseconds duration_;

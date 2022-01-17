@@ -5,11 +5,11 @@
 #include <streambuf>
 #include "subtitler/cli/commands.h"
 #include "subtitler/subprocess/mock_subprocess_executor.h"
-#include "subtitler/play_video/ffplay.h"
+#include "subtitler/video/player/ffplay.h"
 #include "subtitler/util/font_config.h"
 #include "subtitler/cli/io/input.h"
 
-using subtitler::play_video::FFPlay;
+using subtitler::video::player::FFPlay;
 using subtitler::subprocess::MockSubprocessExecutor;
 using subtitler::cli::Commands;
 using subtitler::cli::io::NarrowInputGetter;

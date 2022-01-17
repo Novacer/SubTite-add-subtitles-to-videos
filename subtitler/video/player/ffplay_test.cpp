@@ -1,11 +1,11 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 #include <chrono>
-#include "subtitler/play_video/ffplay.h"
+#include "subtitler/video/player/ffplay.h"
 #include "subtitler/subprocess/mock_subprocess_executor.h"
 #include "subtitler/util/font_config.h"
 
-using subtitler::play_video::FFPlay;
+using subtitler::video::player::FFPlay;
 using subtitler::subprocess::MockSubprocessExecutor;
 using ::testing::IsEmpty;
 using ::testing::NiceMock;

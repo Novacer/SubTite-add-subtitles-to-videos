@@ -7,7 +7,7 @@
 #include <fstream>
 #include <filesystem>
 #include "date/date.h"
-#include "subtitler/play_video/ffplay.h"
+#include "subtitler/video/player/ffplay.h"
 #include "subtitler/util/duration_format.h"
 #include "subtitler/srt/subrip_item.h"
 #include "subtitler/util/temp_file.h"
@@ -41,7 +41,7 @@ std::vector<std::string> Tokenize(const std::string &command) {
     return tokens;
 }
 
-void CloseAnyOpenPlayers(play_video::FFPlay *ffplay, std::ostream &output) {
+void CloseAnyOpenPlayers(video::player::FFPlay *ffplay, std::ostream &output) {
     if (ffplay->is_playing()) {
         auto captured_error = ffplay->ClosePlayer(WAIT_TIMEOUT_MS);
         if (!captured_error.empty()) {
@@ -56,7 +56,7 @@ using namespace std::chrono_literals;
 using namespace date;
 
 Commands::Commands(const Paths &paths,
-        std::unique_ptr<play_video::FFPlay> ffplay,
+        std::unique_ptr<video::player::FFPlay> ffplay,
         std::unique_ptr<io::InputGetter> input_getter,
         std::ostream &output):
     paths_{paths},

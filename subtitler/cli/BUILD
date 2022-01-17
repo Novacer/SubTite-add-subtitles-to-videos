@@ -10,7 +10,7 @@ cc_binary(
   deps = [
     ":commands",
     "//subtitler/cli/io:input",
-    "//subtitler/play_video:ffplay",
+    "//subtitler/video/player:ffplay",
     "//subtitler/subprocess:subprocess_executor",
     "//subtitler/util:unicode",
     "@com_github_nlohmann_json//:json",
@@ -24,7 +24,7 @@ cc_library(
   hdrs = ["commands.h"],
   srcs = ["commands.cpp"],
   deps = [
-    "//subtitler/play_video:ffplay",
+    "//subtitler/video/player:ffplay",
     "//subtitler/srt:subrip_file",
     "//subtitler/srt:subrip_item",
     "//subtitler/util:duration_format",
@@ -41,7 +41,7 @@ cc_test(
   deps = [
     ":commands",
     "//subtitler/subprocess:mock_subprocess_executor",
-    "//subtitler/play_video:ffplay",
+    "//subtitler/video/player:ffplay",
     "@com_google_googletest//:gtest_main",
   ],
   # Run serially since there are file system dependencies.

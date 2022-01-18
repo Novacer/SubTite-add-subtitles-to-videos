@@ -61,7 +61,7 @@ std::unique_ptr<Metadata> ParseVideoMetadata(const std::string &json_output) {
     return metadata;
 }
 
-}
+} // namespace
 
 FFProbe::FFProbe(const std::string &ffprobe_path, std::unique_ptr<subprocess::SubprocessExecutor> executor)
     : ffprobe_path_{ffprobe_path}, executor_{std::move(executor)} {

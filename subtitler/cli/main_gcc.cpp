@@ -121,7 +121,7 @@ int main(int argc, char **argv) {
 
     cli::Commands::Paths paths{FLAGS_video_path, FLAGS_output_subtitle_path};
     auto executor = std::make_unique<subprocess::SubprocessExecutor>();
-    auto ffplay = std::make_unique<play_video::FFPlay>(FLAGS_ffplay_path, std::move(executor));
+    auto ffplay = std::make_unique<video::player::FFPlay>(FLAGS_ffplay_path, std::move(executor));
     auto input_getter = std::make_unique<cli::io::NarrowInputGetter>(std::cin);
     cli::Commands commands{paths, std::move(ffplay), std::move(input_getter), std::cout};
 

@@ -39,6 +39,33 @@ BOOL CALLBACK SendWMCloseMsg(HWND hwnd, LPARAM lParam) {
     return TRUE;
 }
 
+std::string PollHandle(const HANDLE handle) {
+    DWORD amount_read;
+    CHAR buffer[BUFFER_SIZE + 1]; // Ensure space for null-terminator.
+    BOOL success = FALSE;
+    std::ostringstream str;
+
+    // Spin until we are unable to read the pipe from child process anymore. 
+    for (;;) {
+        success = ReadFile(
+        /* hFile= */ handle,
+        /* lpBuffer= */ buffer,
+        /* nNumberOfBytesToRead= */ BUFFER_SIZE,
+        /* lpNumberOfBytesRead= */ &amount_read,
+        /* lpOverlapped= */ NULL);
+
+        if (!success || amount_read == 0) {
+            break;
+        }
+        
+        // ensure null termination.
+        buffer[amount_read] = '\0';
+        str << buffer;
+    }
+
+    return str.str();
+}
+
 } // namespace
 
 struct SubprocessExecutor::PlatformDependentFields{
@@ -140,45 +167,18 @@ void SubprocessExecutor::Start() {
     CleanupHandle(fields->hStdOutPipeWrite);
     CleanupHandle(fields->hStdErrPipeWrite);
 
-    auto polling_routine = [](const HANDLE handle) {
-        DWORD amount_read;
-        CHAR buffer[BUFFER_SIZE + 1]; // Ensure space for null-terminator.
-        BOOL success = FALSE;
-        std::ostringstream str;
-        
-        // Spin until we are unable to read the pipe from child process anymore. 
-        for (;;) {
-            success = ReadFile(
-            /* hFile= */ handle,
-            /* lpBuffer= */ buffer,
-            /* nNumberOfBytesToRead= */ BUFFER_SIZE,
-            /* lpNumberOfBytesRead= */ &amount_read,
-            /* lpOverlapped= */ NULL);
-
-            if (!success || amount_read == 0) {
-                break;
-            }
-            
-            // ensure null termination.
-            buffer[amount_read] = '\0';
-            str << buffer;
-        }
-
-        return str.str();
-    };
-
     if (capture_output_) {
         // Launch 2 theads to read from stdout and stderr respectively.
         fields->captured_output = std::make_unique<std::future<std::string>>(
             std::async(std::launch::async,
-            [&, this]{
-                return polling_routine(fields->hStdOutPipeRead);
+            [this]{
+                return PollHandle(fields->hStdOutPipeRead);
             })
         );
         fields->captured_error = std::make_unique<std::future<std::string>>(
             std::async(std::launch::async,
-            [&, this]{
-                return polling_routine(fields->hStdErrPipeRead);
+            [this]{
+                return PollHandle(fields->hStdErrPipeRead);
             })
         );
     }

@@ -1,17 +1,18 @@
 #include "subtitler/cli/commands.h"
 
-#include <chrono>
-#include <vector>
 #include <algorithm>
-#include <optional>
-#include <fstream>
+#include <chrono>
 #include <filesystem>
+#include <fstream>
+#include <optional>
+#include <vector>
+
 #include "date/date.h"
-#include "subtitler/video/player/ffplay.h"
-#include "subtitler/util/duration_format.h"
-#include "subtitler/srt/subrip_item.h"
-#include "subtitler/util/temp_file.h"
 #include "subtitler/cli/io/input.h"
+#include "subtitler/srt/subrip_item.h"
+#include "subtitler/util/duration_format.h"
+#include "subtitler/util/temp_file.h"
+#include "subtitler/video/player/ffplay.h"
 
 namespace subtitler {
 namespace cli {
@@ -50,31 +51,32 @@ void CloseAnyOpenPlayers(video::player::FFPlay *ffplay, std::ostream &output) {
     }
 }
 
-} // namespace
+}  // namespace
 
 using namespace std::chrono_literals;
 using namespace date;
 
 Commands::Commands(const Paths &paths,
-        std::unique_ptr<video::player::FFPlay> ffplay,
-        std::unique_ptr<io::InputGetter> input_getter,
-        std::ostream &output):
-    paths_{paths},
-    ffplay_{std::move(ffplay)},
-    input_getter_{std::move(input_getter)},
-    output_{output},
-    start_{0ms},
-    duration_{5s},
-    srt_file_{},
-    srt_file_has_changed_{false} {}
+                   std::unique_ptr<video::player::FFPlay> ffplay,
+                   std::unique_ptr<io::InputGetter> input_getter,
+                   std::ostream &output)
+    : paths_{paths},
+      ffplay_{std::move(ffplay)},
+      input_getter_{std::move(input_getter)},
+      output_{output},
+      start_{0ms},
+      duration_{5s},
+      srt_file_{},
+      srt_file_has_changed_{false} {}
 
 Commands::~Commands() = default;
 
 void Commands::MainLoop() {
     output_ << "Initialized with start=" << FormatDuration(start_)
             << " duration=" << FormatDuration(duration_) << std::endl;
-    output_ << "Starting interactive mode. Type help for instructions." << std::endl;
-    
+    output_ << "Starting interactive mode. Type help for instructions."
+            << std::endl;
+
     std::string command;
     while (input_getter_->getline(command)) {
         auto tokens = Tokenize(command);
@@ -85,7 +87,7 @@ void Commands::MainLoop() {
             // Handoff remaining tokens to play()
             tokens.erase(tokens.begin());
             Play(tokens);
-        }  else if (tokens.front() == PRINT_SUBS_COMMAND) {
+        } else if (tokens.front() == PRINT_SUBS_COMMAND) {
             PrintSubs();
         } else if (tokens.front() == ADD_SUB_COMMAND) {
             tokens.erase(tokens.begin());
@@ -181,14 +183,15 @@ void Commands::Play(const std::vector<std::string> &tokens) {
         }
     }
 
-    output_ << "Playing start=" << FormatDuration(start_) << " duration=" << FormatDuration(duration_) << std::endl;
+    output_ << "Playing start=" << FormatDuration(start_)
+            << " duration=" << FormatDuration(duration_) << std::endl;
     CloseAnyOpenPlayers(ffplay_.get(), output_);
 
     try {
         // Error generating preview does not block the player from opening.
         _GeneratePreviewSubs();
     } catch (const std::exception &e) {
-        output_ << "Error generating preview subs:" << e.what() << std::endl; 
+        output_ << "Error generating preview subs:" << e.what() << std::endl;
     }
     try {
         ffplay_->start_pos(start_)
@@ -204,7 +207,7 @@ void Commands::Play(const std::vector<std::string> &tokens) {
 
 void Commands::PrintSubs() {
     auto collisions = srt_file_.GetCollisions(start_, duration_);
-    for (const auto &[seq_num, item]: collisions) {
+    for (const auto &[seq_num, item] : collisions) {
         item->ToStream(seq_num, output_);
         output_ << std::endl;
     }
@@ -213,21 +216,25 @@ void Commands::PrintSubs() {
 void Commands::AddSub(const std::vector<std::string> &tokens) {
     std::size_t i = 0;
     srt::SubRipItem item;
-    item.start(start_)
-        ->duration(duration_);
+    item.start(start_)->duration(duration_);
 
     while (i < tokens.size()) {
         if (tokens.at(i) == "position" || tokens.at(i) == "p") {
             if (i + 1 >= tokens.size()) {
-                output_ << "Missing position id. Valid positions are: " << std::endl;
-                output_ << srt::SubRipItem::substation_alpha_positions << std::endl;
+                output_ << "Missing position id. Valid positions are: "
+                        << std::endl;
+                output_ << srt::SubRipItem::substation_alpha_positions
+                        << std::endl;
                 return;
             }
             try {
                 item.position(tokens.at(i + 1));
             } catch (const std::out_of_range &e) {
-                output_ << "Position " << tokens.at(i + 1) << " not recognized. Valid positions are: " << std::endl;
-                output_ << srt::SubRipItem::substation_alpha_positions << std::endl;
+                output_ << "Position " << tokens.at(i + 1)
+                        << " not recognized. Valid positions are: "
+                        << std::endl;
+                output_ << srt::SubRipItem::substation_alpha_positions
+                        << std::endl;
                 return;
             }
 
@@ -238,12 +245,14 @@ void Commands::AddSub(const std::vector<std::string> &tokens) {
         }
     }
 
-    output_ << "Enter the subtitles, multiple lines allowed. A blank line (enter) represents end of input."
-            << std::endl
-            << "Use /play to replay the video, /cancel to discard all input."
-            << "Or, add blank line (enter) immediately to exit out of this mode."
-            << std::endl;
-    
+    output_
+        << "Enter the subtitles, multiple lines allowed. A blank line (enter) "
+           "represents end of input."
+        << std::endl
+        << "Use /play to replay the video, /cancel to discard all input."
+        << "Or, add blank line (enter) immediately to exit out of this mode."
+        << std::endl;
+
     std::string subtitle;
     while (input_getter_->getline(subtitle)) {
         if (subtitle.empty()) {
@@ -251,7 +260,8 @@ void Commands::AddSub(const std::vector<std::string> &tokens) {
         }
         // /play replays the video while in addsub mode.
         if (subtitle.rfind("/play", 0) == 0) {
-            // Ignore rest of input the line and play video with no other params.
+            // Ignore rest of input the line and play video with no other
+            // params.
             std::vector<std::string> temp;
             Play(temp);
         } else if (subtitle.rfind("/cancel", 0) == 0) {
@@ -276,9 +286,11 @@ void Commands::DeleteSub(const std::vector<std::string> &tokens) {
     while (i < tokens.size()) {
         if (tokens.at(i) == "--force") {
             force = true;
-        } else if (std::istringstream stream{tokens.at(i)}; stream >> sequence_num) {
+        } else if (std::istringstream stream{tokens.at(i)};
+                   stream >> sequence_num) {
             if (sequence_num_set) {
-                output_ << "Can only provide one sequence number to delete!" << std::endl;
+                output_ << "Can only provide one sequence number to delete!"
+                        << std::endl;
                 return;
             }
             sequence_num_set = true;
@@ -293,12 +305,17 @@ void Commands::DeleteSub(const std::vector<std::string> &tokens) {
         output_ << "Missing sequence num. Check help for usage." << std::endl;
         return;
     }
-    if (auto it = collisions.find(sequence_num); it == collisions.end() && !force) {
-        output_ << "The subtitle you want to delete is not within the current player position." << std::endl;
-        output_ << "Either change position using play or use delete --force {sequence_num}" << std::endl;
+    if (auto it = collisions.find(sequence_num);
+        it == collisions.end() && !force) {
+        output_ << "The subtitle you want to delete is not within the current "
+                   "player position."
+                << std::endl;
+        output_ << "Either change position using play or use delete --force "
+                   "{sequence_num}"
+                << std::endl;
         return;
     }
-    
+
     try {
         auto deleted_item = srt_file_.RemoveItem(sequence_num);
         output_ << "Deleted: ";
@@ -321,7 +338,8 @@ void Commands::EditSub(const std::vector<std::string> &tokens) {
     }
 
     if (std::istringstream stream{tokens.front()}; !(stream >> sequence_num)) {
-        output_ << "Unable to parse " << tokens.front() << " as sequence number!" << std::endl;
+        output_ << "Unable to parse " << tokens.front()
+                << " as sequence number!" << std::endl;
         return;
     }
 
@@ -329,15 +347,19 @@ void Commands::EditSub(const std::vector<std::string> &tokens) {
     while (i < tokens.size()) {
         if (tokens.at(i) == "position" || tokens.at(i) == "p") {
             if (i + 1 >= tokens.size()) {
-                output_ << "Missing position id. Valid positions are:" << std::endl;
-                output_ << srt::SubRipItem::substation_alpha_positions << std::endl;
+                output_ << "Missing position id. Valid positions are:"
+                        << std::endl;
+                output_ << srt::SubRipItem::substation_alpha_positions
+                        << std::endl;
                 return;
             }
             try {
                 srt_file_.EditItemPosition(sequence_num, tokens.at(i + 1));
             } catch (const std::out_of_range &e) {
-                output_ << "Unable to edit position of " << sequence_num << ". Valid positions are:" << std::endl;
-                output_ << srt::SubRipItem::substation_alpha_positions << std::endl;
+                output_ << "Unable to edit position of " << sequence_num
+                        << ". Valid positions are:" << std::endl;
+                output_ << srt::SubRipItem::substation_alpha_positions
+                        << std::endl;
                 return;
             }
 
@@ -356,7 +378,8 @@ void Commands::Save() {
     auto path_wrapper = fs::path(fs::u8path(paths_.output_subtitle_path));
     std::ofstream file{path_wrapper, std::ofstream::out | std::ofstream::trunc};
     if (!file) {
-        throw std::runtime_error("Could not open file " + paths_.output_subtitle_path);
+        throw std::runtime_error("Could not open file " +
+                                 paths_.output_subtitle_path);
     }
     srt_file_.ToStream(file);
     srt_file_has_changed_ = false;
@@ -378,8 +401,8 @@ void Commands::Quit() {
     }
 }
 
-// If there are subtitles at this player position, generate a temp file with those subs.
-// Then set the player to display them.
+// If there are subtitles at this player position, generate a temp file with
+// those subs. Then set the player to display them.
 void Commands::_GeneratePreviewSubs() {
     std::ostringstream temp_subtitles_stream;
     srt_file_.ToStream(temp_subtitles_stream, start_, duration_);
@@ -397,5 +420,5 @@ void Commands::_GeneratePreviewSubs() {
     }
 }
 
-} // namespace cli
-} // namespace subtitler
+}  // namespace cli
+}  // namespace subtitler

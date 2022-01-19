@@ -1,6 +1,7 @@
 #include "subtitler/util/unicode.h"
 
 #include <windows.h>
+
 #include <stdexcept>
 
 namespace subtitler {
@@ -68,4 +69,4 @@ std::wstring ConvertToWString(const std::string &str) {
     return result;
 }
 
-} // namespace subtitler
+}  // namespace subtitler

@@ -1,7 +1,9 @@
-#include <gtest/gtest.h>
-#include <gmock/gmock.h>
-#include <chrono>
 #include "subtitler/util/duration_format.h"
+
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
+
+#include <chrono>
 
 using namespace std::chrono_literals;
 using namespace subtitler;

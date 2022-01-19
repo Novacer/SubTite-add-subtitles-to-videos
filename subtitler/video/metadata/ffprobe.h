@@ -1,23 +1,22 @@
 #ifndef SUBTITLER_VIDEO_METADATA_FFPROBE
 #define SUBTITLER_VIDEO_METADATA_FFPROBE
 
-#include <string>
+#include <chrono>
 #include <memory>
 #include <optional>
+#include <string>
 #include <vector>
-#include <chrono>
 
 // Forward declaration
 namespace subtitler::subprocess {
 
 class SubprocessExecutor;
 
-} // namespace subtitler::subprocess
+}  // namespace subtitler::subprocess
 
 namespace subtitler {
 namespace video {
 namespace metadata {
-
 
 struct AudioStreamInfo {
     int index;
@@ -46,22 +45,22 @@ struct Metadata {
 };
 
 class FFProbe {
-public:
-    FFProbe(const std::string &ffprobe_path, std::unique_ptr<subprocess::SubprocessExecutor> executor);
+  public:
+    FFProbe(const std::string &ffprobe_path,
+            std::unique_ptr<subprocess::SubprocessExecutor> executor);
     ~FFProbe();
 
     std::unique_ptr<Metadata> GetVideoMetadata(const std::string &video_path);
 
-private:
+  private:
     std::string ffprobe_path_;
     std::unique_ptr<subprocess::SubprocessExecutor> executor_;
 
     std::vector<std::string> BuildArgs();
 };
 
-} // namespace metadata
-} // namespace video
-} // namespace subtitler
-
+}  // namespace metadata
+}  // namespace video
+}  // namespace subtitler
 
 #endif

@@ -2,10 +2,10 @@
 #define SUBTITLER_SRT_SUBRIP_FILE_H
 
 #include <chrono>
-#include <sstream>
-#include <vector>
-#include <unordered_map>
 #include <functional>
+#include <sstream>
+#include <unordered_map>
+#include <vector>
 
 namespace subtitler {
 namespace srt {
@@ -15,7 +15,7 @@ class SubRipItem;
 
 // Internal representation of an SRT subtitle file.
 class SubRipFile {
-public:
+  public:
     SubRipFile() = default;
 
     // Prints the entire SubRipFile to the stream.
@@ -23,17 +23,15 @@ public:
 
     // Prints a valid SRT file with only the SubRipItems
     // that have non-empty intersections with [start, start + end].
-    void ToStream(
-        std::ostream &output,
-        std::chrono::milliseconds start,
-        std::chrono::milliseconds duration) const;
+    void ToStream(std::ostream &output, std::chrono::milliseconds start,
+                  std::chrono::milliseconds duration) const;
 
     // Return the number of SubRipItems.
     std::size_t NumItems() const;
 
-    // Returns the SubRipItems which have start and ends intersecting with the given interval.
-    // SubRipItems are keyed by sequence number.
-    // Worst case this is a linear search.
+    // Returns the SubRipItems which have start and ends intersecting with the
+    // given interval. SubRipItems are keyed by sequence number. Worst case this
+    // is a linear search.
     std::unordered_map<std::size_t, const SubRipItem *> GetCollisions(
         std::chrono::milliseconds start,
         std::chrono::milliseconds duration) const;
@@ -50,21 +48,22 @@ public:
     // Edits the positioning of an existing SubRipItem.
     // Reference SubRipItem::pos_to_id for valid positions.
     // Throws std::out_of_range if invalid sequence or position is provided.
-    void EditItemPosition(std::size_t sequence_number, const std::string &position);
+    void EditItemPosition(std::size_t sequence_number,
+                          const std::string &position);
 
-private:
-    // SRT items should be ordered by start time to allow for overlapping subtitles.
+  private:
+    // SRT items should be ordered by start time to allow for overlapping
+    // subtitles.
     std::vector<SubRipItem> items_;
 
-    // Find all intervals with non-empty intersection with [start, start + duration]
-    // For each item found, call on_find(index_of_item, item).
+    // Find all intervals with non-empty intersection with [start, start +
+    // duration] For each item found, call on_find(index_of_item, item).
     void ForEachOverlappingItem(
-        std::chrono::milliseconds start,
-        std::chrono::milliseconds duration,
+        std::chrono::milliseconds start, std::chrono::milliseconds duration,
         std::function<void(std::size_t, const SubRipItem &)> on_find) const;
 };
 
-} // namespace srt
-} // namespace subtitler
+}  // namespace srt
+}  // namespace subtitler
 
 #endif

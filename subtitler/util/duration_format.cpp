@@ -1,14 +1,16 @@
 #include "subtitler/util/duration_format.h"
 
-#include <sstream>
 #include <algorithm>
+#include <sstream>
+
 #include "date/date.h"
 
 namespace subtitler {
 
-std::optional<std::chrono::milliseconds> ParseDuration(const std::string &duration) {
+std::optional<std::chrono::milliseconds> ParseDuration(
+    const std::string &duration) {
     // Verify allowable characters
-    for (const auto &c: duration) {
+    for (const auto &c : duration) {
         if (!std::isdigit(c) && c != '.' && c != ':') {
             return std::nullopt;
         }
@@ -62,4 +64,4 @@ std::string ToSubRipDuration(const std::chrono::milliseconds &duration) {
     return result;
 }
 
-} // namespace subtitler
+}  // namespace subtitler

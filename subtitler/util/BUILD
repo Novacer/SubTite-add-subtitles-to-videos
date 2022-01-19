@@ -3,60 +3,60 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 package(default_visibility = ["//subtitler:__subpackages__"])
 
 cc_library(
-  name = "duration_format",
-  hdrs = ["duration_format.h"],
-  srcs = ["duration_format.cpp"],
-  deps = [
-    "@howard_hinnant_date//:date",
-  ],
+    name = "duration_format",
+    srcs = ["duration_format.cpp"],
+    hdrs = ["duration_format.h"],
+    deps = [
+        "@howard_hinnant_date//:date",
+    ],
 )
 
 cc_test(
-  name = "duration_format_test",
-  size = "small",
-  srcs = ["duration_format_test.cpp"],
-  deps = [
-    ":duration_format",
-    "@com_google_googletest//:gtest_main",
-  ],
+    name = "duration_format_test",
+    size = "small",
+    srcs = ["duration_format_test.cpp"],
+    deps = [
+        ":duration_format",
+        "@com_google_googletest//:gtest_main",
+    ],
 )
 
 cc_library(
-  name = "font_config",
-  hdrs = ["font_config.h"],
-  srcs = select({
-    "@bazel_tools//src/conditions:windows": ["font_config_msvc.cpp"],
-    "@bazel_tools//src/conditions:darwin": ["font_config_gcc.cpp"],
-     "//conditions:default": ["font_config_gcc.cpp"],
-  }),
-  deps = [],
+    name = "font_config",
+    srcs = select({
+        "@bazel_tools//src/conditions:windows": ["font_config_msvc.cpp"],
+        "@bazel_tools//src/conditions:darwin": ["font_config_gcc.cpp"],
+        "//conditions:default": ["font_config_gcc.cpp"],
+    }),
+    hdrs = ["font_config.h"],
+    deps = [],
 )
 
 cc_library(
-  name = "temp_file",
-  hdrs = ["temp_file.h"],
-  srcs = ["temp_file.cpp"],
-  deps = [
-    "@com_github_google_glog//:glog",
-  ],
+    name = "temp_file",
+    srcs = ["temp_file.cpp"],
+    hdrs = ["temp_file.h"],
+    deps = [
+        "@com_github_google_glog//:glog",
+    ],
 )
 
 cc_test(
-  name = "temp_file_test",
-  size = "small",
-  srcs = ["temp_file_test.cpp"],
-  deps = [
-    ":temp_file",
-    "@com_google_googletest//:gtest_main",
-  ],
+    name = "temp_file_test",
+    size = "small",
+    srcs = ["temp_file_test.cpp"],
+    deps = [
+        ":temp_file",
+        "@com_google_googletest//:gtest_main",
+    ],
 )
 
 cc_library(
-  name = "unicode",
-  hdrs = ["unicode.h"],
-  srcs = select({
-    "@bazel_tools//src/conditions:windows": ["unicode.cpp"],
-    "@bazel_tools//src/conditions:darwin": [],
-     "//conditions:default": [],
-  }),
+    name = "unicode",
+    srcs = select({
+        "@bazel_tools//src/conditions:windows": ["unicode.cpp"],
+        "@bazel_tools//src/conditions:darwin": [],
+        "//conditions:default": [],
+    }),
+    hdrs = ["unicode.h"],
 )

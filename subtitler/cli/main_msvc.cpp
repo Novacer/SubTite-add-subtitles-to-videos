@@ -8,8 +8,9 @@
 #include <io.h>
 #include <fcntl.h>
 
-#pragma comment(lib, "comdlg32.lib")
+#pragma comment(lib, "ole32.lib")
 #include <windows.h>
+#include <shobjidl.h> 
 
 #include "subtitler/subprocess/subprocess_executor.h"
 #include "subtitler/video/player/ffplay.h"
@@ -65,30 +66,134 @@ void FixInputPath(std::string &path, bool should_have_quotes) {
     }
 }
 
-// Opens a window file dialog to get the file paths.
-// This is the preferred method, since typing the path through terminal
-// may mess up the character encodings.
-void GetFileFromDialog(WCHAR *path_buffer, const std::wstring &dialog_title, bool save) {
-    OPENFILENAMEW ofn;
-    ZeroMemory(&ofn, sizeof(ofn));
-    ofn.lStructSize = sizeof(ofn);
-    ofn.hwndOwner = NULL;
-    ofn.lpstrFilter = NULL;
-    ofn.lpstrFile = path_buffer;
-    ofn.nMaxFile = MAX_PATH;
-    ofn.lpstrTitle = dialog_title.c_str();
-    ofn.Flags = OFN_DONTADDTORECENT;
-
-    if (!save) {
-        ofn.Flags |= OFN_FILEMUSTEXIST;
-        if (!GetOpenFileNameW( &ofn )) {
-            throw std::runtime_error("Unable to open file");
-        }
-    } else {
-        if (!GetSaveFileNameW( &ofn )) {
-            throw std::runtime_error("Unable to save file");
-        }
+// Windows specific function to open a dialog for selecting file paths.
+// Used to open an existing file.
+std::wstring OpenFileDialog() {
+    HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+    std::wstring result;
+    if (FAILED(hr)) {
+        throw std::runtime_error("Could not initialize COM library");
     }
+    IFileOpenDialog *pFileOpen;
+
+    // Create the FileOpenDialog object.
+    hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL, 
+            IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen));
+
+    if (FAILED(hr)) {
+        CoUninitialize();
+        throw std::runtime_error("Could not create OpenFileDialog instance");
+    }
+    DWORD dwFlags = 0;
+    hr = pFileOpen->GetOptions(&dwFlags);
+    if (FAILED(hr)) {
+        pFileOpen->Release();
+        CoUninitialize();
+        throw std::runtime_error("Could not retrieve internal dialog options");
+    }
+    hr = pFileOpen->SetOptions(dwFlags | FOS_DONTADDTORECENT);
+    if (FAILED(hr)) {
+        pFileOpen->Release();
+        CoUninitialize();
+        throw std::runtime_error("Could not set internal dialog options");
+    }
+    hr = pFileOpen->Show(NULL);
+    if (FAILED(hr)) {
+        pFileOpen->Release();
+        CoUninitialize();
+        throw std::runtime_error("Could not open OpenFileDialog");
+    }
+    IShellItem *pItem;
+    hr = pFileOpen->GetResult(&pItem);
+    if (FAILED(hr)) {
+        pFileOpen->Release();
+        CoUninitialize();
+        throw std::runtime_error("Could not get FileOpenResult");
+    }
+    PWSTR pszFilePath;
+    hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+    if (FAILED(hr)) {
+        pItem->Release();
+        pFileOpen->Release();
+        CoUninitialize();
+        throw std::runtime_error("Could not get opened file path");
+    }
+    result = pszFilePath;
+
+    // Cleanup
+    CoTaskMemFree(pszFilePath);
+    pItem->Release();
+    pFileOpen->Release();
+    CoUninitialize();
+
+    if (result.empty()) {
+        throw std::runtime_error("Unexpected empty path selected!");
+    }
+    return result;
+}
+
+std::wstring SaveFileDialog() {
+    HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+    std::wstring result;
+    if (FAILED(hr)) {
+        throw std::runtime_error("Could not initialize COM library");
+    }
+    IFileSaveDialog *pFileSave;
+
+    // Create the FileOpenDialog object.
+    hr = CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_ALL, 
+            IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave));
+
+    if (FAILED(hr)) {
+        CoUninitialize();
+        throw std::runtime_error("Could not create SaveFileDialog instance");
+    }
+    DWORD dwFlags = 0;
+    hr = pFileSave->GetOptions(&dwFlags);
+    if (FAILED(hr)) {
+        pFileSave->Release();
+        CoUninitialize();
+        throw std::runtime_error("Could not retrieve internal dialog options");
+    }
+    hr = pFileSave->SetOptions(dwFlags | FOS_DONTADDTORECENT);
+    if (FAILED(hr)) {
+        pFileSave->Release();
+        CoUninitialize();
+        throw std::runtime_error("Could not set internal dialog options");
+    }
+    hr = pFileSave->Show(NULL);
+    if (FAILED(hr)) {
+        pFileSave->Release();
+        CoUninitialize();
+        throw std::runtime_error("Could not open OpenFileDialog");
+    }
+    IShellItem *pItem;
+    hr = pFileSave->GetResult(&pItem);
+    if (FAILED(hr)) {
+        pFileSave->Release();
+        CoUninitialize();
+        throw std::runtime_error("Could not get FileOpenResult");
+    }
+    PWSTR pszFilePath;
+    hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+    if (FAILED(hr)) {
+        pItem->Release();
+        pFileSave->Release();
+        CoUninitialize();
+        throw std::runtime_error("Could not get file save path");
+    }
+    result = pszFilePath;
+
+    // Cleanup
+    CoTaskMemFree(pszFilePath);
+    pItem->Release();
+    pFileSave->Release();
+    CoUninitialize();
+
+    if (result.empty()) {
+        throw std::runtime_error("Unexpected empty path selected!");
+    }
+    return result;
 }
 
 } // namespace
@@ -100,6 +205,10 @@ DEFINE_validator(ffprobe_path, &ValidateFlagNonEmpty);
 int main(int argc, char **argv) {
     using namespace subtitler;
     namespace fs = std::filesystem;
+
+    // Temporary workaround until Bill Gates fixes this deadlock with ASAN and OpenFileDialog
+    // More info: https://stackoverflow.com/a/69718929/17786559
+    SetProcessAffinityMask(GetCurrentProcess(), 1);
 
     google::InitGoogleLogging(argv[0]);
     gflags::ParseCommandLineFlags(&argc, &argv, /* remove_flags= */ true);
@@ -120,25 +229,24 @@ int main(int argc, char **argv) {
 
     LOG(INFO) << "Successfully detected all binaries!";
 
-    WCHAR video_path_buffer[MAX_PATH] = {0};
-    WCHAR output_subtitle_path_buffer[MAX_PATH] = {0};
+    std::string video_path;
+    std::string output_subtitle_path;
     try {
         std::cout << "Please select the video file you want to subtitle." << std::endl;
-        GetFileFromDialog(video_path_buffer, L"Choose video path", false);
+        video_path = ConvertFromWString(OpenFileDialog());
     } catch(const std::runtime_error &e) {
+        LOG(ERROR) << e.what();
         LOG(ERROR) << "Unable to open video file. Please try again.";
         return 1;
     }
     try {
         std::cout << "Please select the output subtitle file." << std::endl;
-        GetFileFromDialog(output_subtitle_path_buffer, L"Choose output path", true);
+        output_subtitle_path = ConvertFromWString(SaveFileDialog());
     } catch(const std::runtime_error &e) {
+        LOG(ERROR) << e.what();
         LOG(ERROR) << "Unable to open output subtitle file. Please try again.";
         return 1;
     }
-    
-    auto video_path = ConvertFromWString(video_path_buffer);
-    auto output_subtitle_path = ConvertFromWString(output_subtitle_path_buffer);
 
     // Make sure input file path is wrapped/unwrapped with quotes as needed.
     // Paths passed to command args should have quotes

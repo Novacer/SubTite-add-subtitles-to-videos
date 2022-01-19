@@ -1,4 +1,8 @@
 build:vs2019 --cxxopt='/std:c++17' --cxxopt='/WX'
+build:vs2019-asan --cxxopt='/std:c++17' --cxxopt='/WX' --cxxopt='/fsanitize=address'
+build:vs2019-asan --linkopt='/wholearchive:clang_rt.asan_dynamic-x86_64.lib'
+build:vs2019-asan --linkopt='/wholearchive:clang_rt.asan_dynamic_runtime_thunk-x86_64.lib'
 build:vs2019-prod --cxxopt='/std:c++17' -c opt
+
 build:gcc --cxxopt='-std=c++17' --cxxopt='-Werror'
 build:gcc-prod --cxxopt='-std=c++17' -c opt

@@ -54,5 +54,9 @@ cc_test(
 cc_library(
   name = "unicode",
   hdrs = ["unicode.h"],
-  srcs = ["unicode.cpp"],
+  srcs = select({
+    "@bazel_tools//src/conditions:windows": ["unicode.cpp"],
+    "@bazel_tools//src/conditions:darwin": [],
+     "//conditions:default": [],
+  }),
 )

@@ -2,8 +2,6 @@
 
 namespace subtitler {
 
-std::string get_font_path() {
-    return "C\\:/Windows/Fonts/arial.ttf";
-}
+std::string get_font_path() { return "C\\:/Windows/Fonts/arial.ttf"; }
 
-} // namespace subtitler
+}  // namespace subtitler

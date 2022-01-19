@@ -1,20 +1,22 @@
-#include <gtest/gtest.h>
+#include "subtitler/video/metadata/ffprobe.h"
+
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
+
 #include <chrono>
 #include <nlohmann/json.hpp>
-#include "subtitler/video/metadata/ffprobe.h"
+
 #include "subtitler/subprocess/mock_subprocess_executor.h"
 
-using subtitler::video::metadata::FFProbe;
 using subtitler::subprocess::MockSubprocessExecutor;
+using subtitler::video::metadata::FFProbe;
+using ::testing::_;
+using ::testing::InSequence;
 using ::testing::IsEmpty;
 using ::testing::NiceMock;
-using ::testing::StrictMock;
-using ::testing::InSequence;
 using ::testing::Return;
-using ::testing::_;
+using ::testing::StrictMock;
 using namespace std::chrono_literals;
-
 
 TEST(FFProbeTest, ContainerHasAudioAndVideoStream) {
     auto mock_executor = std::make_unique<NiceMock<MockSubprocessExecutor>>();
@@ -41,14 +43,17 @@ TEST(FFProbeTest, ContainerHasAudioAndVideoStream) {
     })";
     {
         InSequence sequence;
-        EXPECT_CALL(*mock_executor, SetCommand("ffprobe video.mp4 -hide_banner -show_format"
-                                               " -loglevel error -show_streams -print_format json=compact=1"))
+        EXPECT_CALL(
+            *mock_executor,
+            SetCommand(
+                "ffprobe video.mp4 -hide_banner -show_format"
+                " -loglevel error -show_streams -print_format json=compact=1"))
             .Times(1);
-        EXPECT_CALL(*mock_executor, Start())
-            .Times(1);
+        EXPECT_CALL(*mock_executor, Start()).Times(1);
         EXPECT_CALL(*mock_executor, WaitUntilFinished(std::optional<int>(5000)))
             .Times(1)
-            .WillOnce(Return(MockSubprocessExecutor::Output{json_with_audio_stream, ""}));
+            .WillOnce(Return(
+                MockSubprocessExecutor::Output{json_with_audio_stream, ""}));
     }
 
     FFProbe ffprobe("ffprobe", std::move(mock_executor));
@@ -75,16 +80,15 @@ TEST(FFProbeTest, ContainerHasAudioAndVideoStream) {
     ASSERT_EQ(video->duration, 1239s + 195ms);
 }
 
-
 TEST(FFProbeTest, FFProbeStderrIsThrownBackAtCaller) {
     auto mock_executor = std::make_unique<NiceMock<MockSubprocessExecutor>>();
     {
         InSequence sequence;
-        EXPECT_CALL(*mock_executor, Start())
-            .Times(1);
+        EXPECT_CALL(*mock_executor, Start()).Times(1);
         EXPECT_CALL(*mock_executor, WaitUntilFinished(std::optional<int>(5000)))
             .Times(1)
-            .WillOnce(Return(MockSubprocessExecutor::Output{"stdout", "stderr"}));
+            .WillOnce(
+                Return(MockSubprocessExecutor::Output{"stdout", "stderr"}));
     }
 
     try {
@@ -100,8 +104,7 @@ TEST(FFProbeTest, EmptyJsonThrowsError) {
     auto mock_executor = std::make_unique<NiceMock<MockSubprocessExecutor>>();
     {
         InSequence sequence;
-        EXPECT_CALL(*mock_executor, Start())
-            .Times(1);
+        EXPECT_CALL(*mock_executor, Start()).Times(1);
         EXPECT_CALL(*mock_executor, WaitUntilFinished(std::optional<int>(5000)))
             .Times(1)
             .WillOnce(Return(MockSubprocessExecutor::Output{"{}", ""}));

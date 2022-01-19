@@ -1,12 +1,13 @@
 #include "subtitler/video/player/ffplay.h"
 
-#include <vector>
+#include <iostream>
 #include <sstream>
 #include <stdexcept>
+#include <vector>
+
 #include "date/date.h"
 #include "subtitler/subprocess/subprocess_executor.h"
 #include "subtitler/util/font_config.h"
-#include <iostream>
 
 namespace subtitler {
 namespace video {
@@ -20,15 +21,20 @@ std::string FormatChrono(const std::chrono::milliseconds &chrono) {
     return stream.str();
 }
 
-} // namespace
+}  // namespace
 
-FFPlay::FFPlay(const std::string &ffplay_path, std::unique_ptr<subprocess::SubprocessExecutor> executor):
-    ffplay_path_{ffplay_path}, executor_{std::move(executor)}, is_playing_{false} {
+FFPlay::FFPlay(const std::string &ffplay_path,
+               std::unique_ptr<subprocess::SubprocessExecutor> executor)
+    : ffplay_path_{ffplay_path},
+      executor_{std::move(executor)},
+      is_playing_{false} {
     if (ffplay_path_.empty()) {
-        throw std::invalid_argument("FFPlay path provided to ffplay cannot be empty!");
+        throw std::invalid_argument(
+            "FFPlay path provided to ffplay cannot be empty!");
     }
     if (!executor_) {
-        throw std::invalid_argument("Executor provided to ffplay cannot be null!");
+        throw std::invalid_argument(
+            "Executor provided to ffplay cannot be null!");
     }
 }
 
@@ -75,8 +81,9 @@ std::vector<std::string> FFPlay::BuildArgs() {
     }
     if (enable_timestamp_ || !subtitles_path_.empty()) {
         // Reference https://stackoverflow.com/questions/67359117
-        // Note that if we want to display subtitles also, we must have the filters separated by comma.
-        // For example: https://stackoverflow.com/questions/6195872
+        // Note that if we want to display subtitles also, we must have the
+        // filters separated by comma. For example:
+        // https://stackoverflow.com/questions/6195872
         args.emplace_back("-vf");
         std::ostringstream draw_text;
         if (enable_timestamp_) {
@@ -109,7 +116,7 @@ void FFPlay::OpenPlayer(const std::string &video_path) {
     std::ostringstream command;
     command << ffplay_path_ << " " << video_path;
     auto args = BuildArgs();
-    for (const auto &arg: args) {
+    for (const auto &arg : args) {
         command << " " << arg;
     }
     executor_->CaptureOutput(true);
@@ -128,6 +135,6 @@ std::string FFPlay::ClosePlayer(std::optional<int> timeout_ms) {
     return ffplay_output.subproc_stderr;
 }
 
-} // namespace player
-} // namespace video
-} // namespace subtitler
+}  // namespace player
+}  // namespace video
+}  // namespace subtitler

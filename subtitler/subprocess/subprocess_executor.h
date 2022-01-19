@@ -1,18 +1,19 @@
 #ifndef SUBTITLER_SUBPROCESS_SUBPROCESS_EXECUTOR_H
 #define SUBTITLER_SUBPROCESS_SUBPROCESS_EXECUTOR_H
 
-#include <string>
 #include <memory>
 #include <optional>
+#include <string>
 
 namespace subtitler {
 namespace subprocess {
 
 /**
- * SubprocessExecutor serves as an abstraction to asynchronously run a subprocess.
- * Stdout is collected and returned to the caller as a string after termination. 
- * The client may have multiple instances of SubprocessExecutor alive at the same time.
- * 
+ * SubprocessExecutor serves as an abstraction to asynchronously run a
+ * subprocess. Stdout is collected and returned to the caller as a string after
+ * termination. The client may have multiple instances of SubprocessExecutor
+ * alive at the same time.
+ *
  * Sample Usage:
  * SubprocessExecutor subprocess;
  * subprocess.SetCommand("echo hello world");
@@ -22,7 +23,7 @@ namespace subprocess {
  * auto captured_output = subprocess.WaitUntilFinished();
  */
 class SubprocessExecutor {
-public:
+  public:
     SubprocessExecutor();
     SubprocessExecutor(const std::string &command, bool capture_output);
     virtual ~SubprocessExecutor();
@@ -33,7 +34,8 @@ public:
     // Sets whether stdout and stderr should be captured.
     virtual void CaptureOutput(bool capture_output);
 
-    // Start executing the command. Throws std::runtime_error if unable to Start() the command.
+    // Start executing the command. Throws std::runtime_error if unable to
+    // Start() the command.
     virtual void Start();
 
     struct Output {
@@ -44,10 +46,12 @@ public:
     // Wait until process finishes and return its stdout and stderr.
     // If capture output is set false, then returns empty string.
     // If timeout is not set then wait forever.
-    // If timeout is set, then wait at most 2 * timeout_ms before force terminating the process.
-    virtual Output WaitUntilFinished(std::optional<int> timeout_ms = std::nullopt);
+    // If timeout is set, then wait at most 2 * timeout_ms before force
+    // terminating the process.
+    virtual Output WaitUntilFinished(
+        std::optional<int> timeout_ms = std::nullopt);
 
-private:
+  private:
     std::string command_;
     bool capture_output_;
     bool is_running_;
@@ -56,7 +60,7 @@ private:
     std::unique_ptr<PlatformDependentFields> fields;
 };
 
-} // namespace subprocess
-} // namespace subtitler
+}  // namespace subprocess
+}  // namespace subtitler
 
 #endif

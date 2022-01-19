@@ -1,8 +1,10 @@
-#include <gtest/gtest.h>
+#include "subtitler/srt/subrip_item.h"
+
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
+
 #include <chrono>
 #include <stdexcept>
-#include "subtitler/srt/subrip_item.h"
 
 using namespace std::chrono_literals;
 using namespace subtitler;
@@ -25,8 +27,7 @@ TEST(SubRipItemTest, MultiLineSubtitle) {
         "00:00:01,123 --> 00:00:06,123\n"
         "This is a subtitle!\n"
         "This is another line!\n",
-        output.str()
-    );
+        output.str());
 }
 
 TEST(SubRipItemTest, ClearSubtitle) {
@@ -45,39 +46,34 @@ TEST(SubRipItemTest, ClearSubtitle) {
         "123\n"
         "00:00:01,123 --> 00:00:06,123\n"
         "This line should be seen!\n",
-        output.str()
-    );
+        output.str());
 }
 
 TEST(SubRipItemTest, SetPosition) {
     SubRipItem item;
-    item.start(1s + 123ms)
-        ->duration(5s)
-        ->append_line("Hello World!");
+    item.start(1s + 123ms)->duration(5s)->append_line("Hello World!");
 
     ASSERT_EQ(1, item.num_lines());
-    
+
     std::vector<std::string> positions = {
         "bottom-left", "bottom-center", "bottom-right",
         "middle-left", "middle-center", "middle-right",
-        "top-left", "top-center", "top-right"
-    };
-    std::vector<std::string> abbrev_positions = {
-        "bl", "bc", "br",
-        "ml", "mc", "mr",
-        "tl", "tc", "tr"
-    };
+        "top-left",    "top-center",    "top-right"};
+    std::vector<std::string> abbrev_positions = {"bl", "bc", "br", "ml", "mc",
+                                                 "mr", "tl", "tc", "tr"};
 
-    auto verify_position_ids = [item](const std::vector<std::string> &positions) mutable {
-        int expected_pos_id = 1;
-        for (const auto &position: positions) {
-            std::ostringstream output;
-            item.position(position)
-                ->ToStream(402, output);
-            ASSERT_THAT(output.str(), HasSubstr("{\\an" + std::to_string(expected_pos_id) + "}"));
-            ++expected_pos_id;
-        }
-    };
+    auto verify_position_ids =
+        [item](const std::vector<std::string> &positions) mutable {
+            int expected_pos_id = 1;
+            for (const auto &position : positions) {
+                std::ostringstream output;
+                item.position(position)->ToStream(402, output);
+                ASSERT_THAT(
+                    output.str(),
+                    HasSubstr("{\\an" + std::to_string(expected_pos_id) + "}"));
+                ++expected_pos_id;
+            }
+        };
 
     verify_position_ids(positions);
     verify_position_ids(abbrev_positions);
@@ -86,24 +82,22 @@ TEST(SubRipItemTest, SetPosition) {
 TEST(SubRipItemTest, SetPositionThrowsOutOfRange) {
     try {
         SubRipItem item;
-            item.start(1s + 123ms)
-                ->duration(5s)
-                ->position("blahblah")
-                ->append_line("Hello World!")
-                ->append_line("Foo bar baz.");
-        
+        item.start(1s + 123ms)
+            ->duration(5s)
+            ->position("blahblah")
+            ->append_line("Hello World!")
+            ->append_line("Foo bar baz.");
+
         FAIL() << "Expected std::out_of_range exception";
-    } catch (const std::out_of_range &e) {}
+    } catch (const std::out_of_range &e) {
+    }
 }
 
 TEST(SubRipItemTest, Compare) {
     SubRipItem a, b, c;
-    a.start(1s)
-        ->duration(4s);
-    b.start(2000ms)
-        ->duration(1s);
-    c.start(1s)
-        ->duration(2s);
+    a.start(1s)->duration(4s);
+    b.start(2000ms)->duration(1s);
+    c.start(1s)->duration(2s);
 
     ASSERT_LT(a, b);
     ASSERT_LT(c, a);
@@ -121,23 +115,18 @@ TEST(SubRipItemTest, CopySemantics) {
     std::ostringstream output_b;
     b.ToStream(456, output_b);
 
-    const auto expected = "456\n"
-                          "00:00:01,000 --> 00:00:03,000\n"
-                          "{\\an1} hello world\n";
+    const auto expected =
+        "456\n"
+        "00:00:01,000 --> 00:00:03,000\n"
+        "{\\an1} hello world\n";
 
-    ASSERT_EQ(
-        expected,
-        output_b.str()
-    );
+    ASSERT_EQ(expected, output_b.str());
 
     SubRipItem c{b};
     std::ostringstream output_c;
     c.ToStream(456, output_c);
 
-    ASSERT_EQ(
-        expected,
-        output_c.str()
-    );
+    ASSERT_EQ(expected, output_c.str());
 }
 
 TEST(SubRipItemTest, MoveSemantics) {
@@ -152,21 +141,16 @@ TEST(SubRipItemTest, MoveSemantics) {
     std::ostringstream output_b;
     b.ToStream(456, output_b);
 
-    const auto expected = "456\n"
-                          "00:00:01,000 --> 00:00:03,000\n"
-                          "{\\an1} hello world\n";
+    const auto expected =
+        "456\n"
+        "00:00:01,000 --> 00:00:03,000\n"
+        "{\\an1} hello world\n";
 
-    ASSERT_EQ(
-        expected,
-        output_b.str()
-    );
+    ASSERT_EQ(expected, output_b.str());
 
     SubRipItem c{std::move(b)};
     std::ostringstream output_c;
     c.ToStream(456, output_c);
 
-    ASSERT_EQ(
-        expected,
-        output_c.str()
-    );
+    ASSERT_EQ(expected, output_c.str());
 }

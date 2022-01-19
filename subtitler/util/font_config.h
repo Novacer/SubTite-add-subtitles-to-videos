@@ -7,6 +7,6 @@ namespace subtitler {
 
 std::string get_font_path();
 
-} // namespace subtitler
+}  // namespace subtitler
 
 #endif

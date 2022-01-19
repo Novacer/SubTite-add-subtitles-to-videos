@@ -1,9 +1,10 @@
 #include "subtitler/cli/io/input.h"
 #include "subtitler/util/unicode.h"
 
-namespace subtitler::cli::io{
+namespace subtitler::cli::io {
 
-WideInputGetter::WideInputGetter(std::wistream &stream): InputGetter{}, stream_{stream} {}
+WideInputGetter::WideInputGetter(std::wistream &stream)
+    : InputGetter{}, stream_{stream} {}
 
 bool WideInputGetter::getline(std::string &line) {
     std::wstring temp;
@@ -14,4 +15,4 @@ bool WideInputGetter::getline(std::string &line) {
     return true;
 }
 
-} // namespace subtitler::cli::io
+}  // namespace subtitler::cli::io

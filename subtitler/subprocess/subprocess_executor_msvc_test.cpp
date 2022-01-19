@@ -1,5 +1,6 @@
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
+
 #include "subtitler/subprocess/subprocess_executor.h"
 
 using subtitler::subprocess::SubprocessExecutor;
@@ -58,7 +59,9 @@ TEST(SubprocessExecutor, StartTwiceWithoutWaitingThrowsError) {
         executor.Start();
         FAIL() << "Expected std::runtime_error";
     } catch (const std::runtime_error &e) {
-        ASSERT_STREQ(e.what(), "You must call WaitUntilFinished() before starting again.");
+        ASSERT_STREQ(
+            e.what(),
+            "You must call WaitUntilFinished() before starting again.");
     }
 }
 
@@ -72,7 +75,8 @@ TEST(SubprocessExecutor, StopTwiceWithoutStartingThrowsError) {
         executor.WaitUntilFinished();
         FAIL() << "Expected std::runtime_error";
     } catch (const std::runtime_error &e) {
-        ASSERT_STREQ(e.what(), "You must call Start() before you are able to wait.");
+        ASSERT_STREQ(e.what(),
+                     "You must call Start() before you are able to wait.");
     }
 }
 

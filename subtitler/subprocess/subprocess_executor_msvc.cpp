@@ -3,9 +3,11 @@
 #pragma comment(lib, "User32.lib")
 
 #include <windows.h>
-#include <stdexcept>
-#include <sstream>
+
 #include <future>
+#include <sstream>
+#include <stdexcept>
+
 #include "subtitler/util/unicode.h"
 
 namespace subtitler {
@@ -41,23 +43,23 @@ BOOL CALLBACK SendWMCloseMsg(HWND hwnd, LPARAM lParam) {
 
 std::string PollHandle(const HANDLE handle) {
     DWORD amount_read;
-    CHAR buffer[BUFFER_SIZE + 1]; // Ensure space for null-terminator.
+    CHAR buffer[BUFFER_SIZE + 1];  // Ensure space for null-terminator.
     BOOL success = FALSE;
     std::ostringstream str;
 
-    // Spin until we are unable to read the pipe from child process anymore. 
+    // Spin until we are unable to read the pipe from child process anymore.
     for (;;) {
         success = ReadFile(
-        /* hFile= */ handle,
-        /* lpBuffer= */ buffer,
-        /* nNumberOfBytesToRead= */ BUFFER_SIZE,
-        /* lpNumberOfBytesRead= */ &amount_read,
-        /* lpOverlapped= */ NULL);
+            /* hFile= */ handle,
+            /* lpBuffer= */ buffer,
+            /* nNumberOfBytesToRead= */ BUFFER_SIZE,
+            /* lpNumberOfBytesRead= */ &amount_read,
+            /* lpOverlapped= */ NULL);
 
         if (!success || amount_read == 0) {
             break;
         }
-        
+
         // ensure null termination.
         buffer[amount_read] = '\0';
         str << buffer;
@@ -66,9 +68,9 @@ std::string PollHandle(const HANDLE handle) {
     return str.str();
 }
 
-} // namespace
+}  // namespace
 
-struct SubprocessExecutor::PlatformDependentFields{
+struct SubprocessExecutor::PlatformDependentFields {
     HANDLE hStdOutPipeRead = NULL;
     HANDLE hStdOutPipeWrite = NULL;
     HANDLE hStdErrPipeRead = NULL;
@@ -79,21 +81,22 @@ struct SubprocessExecutor::PlatformDependentFields{
     std::unique_ptr<std::future<std::string>> captured_error = nullptr;
 };
 
-SubprocessExecutor::SubprocessExecutor() :
-    command_{},
-    capture_output_{false},
-    is_running_{false},
-    fields{std::make_unique<PlatformDependentFields>()} {}
+SubprocessExecutor::SubprocessExecutor()
+    : command_{},
+      capture_output_{false},
+      is_running_{false},
+      fields{std::make_unique<PlatformDependentFields>()} {}
 
-SubprocessExecutor::SubprocessExecutor(const std::string &command, bool capture_output) :
-    command_{command},
-    capture_output_{capture_output},
-    is_running_{false},
-    fields{std::make_unique<PlatformDependentFields>()} {}
+SubprocessExecutor::SubprocessExecutor(const std::string &command,
+                                       bool capture_output)
+    : command_{command},
+      capture_output_{capture_output},
+      is_running_{false},
+      fields{std::make_unique<PlatformDependentFields>()} {}
 
 SubprocessExecutor::~SubprocessExecutor() = default;
 
-void SubprocessExecutor::SetCommand(const std::string& command) {
+void SubprocessExecutor::SetCommand(const std::string &command) {
     command_ = command;
 }
 
@@ -103,7 +106,8 @@ void SubprocessExecutor::CaptureOutput(bool capture) {
 
 void SubprocessExecutor::Start() {
     if (is_running_) {
-        throw std::runtime_error("You must call WaitUntilFinished() before starting again.");
+        throw std::runtime_error(
+            "You must call WaitUntilFinished() before starting again.");
     }
 
     SECURITY_ATTRIBUTES security_attributes;
@@ -112,24 +116,33 @@ void SubprocessExecutor::Start() {
     security_attributes.lpSecurityDescriptor = NULL;
 
     if (capture_output_) {
-        if (!CreatePipe(&fields->hStdOutPipeRead, &fields->hStdOutPipeWrite, &security_attributes, 0)) {
-            throw std::runtime_error("Unable to create stdout pipe while running: " + command_);
+        if (!CreatePipe(&fields->hStdOutPipeRead, &fields->hStdOutPipeWrite,
+                        &security_attributes, 0)) {
+            throw std::runtime_error(
+                "Unable to create stdout pipe while running: " + command_);
         }
-        // Do not let child process inherit the read handles (they can only write).
-        if (!SetHandleInformation(fields->hStdOutPipeRead, HANDLE_FLAG_INHERIT, 0)) {
-            throw std::runtime_error("Unable to set stdout handle info while running: " + command_);
+        // Do not let child process inherit the read handles (they can only
+        // write).
+        if (!SetHandleInformation(fields->hStdOutPipeRead, HANDLE_FLAG_INHERIT,
+                                  0)) {
+            throw std::runtime_error(
+                "Unable to set stdout handle info while running: " + command_);
         }
-        if (!CreatePipe(&fields->hStdErrPipeRead, &fields->hStdErrPipeWrite, &security_attributes, 0)) {
-            throw std::runtime_error("Unable to create err pipe while running: " + command_);
+        if (!CreatePipe(&fields->hStdErrPipeRead, &fields->hStdErrPipeWrite,
+                        &security_attributes, 0)) {
+            throw std::runtime_error(
+                "Unable to create err pipe while running: " + command_);
         }
-        if (!SetHandleInformation(fields->hStdErrPipeRead, HANDLE_FLAG_INHERIT, 0)) {
-            throw std::runtime_error("Unable to set err handle info while running: " + command_);
+        if (!SetHandleInformation(fields->hStdErrPipeRead, HANDLE_FLAG_INHERIT,
+                                  0)) {
+            throw std::runtime_error(
+                "Unable to set err handle info while running: " + command_);
         }
     }
 
-    PROCESS_INFORMATION proc_info; 
+    PROCESS_INFORMATION proc_info;
     ZeroMemory(&proc_info, sizeof(PROCESS_INFORMATION));
-    
+
     STARTUPINFOW start_info;
     ZeroMemory(&start_info, sizeof(STARTUPINFOW));
     start_info.cb = sizeof(STARTUPINFOW);
@@ -139,7 +152,7 @@ void SubprocessExecutor::Start() {
 
     std::wstring command = ConvertToWString(command_);
     BOOL success = CreateProcessW(
-        /* lpApplicationName= */NULL,
+        /* lpApplicationName= */ NULL,
         /* lpCommandLine= */ &command[0],
         /* lpProcessAttributes= */ NULL,
         /* lpThreadAttributes= */ NULL,
@@ -151,7 +164,8 @@ void SubprocessExecutor::Start() {
         /* lpProcessInformation= */ &proc_info);
 
     if (!success) {
-        throw std::runtime_error("Unable to create process to run: " + command_);
+        throw std::runtime_error("Unable to create process to run: " +
+                                 command_);
     }
     is_running_ = true;
     fields->hProcess = proc_info.hProcess;
@@ -162,7 +176,8 @@ void SubprocessExecutor::Start() {
 
     // IMPORTANT! Close handles to stdout and stderr write.
     // Since we will not use these we must close them.
-    // Otherwise we get a deadlock since we hold the write pipe, but child needs to write too!
+    // Otherwise we get a deadlock since we hold the write pipe, but child needs
+    // to write too!
     // https://devblogs.microsoft.com/oldnewthing/20110707-00/?p=10223
     CleanupHandle(fields->hStdOutPipeWrite);
     CleanupHandle(fields->hStdErrPipeWrite);
@@ -171,30 +186,28 @@ void SubprocessExecutor::Start() {
         // Launch 2 theads to read from stdout and stderr respectively.
         fields->captured_output = std::make_unique<std::future<std::string>>(
             std::async(std::launch::async,
-            [this]{
-                return PollHandle(fields->hStdOutPipeRead);
-            })
-        );
+                       [this] { return PollHandle(fields->hStdOutPipeRead); }));
         fields->captured_error = std::make_unique<std::future<std::string>>(
             std::async(std::launch::async,
-            [this]{
-                return PollHandle(fields->hStdErrPipeRead);
-            })
-        );
+                       [this] { return PollHandle(fields->hStdErrPipeRead); }));
     }
 }
 
-SubprocessExecutor::Output SubprocessExecutor::WaitUntilFinished(std::optional<int> timeout_ms) {
+SubprocessExecutor::Output SubprocessExecutor::WaitUntilFinished(
+    std::optional<int> timeout_ms) {
     if (!is_running_) {
-        throw std::runtime_error("You must call Start() before you are able to wait.");
+        throw std::runtime_error(
+            "You must call Start() before you are able to wait.");
     }
 
     // First wait to see if it finishes in time.
-    if (timeout_ms && WaitForSingleObject(fields->hProcess, *timeout_ms) == WAIT_TIMEOUT) {
+    if (timeout_ms &&
+        WaitForSingleObject(fields->hProcess, *timeout_ms) == WAIT_TIMEOUT) {
         // If not then ask it nicely to close.
         EnumWindows(&SendWMCloseMsg, fields->dwProcessId);
         // Wait for another timeout_ms before we force terminate.
-        if (WaitForSingleObject(fields->hProcess, *timeout_ms) == WAIT_TIMEOUT) {
+        if (WaitForSingleObject(fields->hProcess, *timeout_ms) ==
+            WAIT_TIMEOUT) {
             // If still not finished, then force kill.
             TerminateProcess(fields->hProcess, /* uExitCode= */ 0);
         }
@@ -225,5 +238,5 @@ SubprocessExecutor::Output SubprocessExecutor::WaitUntilFinished(std::optional<i
     return output;
 }
 
-} // namespace subprocess
-} // namespace subtitler
+}  // namespace subprocess
+}  // namespace subtitler

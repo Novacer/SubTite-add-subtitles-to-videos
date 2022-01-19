@@ -1,22 +1,23 @@
-#include <iostream>
-#include <stdexcept>
-#include <memory>
-#include <fstream>
-#include <filesystem>
+#include <fcntl.h>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 #include <io.h>
-#include <fcntl.h>
+
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <memory>
+#include <stdexcept>
 
 #pragma comment(lib, "ole32.lib")
+#include <shobjidl.h>
 #include <windows.h>
-#include <shobjidl.h> 
 
-#include "subtitler/subprocess/subprocess_executor.h"
-#include "subtitler/video/player/ffplay.h"
 #include "subtitler/cli/commands.h"
 #include "subtitler/cli/io/input.h"
+#include "subtitler/subprocess/subprocess_executor.h"
 #include "subtitler/util/unicode.h"
+#include "subtitler/video/player/ffplay.h"
 
 DEFINE_string(ffplay_path, "ffplay", "Required. Path to ffplay binary.");
 DEFINE_string(ffmpeg_path, "ffmpeg", "Required. Path to ffmpeg binary.");
@@ -34,19 +35,22 @@ void ValidateFFBinaries() {
     subtitler::subprocess::SubprocessExecutor executor;
     executor.CaptureOutput(true);
 
-    for (const auto &binary: {FLAGS_ffplay_path, FLAGS_ffmpeg_path, FLAGS_ffprobe_path}) {
+    for (const auto &binary :
+         {FLAGS_ffplay_path, FLAGS_ffmpeg_path, FLAGS_ffprobe_path}) {
         executor.SetCommand(binary + " -version");
         executor.Start();
         auto output = executor.WaitUntilFinished(5000);
         if (output.subproc_stdout.empty() || !output.subproc_stderr.empty()) {
-            throw std::runtime_error("Error trying to detect binary at " + binary);
+            throw std::runtime_error("Error trying to detect binary at " +
+                                     binary);
         }
     }
 }
 
 // Make a best effort to fix otherwise valid input paths.
-// For example, in some cases we need quotes when passing input paths like "path/to some/folder"
-// as a command line argument. While in some other cases (opening file directly) we don't want to use quotes.
+// For example, in some cases we need quotes when passing input paths like
+// "path/to some/folder" as a command line argument. While in some other cases
+// (opening file directly) we don't want to use quotes.
 void FixInputPath(std::string &path, bool should_have_quotes) {
     if (path.empty() || path.length() < 2) {
         return;
@@ -70,7 +74,8 @@ void FixInputPath(std::string &path, bool should_have_quotes) {
 // If save is true, the file will be treated as an output file.
 // If save is false, the file to be opened must exist.
 std::wstring OpenFileDialog(bool save) {
-    HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+    HRESULT hr =
+        CoInitializeEx(NULL, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
     if (FAILED(hr)) {
         throw std::runtime_error("Could not initialize COM library");
     }
@@ -78,13 +83,15 @@ std::wstring OpenFileDialog(bool save) {
 
     // Create the FileOpenDialog object.
     if (save) {
-        hr = CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_ALL, 
-            IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileDialog));
+        hr = CoCreateInstance(CLSID_FileSaveDialog, NULL, CLSCTX_ALL,
+                              IID_IFileSaveDialog,
+                              reinterpret_cast<void **>(&pFileDialog));
     } else {
-        hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL, 
-            IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileDialog));
+        hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_ALL,
+                              IID_IFileOpenDialog,
+                              reinterpret_cast<void **>(&pFileDialog));
     }
-    
+
     if (FAILED(hr)) {
         CoUninitialize();
         throw std::runtime_error("Could not create FileDialog instance");
@@ -137,7 +144,7 @@ std::wstring OpenFileDialog(bool save) {
     return result;
 }
 
-} // namespace
+}  // namespace
 
 DEFINE_validator(ffplay_path, &ValidateFlagNonEmpty);
 DEFINE_validator(ffmpeg_path, &ValidateFlagNonEmpty);
@@ -147,8 +154,8 @@ int main(int argc, char **argv) {
     using namespace subtitler;
     namespace fs = std::filesystem;
 
-    // Temporary workaround until Bill Gates fixes this deadlock with ASAN and OpenFileDialog
-    // More info: https://stackoverflow.com/a/69718929/17786559
+    // Temporary workaround until Bill Gates fixes this deadlock with ASAN and
+    // OpenFileDialog More info: https://stackoverflow.com/a/69718929/17786559
     SetProcessAffinityMask(GetCurrentProcess(), 1);
 
     google::InitGoogleLogging(argv[0]);
@@ -157,14 +164,17 @@ int main(int argc, char **argv) {
     // Needed to receive unicode input from terminal.
     // TODO: clients need chcp 65001 to see unicode output in terminal.
     _setmode(_fileno(stdin), _O_U16TEXT);
-    
+
     try {
         ValidateFFBinaries();
     } catch (const std::runtime_error &e) {
         LOG(ERROR) << e.what();
-        LOG(ERROR) << "Please verify you have ffmpeg, ffplay, and ffpath installed.";
-        LOG(ERROR) << "You can either add these to your PATH variable and the CLI can detect them automatically.";
-        LOG(ERROR) << "Or you may provide the paths using --ffmpeg_path, --ffprobe_path, --ffplay_path flags";
+        LOG(ERROR)
+            << "Please verify you have ffmpeg, ffplay, and ffpath installed.";
+        LOG(ERROR) << "You can either add these to your PATH variable and the "
+                      "CLI can detect them automatically.";
+        LOG(ERROR) << "Or you may provide the paths using --ffmpeg_path, "
+                      "--ffprobe_path, --ffplay_path flags";
         return 1;
     }
 
@@ -173,17 +183,19 @@ int main(int argc, char **argv) {
     std::string video_path;
     std::string output_subtitle_path;
     try {
-        std::cout << "Please select the video file you want to subtitle." << std::endl;
+        std::cout << "Please select the video file you want to subtitle."
+                  << std::endl;
         video_path = ConvertFromWString(OpenFileDialog(/* save= */ false));
-    } catch(const std::runtime_error &e) {
+    } catch (const std::runtime_error &e) {
         LOG(INFO) << e.what();
         LOG(ERROR) << "Unable to open video file. Please try again.";
         return 1;
     }
     try {
         std::cout << "Please select the output subtitle file." << std::endl;
-        output_subtitle_path = ConvertFromWString(OpenFileDialog(/* save= */ true));
-    } catch(const std::runtime_error &e) {
+        output_subtitle_path =
+            ConvertFromWString(OpenFileDialog(/* save= */ true));
+    } catch (const std::runtime_error &e) {
         LOG(INFO) << e.what();
         LOG(ERROR) << "Unable to open output subtitle file. Please try again.";
         return 1;
@@ -210,14 +222,13 @@ int main(int argc, char **argv) {
 
     cli::Commands::Paths paths{video_path, output_subtitle_path};
     auto executor = std::make_unique<subprocess::SubprocessExecutor>();
-    auto ffplay = std::make_unique<video::player::FFPlay>(FLAGS_ffplay_path, std::move(executor));
-    auto wide_input_getter = std::make_unique<cli::io::WideInputGetter>(std::wcin);
-    
-    cli::Commands commands{
-        paths,
-        std::move(ffplay),
-        std::move(wide_input_getter),
-        std::cout};
+    auto ffplay = std::make_unique<video::player::FFPlay>(FLAGS_ffplay_path,
+                                                          std::move(executor));
+    auto wide_input_getter =
+        std::make_unique<cli::io::WideInputGetter>(std::wcin);
+
+    cli::Commands commands{paths, std::move(ffplay),
+                           std::move(wide_input_getter), std::cout};
 
     try {
         commands.MainLoop();
@@ -225,6 +236,6 @@ int main(int argc, char **argv) {
         LOG(ERROR) << e.what();
         return 1;
     }
-    
+
     return 0;
 }

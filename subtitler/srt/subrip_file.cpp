@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <stdexcept>
+
 #include "subtitler/srt/subrip_item.h"
 
 namespace subtitler {
@@ -14,14 +15,14 @@ void SubRipFile::ToStream(std::ostream &output) const {
     }
 }
 
-void SubRipFile::ToStream(std::ostream &output,
-    std::chrono::milliseconds start,
-    std::chrono::milliseconds duration) const {
+void SubRipFile::ToStream(std::ostream &output, std::chrono::milliseconds start,
+                          std::chrono::milliseconds duration) const {
     std::size_t sequence_number = 1;
 
     auto print_item = [&](std::size_t ignored, const SubRipItem &item) {
-        // To produce a valid SRT file, the first subtitle must begin with sequence one.
-        // Hence we provide our own sequential counter while ignoring the index.
+        // To produce a valid SRT file, the first subtitle must begin with
+        // sequence one. Hence we provide our own sequential counter while
+        // ignoring the index.
         item.ToStream(sequence_number, output);
         output << std::endl;
         ++sequence_number;
@@ -29,17 +30,15 @@ void SubRipFile::ToStream(std::ostream &output,
     this->ForEachOverlappingItem(start, duration, print_item);
 }
 
-std::size_t SubRipFile::NumItems() const {
-    return items_.size();
-}
+std::size_t SubRipFile::NumItems() const { return items_.size(); }
 
 std::unordered_map<std::size_t, const SubRipItem *> SubRipFile::GetCollisions(
-    std::chrono::milliseconds start,
-    std::chrono::milliseconds duration) const {
+    std::chrono::milliseconds start, std::chrono::milliseconds duration) const {
     std::unordered_map<std::size_t, const SubRipItem *> intersections;
 
     auto add_to_intersections = [&](std::size_t index, const SubRipItem &item) {
-        // Recall that sequence number is 1's based, while vector index is 0's based.
+        // Recall that sequence number is 1's based, while vector index is 0's
+        // based.
         intersections[index + 1] = &item;
     };
     this->ForEachOverlappingItem(start, duration, add_to_intersections);
@@ -63,7 +62,8 @@ SubRipItem SubRipFile::RemoveItem(std::size_t sequence_number) {
     return backup;
 }
 
-void SubRipFile::EditItemPosition(std::size_t sequence_number, const std::string &position) {
+void SubRipFile::EditItemPosition(std::size_t sequence_number,
+                                  const std::string &position) {
     if (sequence_number <= 0 || sequence_number > NumItems()) {
         throw std::out_of_range("invalid index passed to EditItemPosition()");
     }
@@ -72,19 +72,18 @@ void SubRipFile::EditItemPosition(std::size_t sequence_number, const std::string
     item.position(position);
 }
 
-
 void SubRipFile::ForEachOverlappingItem(
-    std::chrono::milliseconds start,
-    std::chrono::milliseconds duration,
+    std::chrono::milliseconds start, std::chrono::milliseconds duration,
     std::function<void(std::size_t, const SubRipItem &)> on_find) const {
-    // Run linear search to collect intersections. Since we allow overlaps in existing intervals,
-    // there is not a trivial binary search that we can do. A better way would be to use interval tree,
-    // but until we see an actual need to use one let's Keep it Simple!
+    // Run linear search to collect intersections. Since we allow overlaps in
+    // existing intervals, there is not a trivial binary search that we can do.
+    // A better way would be to use interval tree, but until we see an actual
+    // need to use one let's Keep it Simple!
     auto end = start + duration;
     for (std::size_t i = 0; i < items_.size(); ++i) {
         auto &item = items_.at(i);
-        // Assume items are sorted by start time. If the next interval starts after I end
-        // then none of the remaining items can overlap with me.
+        // Assume items are sorted by start time. If the next interval starts
+        // after I end then none of the remaining items can overlap with me.
         if (item.start_ > end) {
             break;
         }
@@ -97,5 +96,5 @@ void SubRipFile::ForEachOverlappingItem(
     }
 }
 
-} // namespace srt
-} // namespace subtitler
+}  // namespace srt
+}  // namespace subtitler

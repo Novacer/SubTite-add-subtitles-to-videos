@@ -23,17 +23,17 @@ http_archive(
 )
 
 http_archive(
-  name = "com_google_googletest",
-  sha256 = "5cf189eb6847b4f8fc603a3ffff3b0771c08eec7dd4bd961bfd45477dd13eb73",
-  strip_prefix = "googletest-609281088cfefc76f9d0ce82e1ff6c30cc3591e5",
-  # version 1.10.0
-  urls = ["https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip"],
+    name = "com_google_googletest",
+    sha256 = "5cf189eb6847b4f8fc603a3ffff3b0771c08eec7dd4bd961bfd45477dd13eb73",
+    strip_prefix = "googletest-609281088cfefc76f9d0ce82e1ff6c30cc3591e5",
+    # version 1.10.0
+    urls = ["https://github.com/google/googletest/archive/609281088cfefc76f9d0ce82e1ff6c30cc3591e5.zip"],
 )
 
 http_archive(
     name = "howard_hinnant_date",
-    sha256 = "7a390f200f0ccd207e8cff6757e04817c1a0aec3e327b006b7eb451c57ee3538",
     build_file = "//third_party:date.BUILD",
+    sha256 = "7a390f200f0ccd207e8cff6757e04817c1a0aec3e327b006b7eb451c57ee3538",
     strip_prefix = "date-3.0.1",
     urls = ["https://github.com/HowardHinnant/date/archive/v3.0.1.tar.gz"],
 )

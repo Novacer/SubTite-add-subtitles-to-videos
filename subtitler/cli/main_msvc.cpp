@@ -174,7 +174,7 @@ int main(int argc, char **argv) {
     std::string output_subtitle_path;
     try {
         std::cout << "Please select the video file you want to subtitle." << std::endl;
-        video_path = ConvertFromWString(OpenFileDialog(false));
+        video_path = ConvertFromWString(OpenFileDialog(/* save= */ false));
     } catch(const std::runtime_error &e) {
         LOG(INFO) << e.what();
         LOG(ERROR) << "Unable to open video file. Please try again.";
@@ -182,7 +182,7 @@ int main(int argc, char **argv) {
     }
     try {
         std::cout << "Please select the output subtitle file." << std::endl;
-        output_subtitle_path = ConvertFromWString(OpenFileDialog(true));
+        output_subtitle_path = ConvertFromWString(OpenFileDialog(/* save= */ true));
     } catch(const std::runtime_error &e) {
         LOG(INFO) << e.what();
         LOG(ERROR) << "Unable to open output subtitle file. Please try again.";

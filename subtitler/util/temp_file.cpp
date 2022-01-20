@@ -68,7 +68,7 @@ TempFile::TempFile(const std::string &data, const fs::path &parent_path,
         fp = fopen(random_file_name.c_str(), "wx");
         count++;
     }
-    LOG(INFO) << "Found a file name. Now writing data";
+    LOG(INFO) << "Created a temp file " << random_file_name;
     auto err = fputs(data.c_str(), fp);
     if (err < 0) {
         throw std::runtime_error("Failed to write to temp file");
@@ -76,7 +76,6 @@ TempFile::TempFile(const std::string &data, const fs::path &parent_path,
     fclose(fp);
 
     temp_file_name_ = random_file_name;
-    LOG(INFO) << "Using temp_file: " << temp_file_name_;
     escaped_temp_file_name_ = FixPath(temp_file_name_);
 }
 

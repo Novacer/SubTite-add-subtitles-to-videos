@@ -119,61 +119,31 @@ void Commands::MainLoop() {
 void Commands::Help() {
     output_ << "Supported commands:" << std::endl;
     output_ << "help -- Prints the supported commands." << std::endl;
-    output_
-        << "play -- Play the video at the current position." << std::endl
-        << "          Use start or s {time} duration or d {time} to set"
-        << std::endl
-        << "          when to start playing the video and for how long."
-        << std::endl
-        << "          {time} can be formatted as:" << std::endl
-        << "          12.345 => 12.345 seconds (can have at most 5 digits)"
-        << std::endl
-        << "          12:34.0 => 12 minutes 34 seconds" << std::endl
-        << "          1:23:45 => 1 hour 23 minutes 45 seconds" << std::endl
-        << "          sample usage:" << std::endl
-        << "          play start 1:30 duration 5.5 will play video from 1m30s "
-           "to 1m35.5s"
-        << std::endl
-        << "          Use play next to move the player position to the next 10s"
-        << std::endl;
+    output_ << "play -- Play the video at the current position." << std::endl
+            << "          Use start or s {time} duration or d {time} to set" << std::endl
+            << "          when to start playing the video and for how long." << std::endl
+            << "          {time} can be formatted as:" << std::endl
+            << "          12.345 => 12.345 seconds (can have at most 5 digits)" << std::endl
+            << "          12:34.0 => 12 minutes 34 seconds" << std::endl
+            << "          1:23:45 => 1 hour 23 minutes 45 seconds" << std::endl
+            << "          sample usage:" << std::endl
+            << "          play start 1:30 duration 5.5 will play video from 1m30s to 1m35.5s" << std::endl
+            << "          Use play next to move the player position to the next 10s" << std::endl;
     output_ << "quit -- Optionally saves and exits." << std::endl;
     output_ << std::endl;
-    output_ << "printsubs -- Prints the all subtitles at the current player "
-               "position."
-            << std::endl;
-    output_ << "add       -- Adds a subtitle block. Use position or p "
-               "{position} to set the position."
-            << std::endl
-            << "               valid positions are: bottom-left, "
-               "middle-center, top-right and so on."
-            << std::endl
-            << "               You can also abbreviate as: bl, mc, tr etc."
-            << std::endl
-            << "               It is possible to add multiple subtitles to the "
-               "same section of video."
-            << std::endl
-            << "               Use /play to replay the video using the same "
-               "current position."
-            << std::endl
-            << "               Use /cancel to discard any subtitles."
-            << std::endl;
-    output_ << "delete    -- Removes the subtitle. Use delete {seq_num} to "
-               "identify the subtitle."
-            << std::endl
-            << "               Normally, you can only delete subtitles at the "
-               "current player position."
-            << std::endl
-            << "               However delete --force {seq_num} enables "
-               "deleting any subtitle."
-            << std::endl;
-    output_ << "edit      -- Edit an existing subtitle. Currently supports "
-               "changing position."
-            << std::endl
-            << "               Use edit {seq_num} position or p {position} to "
-               "set the new position."
-            << std::endl;
-    output_ << "save      -- Saves the current SRT to the output file."
-            << std::endl;
+    output_ << "printsubs -- Prints the all subtitles at the current player position." << std::endl;
+    output_ << "add       -- Adds a subtitle block. Use position or p {position} to set the position." << std::endl
+            << "               valid positions are: bottom-left, middle-center, top-right and so on." << std::endl
+            << "               You can also abbreviate as: bl, mc, tr etc." << std::endl
+            << "               It is possible to add multiple subtitles to the same section of video." << std::endl
+            << "               Use /play to replay the video using the same current position." << std::endl
+            << "               Use /cancel to discard any subtitles." << std::endl;
+    output_ << "delete    -- Removes the subtitle. Use delete {seq_num} to identify the subtitle." << std::endl
+            << "               Normally, you can only delete subtitles at the current player position." << std::endl
+            << "               However delete --force {seq_num} enables deleting any subtitle." << std::endl;
+    output_ << "edit      -- Edit an existing subtitle. Currently supports changing position." << std::endl
+            << "               Use edit {seq_num} position or p {position} to set the new position." << std::endl;
+    output_ << "save      -- Saves the current SRT to the output file." << std::endl;
 }
 
 void Commands::Play(const std::vector<std::string> &tokens) {

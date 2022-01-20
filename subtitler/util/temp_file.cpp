@@ -4,8 +4,11 @@
 
 #include <cstdio>
 #include <filesystem>
+#include <random>
 #include <sstream>
 #include <stdexcept>
+
+namespace fs = std::filesystem;
 
 namespace subtitler {
 
@@ -29,31 +32,51 @@ std::string FixPath(const std::string &path) {
 
 }  // namespace
 
-TempFile::TempFile(const std::string &data) {
+TempFile::TempFile(const std::string &data, const fs::path &parent_path,
+                   const std::string &extension) {
     FILE *fp = nullptr;
-    char random_file_name[L_tmpnam_s];
+    std::string random_file_name;
+
+    int count = 0;
     while (!fp) {
-        // Generate a random & currently unique file name.
-        // However due to TOCTOU this is not guaranteed to be unique at time of
-        // file creation. Furthermore, symlink attack is also possible. We
-        // attempt to mitigate this by opening in x mode, which fails if file
-        // already exists. Detailed discussion:
-        // https://stackoverflow.com/questions/14230886
-        auto err = tmpnam_s(random_file_name, L_tmpnam_s);
-        if (err) {
-            throw std::runtime_error("Unable to create unique temp file");
+        if (count > 10) {
+            throw std::runtime_error("Could not write random path!");
         }
-        // Write exclusive mode fails if the file already exists.
-        // No analog to this in ofstream hence we use the C function instead.
-        fp = fopen(random_file_name, "wx");
+
+        static std::string chrs =
+            "0123456789"
+            "abcdefghijklmnopqrstuvwxyz"
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+        int length = 10;
+
+        thread_local static std::mt19937 rg{std::random_device{}()};
+        thread_local static std::uniform_int_distribution<
+            std::string::size_type>
+            pick(0, chrs.length() - 1);
+
+        random_file_name.clear();
+        random_file_name.reserve(length);
+
+        while (length--) {
+            random_file_name += chrs.at(pick(rg));
+        }
+
+        auto random_full_path = parent_path / (random_file_name + extension);
+        random_file_name = random_full_path.string();
+
+        fp = fopen(random_file_name.c_str(), "wx");
+        count++;
     }
-    // Temp file successfully created. Push the data to it.
+    LOG(INFO) << "Found a file name. Now writing data";
     auto err = fputs(data.c_str(), fp);
-    if (err) {
+    if (err < 0) {
         throw std::runtime_error("Failed to write to temp file");
     }
     fclose(fp);
+
     temp_file_name_ = random_file_name;
+    LOG(INFO) << "Using temp_file: " << temp_file_name_;
     escaped_temp_file_name_ = FixPath(temp_file_name_);
 }
 

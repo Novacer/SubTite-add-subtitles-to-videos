@@ -1,3 +1,6 @@
+// Experimental binary using ffmpeg to trim videos.
+// TODO: clean this up.
+
 #include <fcntl.h>
 #include <gflags/gflags.h>
 #include <glog/logging.h>
@@ -13,11 +16,10 @@
 #include <shobjidl.h>
 #include <windows.h>
 
-#include "subtitler/cli/commands.h"
-#include "subtitler/cli/io/input.h"
 #include "subtitler/subprocess/subprocess_executor.h"
+#include "subtitler/util/duration_format.h"
+#include "subtitler/util/temp_file.h"
 #include "subtitler/util/unicode.h"
-#include "subtitler/video/player/ffplay.h"
 
 DEFINE_string(ffplay_path, "ffplay", "Required. Path to ffplay binary.");
 DEFINE_string(ffmpeg_path, "ffmpeg", "Required. Path to ffmpeg binary.");
@@ -144,6 +146,11 @@ std::wstring OpenFileDialog(bool save) {
     return result;
 }
 
+struct Interval {
+    std::optional<std::chrono::milliseconds> start;
+    std::optional<std::chrono::milliseconds> end;
+};
+
 }  // namespace
 
 DEFINE_validator(ffplay_path, &ValidateFlagNonEmpty);
@@ -184,57 +191,186 @@ int main(int argc, char **argv) {
     LOG(INFO) << "Successfully detected all binaries!";
 
     std::string video_path;
-    std::string output_subtitle_path;
+    std::string timestamp_path;
+    std::string output_path;
     try {
-        std::cout << "Please select the video file you want to subtitle."
-                  << std::endl;
-        video_path = ConvertFromWString(OpenFileDialog(/* save= */ false));
+        std::cout << "Please select the video file you trim." << std::endl;
+        auto temp = OpenFileDialog(/* save= */ false);
+        LOG(INFO) << temp.size();
+        video_path = ConvertFromWString(temp);
     } catch (const std::runtime_error &e) {
         LOG(INFO) << e.what();
         LOG(ERROR) << "Unable to open video file. Please try again.";
         return 1;
     }
     try {
-        std::cout << "Please select the output subtitle file." << std::endl;
-        output_subtitle_path =
-            ConvertFromWString(OpenFileDialog(/* save= */ true));
+        std::cout << "Please select the time stamp file." << std::endl;
+        auto temp = OpenFileDialog(/* save= */ false);
+        LOG(INFO) << temp.size();
+        timestamp_path = ConvertFromWString(temp);
     } catch (const std::runtime_error &e) {
         LOG(INFO) << e.what();
-        LOG(ERROR) << "Unable to open output subtitle file. Please try again.";
+        LOG(ERROR) << "Unable to open timestamp file. Please try again.";
         return 1;
     }
+    try {
+        std::cout << "Please select output file name." << std::endl;
+        auto temp = OpenFileDialog(/* save= */ true);
+        LOG(INFO) << temp.size();
+        output_path = ConvertFromWString(temp);
+    } catch (const std::runtime_error &e) {
+        LOG(INFO) << e.what();
+        LOG(ERROR) << "Unable to open output file. Please try again.";
+        return 1;
+    }
+
+    LOG(INFO) << video_path;
+    LOG(INFO) << timestamp_path;
+    LOG(INFO) << output_path;
+
+    // IMPORTANT - This must be generated BEFORE the path is fixed with ""
+    auto output_path_wrapper = fs::path(fs::u8path(output_path));
 
     // Make sure input file path is wrapped/unwrapped with quotes as needed.
     // Paths passed to command args should have quotes
     // Paths opened directly should not have quotes.
     // TODO: determine whether the FF binaries should have quotes or not.
     FixInputPath(video_path, /* should_have_quotes= */ true);
-    FixInputPath(output_subtitle_path, /* should_have_quotes= */ false);
+    FixInputPath(timestamp_path, /* should_have_quotes= */ false);
+    FixInputPath(output_path, /* should_have_quotes= */ true);
 
-    // Sanity test writing to output path beforehand so we know it works.
-    {
-        auto path_wrapper = fs::path(fs::u8path(output_subtitle_path));
-        // Write empty string in append mode.
-        std::ofstream ofs{path_wrapper, std::ios_base::app};
-        if (!ofs) {
-            LOG(ERROR) << "Unable to open file: " << output_subtitle_path;
+    auto path_wrapper = fs::path(fs::u8path(timestamp_path));
+
+    std::ifstream stream{path_wrapper};
+    std::string read_buffer;
+    std::vector<Interval> intervals;
+
+    LOG(INFO) << "Reading from file";
+
+    while (std::getline(stream, read_buffer)) {
+        if (read_buffer.empty()) {
+            continue;
+        }
+        std::istringstream line{read_buffer};
+        std::string token;
+        std::optional<std::chrono::milliseconds> start;
+        std::optional<std::chrono::milliseconds> end;
+
+        if (!(line >> token)) {
+            LOG(ERROR) << "Parse error: unable to get start time.";
             return 1;
         }
-        ofs << "";
+        start = subtitler::ParseDuration(token);
+        if (!start) {
+            LOG(ERROR) << "wrong start time format";
+        }
+        if (!(line >> token) || token != "-") {
+            LOG(ERROR) << "Parse error: expected -";
+            return 1;
+        }
+        if (line >> token) {
+            end = subtitler::ParseDuration(token);
+        }
+        intervals.push_back(Interval{start, end});
+        if (!end) {
+            break;
+        }
+    }
+    stream.close();
+
+    LOG(INFO) << "Begin ffmpeg extract intervals...";
+    std::vector<std::unique_ptr<subtitler::TempFile>> temp_files;
+    std::unique_ptr<subtitler::TempFile> file_containing_file_names;
+    try {
+        LOG(INFO) << "before alloc";
+        file_containing_file_names = std::make_unique<subtitler::TempFile>(
+            "", output_path_wrapper.parent_path(), ".txt");
+        LOG(INFO) << "after alloc";
+        if (!file_containing_file_names) {
+            throw std::runtime_error("I don't know why it didn't alloc?");
+        }
+    } catch (const std::exception &e) {
+        LOG(ERROR) << e.what();
+        return 1;
+    }
+    std::ofstream file_names{
+        fs::path(fs::u8path(file_containing_file_names->FileName()))};
+    LOG(INFO) << "Created the first temp file...";
+
+    subtitler::subprocess::SubprocessExecutor executor{};
+    executor.CaptureOutput(true);
+
+    for (const auto &interval : intervals) {
+        auto start_str = subtitler::FormatDuration(*interval.start);
+        std::string end_str = "";
+        if (interval.end) {
+            end_str = subtitler::FormatDuration(*interval.end);
+        }
+
+        LOG(INFO) << "Start interval";
+
+        std::ostringstream builder;
+        builder << "ffmpeg -loglevel error -y -ss " << start_str;
+        if (!end_str.empty()) {
+            builder << " -to " << end_str;
+        }
+        builder << " -i " << video_path;
+        builder << " -f matroska -c copy ";
+
+        try {
+            temp_files.emplace_back(std::make_unique<subtitler::TempFile>(
+                "", output_path_wrapper.parent_path(), ".mkv"));
+        } catch (const std::exception &e) {
+            LOG(ERROR) << e.what();
+            return 1;
+        }
+
+        auto temp_file_name = (*temp_files.rbegin())->FileName();
+        builder << '"' << temp_file_name << '"';
+
+        LOG(INFO) << "Running: " << builder.str();
+        executor.SetCommand(builder.str());
+
+        try {
+            executor.Start();
+            auto output = executor.WaitUntilFinished();
+            if (!output.subproc_stderr.empty()) {
+                LOG(ERROR) << "Encountered error running: " << builder.str();
+                LOG(ERROR) << output.subproc_stderr;
+                return 1;
+            }
+        } catch (const std::exception &e) {
+            LOG(ERROR) << e.what();
+            return 1;
+        }
+
+        LOG(INFO) << "Subproc complete, now writing";
+        // Use the original filename without modifications.
+        file_names << "file '" << temp_file_name << "'"
+                   << std::endl;
     }
 
-    cli::Commands::Paths paths{video_path, output_subtitle_path};
-    auto executor = std::make_unique<subprocess::SubprocessExecutor>();
-    auto ffplay = std::make_unique<video::player::FFPlay>(FLAGS_ffplay_path,
-                                                          std::move(executor));
-    auto wide_input_getter =
-        std::make_unique<cli::io::WideInputGetter>(std::wcin);
+    file_names.close();
 
-    cli::Commands commands{paths, std::move(ffplay),
-                           std::move(wide_input_getter), std::cout};
+    LOG(INFO) << "Split done, now starting concat";
+    // Concat the filenames
+    std::ostringstream builder;
+    builder << "ffmpeg -safe 0 -loglevel error -y -f concat -i ";
+    builder << '"' << file_containing_file_names->FileName() << '"';
+    builder << " -c copy " << output_path;
+
+    LOG(INFO) << "Running " << builder.str();
+
+    executor.SetCommand(builder.str());
 
     try {
-        commands.MainLoop();
+        executor.Start();
+        auto output = executor.WaitUntilFinished();
+        if (!output.subproc_stderr.empty()) {
+            LOG(ERROR) << "Encountered error running: " << builder.str();
+            LOG(ERROR) << output.subproc_stderr;
+            return 1;
+        }
     } catch (const std::exception &e) {
         LOG(ERROR) << e.what();
         return 1;

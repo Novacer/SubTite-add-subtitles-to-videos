@@ -19,7 +19,7 @@ class TempFile {
     // temp file with this data. Throws std::runtime_error if something goes.
     explicit TempFile(const std::string& data,
                       const std::filesystem::path& parent_path,
-                      const std::string &extension);
+                      const std::string& extension);
 
     // When this object is destroyed, the temp file will be deleted.
     ~TempFile();

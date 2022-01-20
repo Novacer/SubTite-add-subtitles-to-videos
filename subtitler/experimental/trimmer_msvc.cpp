@@ -164,12 +164,12 @@ int main(int argc, char **argv) {
     google::InitGoogleLogging(argv[0]);
     gflags::ParseCommandLineFlags(&argc, &argv, /* remove_flags= */ true);
 
-    #ifdef _DEBUG
+#ifdef _DEBUG
     LOG(INFO) << "debug mode";
     // Temporary workaround until Bill Gates fixes this deadlock with ASAN and
     // OpenFileDialog More info: https://stackoverflow.com/a/69718929/17786559
     SetProcessAffinityMask(GetCurrentProcess(), 1);
-    #endif
+#endif
 
     // Needed to receive unicode input from terminal.
     // TODO: clients need chcp 65001 to see unicode output in terminal.
@@ -346,8 +346,7 @@ int main(int argc, char **argv) {
 
         LOG(INFO) << "Subproc complete, now writing";
         // Use the original filename without modifications.
-        file_names << "file '" << temp_file_name << "'"
-                   << std::endl;
+        file_names << "file '" << temp_file_name << "'" << std::endl;
     }
 
     file_names.close();

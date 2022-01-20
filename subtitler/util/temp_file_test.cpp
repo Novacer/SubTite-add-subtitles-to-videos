@@ -3,9 +3,9 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <cstdlib>
 #include <filesystem>
 #include <fstream>
-#include <cstdlib>
 
 using namespace subtitler;
 namespace fs = std::filesystem;

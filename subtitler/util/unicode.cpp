@@ -9,7 +9,7 @@ namespace subtitler {
 std::string ConvertFromWString(const std::wstring &wstr) {
     int num_chars = WideCharToMultiByte(
         /* CodePage= */ CP_UTF8,
-        /* dwFlags= */ WC_COMPOSITECHECK,
+        /* dwFlags= */ WC_ERR_INVALID_CHARS,
         /* lpWideCharStr= */ wstr.c_str(),
         /* cchWideChar= */ wstr.length(),
         /* lpMultiByteStr= */ NULL,
@@ -25,7 +25,7 @@ std::string ConvertFromWString(const std::wstring &wstr) {
     result.resize(num_chars);
     auto res = WideCharToMultiByte(
         /* CodePage= */ CP_UTF8,
-        /* dwFlags= */ WC_COMPOSITECHECK,
+        /* dwFlags= */ WC_ERR_INVALID_CHARS,
         /* lpWideCharStr= */ wstr.c_str(),
         /* cchWideChar= */ wstr.length(),
         /* lpMultiByteStr= */ &result[0],

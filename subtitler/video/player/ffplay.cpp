@@ -1,6 +1,5 @@
 #include "subtitler/video/player/ffplay.h"
 
-#include <iostream>
 #include <sstream>
 #include <stdexcept>
 #include <vector>
@@ -86,6 +85,7 @@ std::vector<std::string> FFPlay::BuildArgs() {
         // https://stackoverflow.com/questions/6195872
         args.emplace_back("-vf");
         std::ostringstream draw_text;
+        draw_text << '"';
         if (enable_timestamp_) {
             draw_text << "drawtext=text='%{pts\\:hms}':"
                       << "fontsize=(h/30):fontcolor=white:"
@@ -102,6 +102,7 @@ std::vector<std::string> FFPlay::BuildArgs() {
             }
             draw_text << "subtitles='" << subtitles_path_ << "'";
         }
+        draw_text << '"';
         args.emplace_back(draw_text.str());
     }
     args.emplace_back("-loglevel error");
@@ -114,6 +115,7 @@ void FFPlay::OpenPlayer(const std::string &video_path) {
         throw std::invalid_argument("Cannot play empty video path!");
     }
     std::ostringstream command;
+    // TODO: always wrap path in quotes.
     command << ffplay_path_ << " " << video_path;
     auto args = BuildArgs();
     for (const auto &arg : args) {

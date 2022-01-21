@@ -1,6 +1,7 @@
 #ifndef SUBTITLER_UTIL_TEMP_FILE_H
 #define SUBTITLER_UTIL_TEMP_FILE_H
 
+#include <filesystem>
 #include <string>
 
 namespace subtitler {
@@ -16,7 +17,9 @@ class TempFile {
   public:
     // Constructor takes in the string data to write, and handles creating a
     // temp file with this data. Throws std::runtime_error if something goes.
-    explicit TempFile(const std::string& data);
+    explicit TempFile(const std::string& data,
+                      const std::filesystem::path& parent_path,
+                      const std::string& extension);
 
     // When this object is destroyed, the temp file will be deleted.
     ~TempFile();

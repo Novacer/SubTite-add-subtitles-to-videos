@@ -55,6 +55,7 @@ void CloseAnyOpenPlayers(video::player::FFPlay *ffplay, std::ostream &output) {
 
 using namespace std::chrono_literals;
 using namespace date;
+namespace fs = std::filesystem;
 
 Commands::Commands(const Paths &paths,
                    std::unique_ptr<video::player::FFPlay> ffplay,
@@ -408,7 +409,9 @@ void Commands::_GeneratePreviewSubs() {
     srt_file_.ToStream(temp_subtitles_stream, start_, duration_);
     std::string temp_subtitles = temp_subtitles_stream.str();
     if (!temp_subtitles.empty()) {
-        temp_file_ = std::make_unique<TempFile>(temp_subtitles);
+        auto output_path = fs::path(fs::u8path(paths_.output_subtitle_path));
+        temp_file_ = std::make_unique<TempFile>(
+            temp_subtitles, output_path.parent_path(), ".srt");
         if (!temp_file_) {
             throw std::runtime_error("Could not make a temp file for the subs");
         }

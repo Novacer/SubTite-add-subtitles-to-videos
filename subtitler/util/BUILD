@@ -37,6 +37,7 @@ cc_library(
     srcs = ["temp_file.cpp"],
     hdrs = ["temp_file.h"],
     deps = [
+        ":unicode",
         "@com_github_google_glog//:glog",
     ],
 )

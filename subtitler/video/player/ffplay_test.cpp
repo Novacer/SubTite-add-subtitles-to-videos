@@ -87,11 +87,11 @@ TEST(FFPlayTest, OpenPlayerWithTimeStampsEnabled) {
     EXPECT_CALL(
         *mock_executor,
         SetCommand("ffplay video.mp4 -sn "
-                   "-vf drawtext=text='%{pts\\:hms}':"
+                   "-vf \"drawtext=text='%{pts\\:hms}':"
                    "fontsize=(h/30):fontcolor=white:box=1:boxcolor=black:"
                    "fontfile='" +
                    subtitler::get_font_path() +
-                   "' "
+                   "'\" "
                    "-loglevel error"))
         .Times(1);
 
@@ -102,7 +102,7 @@ TEST(FFPlayTest, OpenPlayerWithTimeStampsEnabled) {
 TEST(FFPlayTest, OpenPlayerWithSubtitlesEnabled) {
     auto mock_executor = std::make_unique<NiceMock<MockSubprocessExecutor>>();
     EXPECT_CALL(*mock_executor, SetCommand("ffplay video.mp4 -sn "
-                                           "-vf subtitles='subtitle.srt' "
+                                           "-vf \"subtitles='subtitle.srt'\" "
                                            "-loglevel error"))
         .Times(1);
 
@@ -115,12 +115,12 @@ TEST(FFPlayTest, OpenPlayerWithTimeStampsAndSubtitles) {
     EXPECT_CALL(
         *mock_executor,
         SetCommand("ffplay video.mp4 -sn "
-                   "-vf drawtext=text='%{pts\\:hms}':"
+                   "-vf \"drawtext=text='%{pts\\:hms}':"
                    "fontsize=(h/30):fontcolor=white:box=1:boxcolor=black:"
                    "fontfile='" +
                    subtitler::get_font_path() +
                    "'"
-                   ",subtitles='subtitle.srt' "
+                   ",subtitles='subtitle.srt'\" "
                    "-loglevel error"))
         .Times(1);
 

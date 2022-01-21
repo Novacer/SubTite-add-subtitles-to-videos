@@ -21,8 +21,9 @@ namespace subtitler {
 
 namespace {
 
-// Replaces backwards slashes with forward slashes
-// Replaces C: with C\:. Needed to make windows file paths work with ffmpeg.
+// Replaces backwards slashes with forward slashes.
+// Replaces 'C:' with 'C\:'
+// Needed to make windows file paths work with ffmpeg.
 std::string FixPath(const std::string &path) {
     std::ostringstream output;
     for (const auto &c : path) {

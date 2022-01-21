@@ -8,9 +8,9 @@ cc_binary(
     }),
     deps = [
         "//subtitler/subprocess:subprocess_executor",
-        "//subtitler/util:unicode",
         "//subtitler/util:duration_format",
         "//subtitler/util:temp_file",
+        "//subtitler/util:unicode",
         "@com_github_gflags_gflags//:gflags",
         "@com_github_google_glog//:glog",
     ],

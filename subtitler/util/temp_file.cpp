@@ -61,7 +61,6 @@ std::string GetRandomString(int length) {
 #ifdef _MSC_VER
 TempFile::TempFile(const std::string &data, const fs::path &parent_path,
                    const std::string &extension) {
-    LOG(INFO) << "hello";
     HANDLE hFile = INVALID_HANDLE_VALUE;
     std::string random_file_name;
     int count = 0;

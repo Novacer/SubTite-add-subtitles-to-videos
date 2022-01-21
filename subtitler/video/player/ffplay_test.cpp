@@ -23,7 +23,7 @@ TEST(FFPlayTest, OpenPlayerWithDefaultArgs) {
         // The following must occur in sequence.
         EXPECT_CALL(*mock_executor, CaptureOutput(true)).Times(1);
         EXPECT_CALL(*mock_executor,
-                    SetCommand("ffplay video.mp4 -sn -loglevel error"))
+                    SetCommand("ffplay \"video.mp4\" -sn -loglevel error"))
             .Times(1);
         EXPECT_CALL(*mock_executor, Start()).Times(1);
     }
@@ -37,7 +37,8 @@ TEST(FFPlayTest, OpenPlayerWithScreenDimensionSettings) {
     auto mock_executor = std::make_unique<NiceMock<MockSubprocessExecutor>>();
     EXPECT_CALL(
         *mock_executor,
-        SetCommand("ffplay video.mp4 -x 100 -y 200 -fs -sn -loglevel error"))
+        SetCommand(
+            "ffplay \"video.mp4\" -x 100 -y 200 -fs -sn -loglevel error"))
         .Times(1);
 
     FFPlay ffplay("ffplay", std::move(mock_executor));
@@ -47,7 +48,7 @@ TEST(FFPlayTest, OpenPlayerWithScreenDimensionSettings) {
 TEST(FFPlayTest, OpenPlayerWithDisableStreamSettings) {
     auto mock_executor = std::make_unique<NiceMock<MockSubprocessExecutor>>();
     EXPECT_CALL(*mock_executor,
-                SetCommand("ffplay video.mp4 -vn -an -loglevel error"))
+                SetCommand("ffplay \"video.mp4\" -vn -an -loglevel error"))
         .Times(1);
 
     FFPlay ffplay("ffplay", std::move(mock_executor));
@@ -61,7 +62,7 @@ TEST(FFPlayTest, OpenPlayerWithSeekAndDurationSettings) {
     using namespace std::chrono_literals;
     auto mock_executor = std::make_unique<NiceMock<MockSubprocessExecutor>>();
     EXPECT_CALL(*mock_executor,
-                SetCommand("ffplay video.mp4 -sn -ss 00:00:12.345 -t "
+                SetCommand("ffplay \"video.mp4\" -sn -ss 00:00:12.345 -t "
                            "01:23:45.000 -loglevel error"))
         .Times(1);
 
@@ -75,7 +76,8 @@ TEST(FFPlayTest, OpenPlayerWithPositionSettings) {
     auto mock_executor = std::make_unique<NiceMock<MockSubprocessExecutor>>();
     EXPECT_CALL(
         *mock_executor,
-        SetCommand("ffplay video.mp4 -sn -left 100 -top -200 -loglevel error"))
+        SetCommand(
+            "ffplay \"video.mp4\" -sn -left 100 -top -200 -loglevel error"))
         .Times(1);
 
     FFPlay ffplay("ffplay", std::move(mock_executor));
@@ -86,7 +88,7 @@ TEST(FFPlayTest, OpenPlayerWithTimeStampsEnabled) {
     auto mock_executor = std::make_unique<NiceMock<MockSubprocessExecutor>>();
     EXPECT_CALL(
         *mock_executor,
-        SetCommand("ffplay video.mp4 -sn "
+        SetCommand("ffplay \"video.mp4\" -sn "
                    "-vf \"drawtext=text='%{pts\\:hms}':"
                    "fontsize=(h/30):fontcolor=white:box=1:boxcolor=black:"
                    "fontfile='" +
@@ -101,7 +103,7 @@ TEST(FFPlayTest, OpenPlayerWithTimeStampsEnabled) {
 
 TEST(FFPlayTest, OpenPlayerWithSubtitlesEnabled) {
     auto mock_executor = std::make_unique<NiceMock<MockSubprocessExecutor>>();
-    EXPECT_CALL(*mock_executor, SetCommand("ffplay video.mp4 -sn "
+    EXPECT_CALL(*mock_executor, SetCommand("ffplay \"video.mp4\" -sn "
                                            "-vf \"subtitles='subtitle.srt'\" "
                                            "-loglevel error"))
         .Times(1);
@@ -114,7 +116,7 @@ TEST(FFPlayTest, OpenPlayerWithTimeStampsAndSubtitles) {
     auto mock_executor = std::make_unique<NiceMock<MockSubprocessExecutor>>();
     EXPECT_CALL(
         *mock_executor,
-        SetCommand("ffplay video.mp4 -sn "
+        SetCommand("ffplay \"video.mp4\" -sn "
                    "-vf \"drawtext=text='%{pts\\:hms}':"
                    "fontsize=(h/30):fontcolor=white:box=1:boxcolor=black:"
                    "fontfile='" +

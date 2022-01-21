@@ -113,11 +113,10 @@ int main(int argc, char **argv) {
         }
     }
 
-    // Make sure input file path is wrapped/unwrapped with quotes as needed.
-    // Paths passed to command args should have quotes
-    // Paths opened directly should not have quotes.
+    // Make sure input file path is unwrapped with quotes in case
+    // user included them.
     // TODO: determine whether the FF binaries should have quotes or not.
-    FixInputPath(FLAGS_video_path, /* should_have_quotes= */ true);
+    FixInputPath(FLAGS_video_path, /* should_have_quotes= */ false);
     FixInputPath(FLAGS_output_subtitle_path, /* should_have_quotes= */ false);
 
     // Sanity test writing to output path beforehand so we know it works.

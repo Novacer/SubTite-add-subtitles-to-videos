@@ -204,13 +204,6 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    // Make sure input file path is wrapped/unwrapped with quotes as needed.
-    // Paths passed to command args should have quotes
-    // Paths opened directly should not have quotes.
-    // TODO: determine whether the FF binaries should have quotes or not.
-    FixInputPath(video_path, /* should_have_quotes= */ true);
-    FixInputPath(output_subtitle_path, /* should_have_quotes= */ false);
-
     // Sanity test writing to output path beforehand so we know it works.
     {
         auto path_wrapper = fs::path(fs::u8path(output_subtitle_path));

@@ -116,7 +116,7 @@ void FFPlay::OpenPlayer(const std::string &video_path) {
     }
     std::ostringstream command;
     // TODO: always wrap path in quotes.
-    command << ffplay_path_ << " " << video_path;
+    command << ffplay_path_ << " " << '"' << video_path << '"';
     auto args = BuildArgs();
     for (const auto &arg : args) {
         command << " " << arg;

@@ -309,13 +309,21 @@ int main(int argc, char **argv) {
 
         LOG(INFO) << "Start interval";
 
+        // WRT command ordering, checkout
+        // https://github.com/mifi/lossless-cut/pull/13
+        // To get lossless you have to snip on a key frame.
+        // OOTH, if you re-encode you can snip wherever you want.
+        // We choose to re-encode. Slower but very accurate.
         std::ostringstream builder;
-        builder << "ffmpeg -loglevel error -y -ss " << start_str;
+        builder << "ffmpeg -loglevel error";
+        builder << " -i " << video_path;
+        builder << " -y -ss " << start_str;
         if (!end_str.empty()) {
             builder << " -to " << end_str;
         }
-        builder << " -i " << video_path;
-        builder << " -f matroska -c copy ";
+
+        builder << " -f matroska -c:v h264 -c:a aac"
+                << " -avoid_negative_ts make_zero ";
 
         try {
             temp_files.emplace_back(std::make_unique<subtitler::TempFile>(

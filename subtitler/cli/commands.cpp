@@ -12,7 +12,12 @@
 #include "subtitler/srt/subrip_item.h"
 #include "subtitler/util/duration_format.h"
 #include "subtitler/util/temp_file.h"
+#include "subtitler/video/metadata/ffprobe.h"
 #include "subtitler/video/player/ffplay.h"
+
+using namespace std::chrono_literals;
+using namespace date;
+namespace fs = std::filesystem;
 
 namespace subtitler {
 namespace cli {
@@ -51,24 +56,52 @@ void CloseAnyOpenPlayers(video::player::FFPlay *ffplay, std::ostream &output) {
     }
 }
 
-}  // namespace
+std::chrono::milliseconds GetEndTime(
+    const video::metadata::Metadata &metadata) {
+    if (!metadata.audio && !metadata.video) {
+        throw std::invalid_argument(
+            "Video must have at least 1 audio or video track!");
+    }
+    std::chrono::milliseconds audio_end = 0ms;
+    std::chrono::milliseconds video_end = 0ms;
+    if (metadata.audio) {
+        const auto &audio = metadata.audio;
+        audio_end = audio->start_time + audio->duration;
+    }
+    if (metadata.video) {
+        const auto &video = metadata.video;
+        video_end = video->start_time + video->duration;
+    }
+    return std::max(audio_end, video_end);
+}
 
-using namespace std::chrono_literals;
-using namespace date;
-namespace fs = std::filesystem;
+}  // namespace
 
 Commands::Commands(const Paths &paths,
                    std::unique_ptr<video::player::FFPlay> ffplay,
                    std::unique_ptr<io::InputGetter> input_getter,
-                   std::ostream &output)
+                   std::ostream &output,
+                   std::unique_ptr<video::metadata::Metadata> metadata)
     : paths_{paths},
       ffplay_{std::move(ffplay)},
       input_getter_{std::move(input_getter)},
       output_{output},
+      metadata_{std::move(metadata)},
       start_{0ms},
       duration_{5s},
       srt_file_{},
-      srt_file_has_changed_{false} {}
+      srt_file_has_changed_{false} {
+    if (!ffplay_) {
+        throw std::invalid_argument("ffplay must not be null");
+    }
+    if (!input_getter_) {
+        throw std::invalid_argument("input_getter must not be null");
+    }
+    if (!metadata_ || !(metadata_->audio || metadata_->video)) {
+        throw std::invalid_argument(
+            "metadata must not be null nor be without both audio & video");
+    }
+}
 
 Commands::~Commands() = default;
 
@@ -182,6 +215,13 @@ void Commands::Play(const std::vector<std::string> &tokens) {
             output_ << "Unrecognized token: " << tokens.at(i) << std::endl;
             return;
         }
+    }
+
+    if (auto end_time = GetEndTime(*metadata_); start_ + duration_ > end_time) {
+        output_ << "You've reached the end of the video." << std::endl;
+        output_ << "Type quit to save and finish." << std::endl;
+        start_ = std::min(start_, end_time);
+        duration_ = end_time - start_;
     }
 
     output_ << "Playing start=" << FormatDuration(start_)

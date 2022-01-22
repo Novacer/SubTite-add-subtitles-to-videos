@@ -9,6 +9,7 @@
 #include "subtitler/cli/commands.h"
 #include "subtitler/cli/io/input.h"
 #include "subtitler/subprocess/subprocess_executor.h"
+#include "subtitler/video/metadata/ffprobe.h"
 #include "subtitler/video/player/ffplay.h"
 
 DEFINE_string(ffplay_path, "ffplay", "Required. Path to ffplay binary.");
@@ -80,6 +81,12 @@ int main(int argc, char **argv) {
     google::InitGoogleLogging(argv[0]);
     gflags::ParseCommandLineFlags(&argc, &argv, /* remove_flags= */ true);
 
+    // If any binary path has spaces, let's make sure they are not
+    // interpreted wrongly by wrapping them up with quotes.
+    FixInputPath(FLAGS_ffprobe_path, /* should_have_quotes= */ true);
+    FixInputPath(FLAGS_ffprobe_path, /* should_have_quotes= */ true);
+    FixInputPath(FLAGS_ffprobe_path, /* should_have_quotes= */ true);
+
     try {
         ValidateFFBinaries();
     } catch (const std::runtime_error &e) {
@@ -115,7 +122,6 @@ int main(int argc, char **argv) {
 
     // Make sure input file path is unwrapped with quotes in case
     // user included them.
-    // TODO: determine whether the FF binaries should have quotes or not.
     FixInputPath(FLAGS_video_path, /* should_have_quotes= */ false);
     FixInputPath(FLAGS_output_subtitle_path, /* should_have_quotes= */ false);
 
@@ -130,13 +136,35 @@ int main(int argc, char **argv) {
         ofs << "";
     }
 
+    // Get video metadata.
+    std::unique_ptr<video::metadata::Metadata> video_metadata;
+    try {
+        video::metadata::FFProbe ffprobe{
+            FLAGS_ffprobe_path,
+            std::make_unique<subprocess::SubprocessExecutor>()};
+        video_metadata = ffprobe.GetVideoMetadata(FLAGS_video_path);
+    } catch (const std::exception &e) {
+        LOG(INFO) << e.what();
+        LOG(ERROR) << "Unable to read video file: " << FLAGS_video_path;
+        return 1;
+    }
+
+    if (video_metadata == nullptr ||
+        !(video_metadata->audio || video_metadata->video)) {
+        LOG(ERROR) << "The inputted video has unsupported format / "
+                      "It does not have any audio/video tracks";
+        return 1;
+    }
+
     cli::Commands::Paths paths{FLAGS_video_path, FLAGS_output_subtitle_path};
-    auto executor = std::make_unique<subprocess::SubprocessExecutor>();
-    auto ffplay = std::make_unique<video::player::FFPlay>(FLAGS_ffplay_path,
-                                                          std::move(executor));
-    auto input_getter = std::make_unique<cli::io::NarrowInputGetter>(std::cin);
-    cli::Commands commands{paths, std::move(ffplay), std::move(input_getter),
-                           std::cout};
+    auto ffplay = std::make_unique<video::player::FFPlay>(
+        FLAGS_ffplay_path, std::make_unique<subprocess::SubprocessExecutor>());
+    auto narrow_input_getter =
+        std::make_unique<cli::io::NarrowInputGetter>(std::cin);
+
+    cli::Commands commands{paths, std::move(ffplay),
+                           std::move(narrow_input_getter), std::cout,
+                           std::move(video_metadata)};
 
     try {
         commands.MainLoop();

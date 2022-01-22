@@ -16,6 +16,12 @@ class FFPlay;
 
 }  // namespace subtitler::video::player
 
+namespace subtitler::video::metadata {
+
+struct Metadata;
+
+}  // namespace subtitler::video::metadata
+
 namespace subtitler::cli::io {
 
 class InputGetter;
@@ -43,7 +49,8 @@ class Commands {
 
     Commands(const Paths &paths, std::unique_ptr<video::player::FFPlay> ffplay,
              std::unique_ptr<io::InputGetter> input_getter,
-             std::ostream &output);
+             std::ostream &output,
+             std::unique_ptr<video::metadata::Metadata> metadata);
 
     ~Commands();
 
@@ -65,6 +72,7 @@ class Commands {
     bool srt_file_has_changed_;
     std::unique_ptr<TempFile> temp_file_;
     std::unique_ptr<io::InputGetter> input_getter_;
+    std::unique_ptr<video::metadata::Metadata> metadata_;
 
     void Help();
 

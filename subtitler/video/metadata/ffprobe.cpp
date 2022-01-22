@@ -97,7 +97,7 @@ std::unique_ptr<Metadata> FFProbe::GetVideoMetadata(
     }
 
     std::ostringstream command;
-    command << ffprobe_path_ << " " << video_path;
+    command << ffprobe_path_ << " " << '"' << video_path << '"';
     auto args = BuildArgs();
     for (const auto &arg : args) {
         command << " " << arg;

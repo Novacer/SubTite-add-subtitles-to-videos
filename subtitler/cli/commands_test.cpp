@@ -3,6 +3,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <cstdlib>
+#include <filesystem>
 #include <fstream>
 #include <sstream>
 #include <streambuf>
@@ -10,11 +12,18 @@
 #include "subtitler/cli/io/input.h"
 #include "subtitler/subprocess/mock_subprocess_executor.h"
 #include "subtitler/util/font_config.h"
+#include "subtitler/video/metadata/ffprobe.h"
 #include "subtitler/video/player/ffplay.h"
+
+namespace fs = std::filesystem;
+using namespace std::chrono_literals;
 
 using subtitler::cli::Commands;
 using subtitler::cli::io::NarrowInputGetter;
 using subtitler::subprocess::MockSubprocessExecutor;
+using subtitler::video::metadata::AudioStreamInfo;
+using subtitler::video::metadata::Metadata;
+using subtitler::video::metadata::VideoStreamInfo;
 using subtitler::video::player::FFPlay;
 using ::testing::_;
 using ::testing::HasSubstr;
@@ -35,12 +44,26 @@ class CommandsTest : public ::testing::Test {
         mock_executor = executor.get();
         video_path = "path/to/test.mp4";
         ffplay_path = "path/to/ffplay";
-        srt_path = "test.srt";
+        std::string temp_dir = std::getenv("TEST_TMPDIR");
+        auto fs_srt_path =
+            fs::path(fs::u8path(temp_dir)) / fs::path("test.srt");
+        srt_path = fs_srt_path.string();
         // Clear the file beforehand.
         std::ofstream file{srt_path, std::ofstream::out | std::ofstream::trunc};
 
         ffplay = std::make_unique<FFPlay>(ffplay_path, std::move(executor));
         paths = Commands::Paths{video_path, srt_path};
+        metadata = std::make_unique<Metadata>();
+
+        AudioStreamInfo audio{};
+        audio.start_time = 0ms;
+        audio.duration = 2h;
+        metadata->audio = std::move(audio);
+
+        VideoStreamInfo video{};
+        video.start_time = 0ms;
+        video.duration = 2h;
+        metadata->video = std::move(video);
     }
 
     MockSubprocessExecutor *mock_executor;
@@ -49,6 +72,7 @@ class CommandsTest : public ::testing::Test {
     std::string srt_path;
     std::unique_ptr<FFPlay> ffplay;
     Commands::Paths paths;
+    std::unique_ptr<Metadata> metadata;
 };
 
 TEST_F(CommandsTest, HelpReturnsNonEmptyMessage) {
@@ -56,7 +80,7 @@ TEST_F(CommandsTest, HelpReturnsNonEmptyMessage) {
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(),
@@ -68,7 +92,7 @@ TEST_F(CommandsTest, CommandNotRecognizedPrintsToStdout) {
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(),
@@ -88,7 +112,7 @@ TEST_F(CommandsTest, PlayCorrectlySetsStartAndDuration) {
     EXPECT_CALL(*mock_executor, SetCommand(expected_command.str())).Times(1);
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 }
 
@@ -105,7 +129,7 @@ TEST_F(CommandsTest, PlayCorrectlySetsStartAndDuration_Swapped) {
     EXPECT_CALL(*mock_executor, SetCommand(expected_command.str())).Times(1);
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 }
 
@@ -114,7 +138,7 @@ TEST_F(CommandsTest, PlayWarnsUserOfIncorrectUsage_MissingStartTime) {
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Missing start time!"));
@@ -125,7 +149,7 @@ TEST_F(CommandsTest, PlayWarnsUserOfIncorrectUsage_UnableToParseStartTime) {
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Unable to parse start time!"));
@@ -136,7 +160,7 @@ TEST_F(CommandsTest, PlayWarnsUserOfIncorrectUsage_MissingDurationTime) {
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Missing duration time!"));
@@ -147,7 +171,7 @@ TEST_F(CommandsTest, PlayWarnsUserOfIncorrectUsage_UnableToParseDurationTime) {
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Unable to parse duration time!"));
@@ -158,7 +182,7 @@ TEST_F(CommandsTest, PlayWarnsUserOfIncorrectUsage_UnrecognizedToken) {
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Unrecognized token: wacky"));
@@ -172,7 +196,7 @@ TEST_F(CommandsTest, PlayPrintsErrorWhenClosingPlayerReturnsError) {
         .WillOnce(Return(MockSubprocessExecutor::Output{"stdout", "stderr"}));
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Error closing player: stderr"));
@@ -186,7 +210,7 @@ TEST_F(CommandsTest, PlayPrintsErrorWhenOpeningPlayerReturnsError) {
         .WillOnce(Throw(std::runtime_error("some error message")));
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(),
@@ -201,7 +225,7 @@ TEST_F(CommandsTest, PlayNextPrintsErrorWhenClosingPlayerReturnsError) {
         .WillOnce(Return(MockSubprocessExecutor::Output{"stdout", "stderr"}));
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Error closing player: stderr"));
@@ -215,11 +239,55 @@ TEST_F(CommandsTest, PlayNextCorrectlyUpdatesNewStartAndDuration) {
         .WillOnce(Return(MockSubprocessExecutor::Output{"stdout", ""}));
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(),
                 HasSubstr("Playing start=00:00:11.000 duration=00:00:05.000"));
+}
+
+TEST_F(CommandsTest, PlayReachesEndOfVideo_AudioEndsLater) {
+    metadata->audio->start_time = 1s;
+    metadata->audio->duration = 10s;
+    metadata->video->start_time = 2s;
+    metadata->video->duration = 8s;
+
+    std::istringstream input{"play start 10 duration 10 \n play next"};
+    std::ostringstream output;
+    EXPECT_CALL(*mock_executor, WaitUntilFinished(_))
+        .Times(1)
+        .WillOnce(Return(MockSubprocessExecutor::Output{"stdout", ""}));
+
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
+                      output, std::move(metadata)};
+    commands.MainLoop();
+
+    ASSERT_THAT(output.str(),
+                HasSubstr("You've reached the end of the video."));
+    ASSERT_THAT(output.str(),
+                HasSubstr("Playing start=00:00:10.000 duration=00:00:01.000"));
+}
+
+TEST_F(CommandsTest, PlayReachesEndOfVideo_VideoEndsLater) {
+    metadata->audio->start_time = 3s;
+    metadata->audio->duration = 5s;
+    metadata->video->start_time = 2s;
+    metadata->video->duration = 8s;
+
+    std::istringstream input{"play start 11 duration 10 \n play next"};
+    std::ostringstream output;
+    EXPECT_CALL(*mock_executor, WaitUntilFinished(_))
+        .Times(1)
+        .WillOnce(Return(MockSubprocessExecutor::Output{"stdout", ""}));
+
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
+                      output, std::move(metadata)};
+    commands.MainLoop();
+
+    ASSERT_THAT(output.str(),
+                HasSubstr("You've reached the end of the video."));
+    ASSERT_THAT(output.str(),
+                HasSubstr("Playing start=00:00:10.000 duration=00:00:00.000"));
 }
 
 TEST_F(CommandsTest, QuitClosesOpenPlayersAndBreaksTheLoop) {
@@ -232,7 +300,7 @@ TEST_F(CommandsTest, QuitClosesOpenPlayersAndBreaksTheLoop) {
             Return(MockSubprocessExecutor::Output{"stdout", "I am closed."}));
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Error closing player: I am closed."));
@@ -244,7 +312,7 @@ TEST_F(CommandsTest, AddedSubtitleIsThenPrintable) {
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("1\n"
@@ -258,7 +326,7 @@ TEST_F(CommandsTest, EmptySubtitleIsNotAdded) {
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), Not(HasSubstr(" --> ")));
@@ -270,7 +338,7 @@ TEST_F(CommandsTest, AddSubCanBeCancelledInFlight) {
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), Not(HasSubstr("Hello world!")));
@@ -283,7 +351,7 @@ TEST_F(CommandsTest, AddedSubtitleCanReplayVideoDuringInput) {
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     // Use output log to check if play was called.
@@ -306,7 +374,7 @@ TEST_F(CommandsTest, AddedSubtitleIsThenSaveable) {
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     std::ifstream ifs{srt_path};
@@ -325,7 +393,7 @@ TEST_F(CommandsTest, AddedSubtitleCanBeSavedWhileQuitting) {
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     std::ifstream ifs{srt_path};
@@ -346,7 +414,7 @@ TEST_F(CommandsTest, AddSubInvalidCommandsPrintsErrorMessages) {
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(),
@@ -362,7 +430,7 @@ TEST_F(CommandsTest, DeleteSubInRangeCanBeDoneWithoutForce) {
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Deleted: 1\n"
@@ -378,7 +446,7 @@ TEST_F(CommandsTest, DeleteSubOutOfRangeCannotBeDoneWithoutForce) {
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(),
@@ -396,7 +464,7 @@ TEST_F(CommandsTest, DeleteSubOutOfRangeWithForce) {
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Deleted: 1\n"
@@ -410,7 +478,7 @@ TEST_F(CommandsTest, DeleteSubInvalidCommandsPrintErrorMessages) {
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(),
@@ -427,7 +495,7 @@ TEST_F(CommandsTest, EditSubPositionAfterAdding) {
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("1\n"
@@ -444,7 +512,7 @@ TEST_F(CommandsTest, EditSubPositionInvalidCommandsPrintErrorMessages) {
     std::ostringstream output;
 
     Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
-                      output};
+                      output, std::move(metadata)};
     commands.MainLoop();
 
     ASSERT_THAT(output.str(),

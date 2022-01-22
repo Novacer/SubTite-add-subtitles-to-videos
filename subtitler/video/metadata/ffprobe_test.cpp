@@ -46,7 +46,7 @@ TEST(FFProbeTest, ContainerHasAudioAndVideoStream) {
         EXPECT_CALL(
             *mock_executor,
             SetCommand(
-                "ffprobe video.mp4 -hide_banner -show_format"
+                "ffprobe \"video.mp4\" -hide_banner -show_format"
                 " -loglevel error -show_streams -print_format json=compact=1"))
             .Times(1);
         EXPECT_CALL(*mock_executor, Start()).Times(1);

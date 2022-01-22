@@ -36,7 +36,7 @@ std::string PollHandle(int fd) {
             break;
         }
         // Ensure null termiantion
-        buffer[amount_read] = '\0';
+        buffer[bytes_read] = '\0';
         str << buffer;
     }
 
@@ -150,28 +150,28 @@ void SubprocessExecutor::Start() {
     if (pipe(cerr_pipe) < 0) {
         throw std::runtime_error("Could not create stderr pipe");
     }
-    if (!posix_spawn_file_actions_init(action.get())) {
+    if (posix_spawn_file_actions_init(action.get())) {
         throw std::runtime_error("Error while initializing subprocess");
     }
     // Tell spawned process to close our side of the pipes
-    if (!posix_spawn_file_actions_addclose(action.get(), cout_pipe[0])) {
+    if (posix_spawn_file_actions_addclose(action.get(), cout_pipe[0])) {
         throw std::runtime_error("Error while configuring subprocess");
     }
-    if (!posix_spawn_file_actions_addclose(action.get(), cerr_pipe[0])) {
+    if (posix_spawn_file_actions_addclose(action.get(), cerr_pipe[0])) {
         throw std::runtime_error("Error while configuring subprocess");
     }
     // Tell spawned process to make a duplicate of their end of the pipe.
-    if (!posix_spawn_file_actions_adddup2(action.get(), cout_pipe[1], 1)) {
+    if (posix_spawn_file_actions_adddup2(action.get(), cout_pipe[1], 1)) {
         throw std::runtime_error("Error while configuring subprocess");
     }
-    if (!posix_spawn_file_actions_adddup2(action.get(), cerr_pipe[1], 2)) {
+    if (posix_spawn_file_actions_adddup2(action.get(), cerr_pipe[1], 2)) {
         throw std::runtime_error("Error while configuring subprocess");
     }
     // Tell spanwed process to close their (old) end of the pipe.
-    if (!posix_spawn_file_actions_addclose(action.get(), cout_pipe[1])) {
+    if (posix_spawn_file_actions_addclose(action.get(), cout_pipe[1])) {
         throw std::runtime_error("Error while configuring subprocess");
     }
-    if (!posix_spawn_file_actions_addclose(action.get(), cerr_pipe[1])) {
+    if (posix_spawn_file_actions_addclose(action.get(), cerr_pipe[1])) {
         throw std::runtime_error("Error while configuring subprocess");
     }
 
@@ -221,13 +221,13 @@ SubprocessExecutor::Output SubprocessExecutor::WaitUntilFinished(
     } else {
         int status = 0;
         // Wait forever
-        waitpid(-1, &status, 0);
+        waitpid(fields->pid, &status, 0);
     }
 
     SubprocessExecutor::Output output;
     if (fields->captured_output) {
         // Block until stdout thread finishes
-        output.subproc_stdout = fields->capture_output_->get();
+        output.subproc_stdout = fields->captured_output->get();
     }
     if (fields->captured_error) {
         // Block until stdout thread finishes
@@ -246,6 +246,8 @@ SubprocessExecutor::Output SubprocessExecutor::WaitUntilFinished(
     fields->actions.reset();
     fields->captured_output.reset();
     fields->captured_error.reset();
+    
+    return output;
 }
 
 }  // namespace subprocess

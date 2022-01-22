@@ -65,14 +65,14 @@ class Commands {
   private:
     Paths paths_;
     std::unique_ptr<video::player::FFPlay> ffplay_;
+    std::unique_ptr<io::InputGetter> input_getter_;
     std::ostream &output_;
+    std::unique_ptr<video::metadata::Metadata> metadata_;
     std::chrono::milliseconds start_;
     std::chrono::milliseconds duration_;
     srt::SubRipFile srt_file_;
     bool srt_file_has_changed_;
     std::unique_ptr<TempFile> temp_file_;
-    std::unique_ptr<io::InputGetter> input_getter_;
-    std::unique_ptr<video::metadata::Metadata> metadata_;
 
     void Help();
 

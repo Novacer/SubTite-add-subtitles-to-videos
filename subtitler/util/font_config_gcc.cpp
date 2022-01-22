@@ -2,7 +2,8 @@
 
 namespace subtitler {
 
-std::string get_font_path() { return "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf"; }
+std::string get_font_path() {
+    return "/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf";
+}
 
 }  // namespace subtitler
-

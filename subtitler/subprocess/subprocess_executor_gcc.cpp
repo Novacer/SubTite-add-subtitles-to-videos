@@ -246,7 +246,7 @@ SubprocessExecutor::Output SubprocessExecutor::WaitUntilFinished(
     fields->actions.reset();
     fields->captured_output.reset();
     fields->captured_error.reset();
-    
+
     return output;
 }
 

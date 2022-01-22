@@ -45,7 +45,7 @@ void ValidateFFBinaries() {
         executor->Start();
     }
     std::ostringstream errors;
-    for (auto i = 0; i < executors.size(); ++i) {
+    for (std::size_t i = 0; i < executors.size(); ++i) {
         auto &executor = executors.at(i);
         auto output = executor->WaitUntilFinished(2000);
         if (output.subproc_stdout.empty() || !output.subproc_stderr.empty()) {

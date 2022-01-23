@@ -22,7 +22,6 @@ TEST(SubprocessExecutorTest, SanityCheck) {
     captured_ouptut = executor.WaitUntilFinished(2000);
 
     ASSERT_THAT(captured_ouptut.subproc_stdout, IsEmpty());
-    // Since we used cmd it will have carriage return.
     ASSERT_THAT(captured_ouptut.subproc_stderr, "hello world\n");
 }
 

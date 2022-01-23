@@ -14,6 +14,8 @@
 #include "subtitler/subprocess/subprocess_executor.h"
 #include "subtitler/util/unicode.h"
 
+extern char **environ;
+
 namespace subtitler {
 namespace subprocess {
 
@@ -183,7 +185,7 @@ void SubprocessExecutor::Start() {
                     &command_[0],      // {command}
                     nullptr};
     pid_t pid = 0;
-    if (posix_spawnp(&pid, args[0], action.get(), nullptr, args, nullptr)) {
+    if (posix_spawnp(&pid, args[0], action.get(), nullptr, args, environ)) {
         throw std::runtime_error("Failed to spawn subprocess");
     }
 

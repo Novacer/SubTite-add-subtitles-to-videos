@@ -3,4 +3,6 @@ build:vs2019-asan --cxxopt='/std:c++17' --cxxopt='/WX' --cxxopt='/fsanitize=addr
 build:vs2019-prod --cxxopt='/std:c++17' -c opt
 
 build:gcc --cxxopt='-std=c++17' --cxxopt='-Werror'
+build:gcc-asan --cxxopt='-std=c++17' --cxxopt='-Werror' -c dbg
+build:gcc-asan --cxxopt='-fsanitize=address' --linkopt='-fsanitize=address'
 build:gcc-prod --cxxopt='-std=c++17' -c opt

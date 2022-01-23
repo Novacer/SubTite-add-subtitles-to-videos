@@ -196,9 +196,9 @@ void SubprocessExecutor::Start() {
     if (posix_spawnp(&pid, arg_expansion.we_wordv[0], action.get(), nullptr,
                      arg_expansion.we_wordv, environ)) {
         wordfree(&arg_expansion);
-	posix_spawn_file_actions_destroy(action.get());
-	close(cout_pipe[0]), close(cout_pipe[1]);
-	close(cerr_pipe[0]), close(cerr_pipe[1]);
+        posix_spawn_file_actions_destroy(action.get());
+        close(cout_pipe[0]), close(cout_pipe[1]);
+        close(cerr_pipe[0]), close(cerr_pipe[1]);
         throw std::runtime_error("Unable to create process to run: " +
                                  command_);
     }

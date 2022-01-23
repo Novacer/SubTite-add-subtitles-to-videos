@@ -5,6 +5,8 @@
 
 #include "date/date.h"
 
+using namespace std::chrono_literals;
+
 namespace subtitler {
 
 std::optional<std::chrono::milliseconds> ParseDuration(
@@ -21,7 +23,7 @@ std::optional<std::chrono::milliseconds> ParseDuration(
 
     auto num_colons = std::count(duration.begin(), duration.end(), ':');
     std::istringstream stream{duration};
-    std::chrono::milliseconds result;
+    std::chrono::milliseconds result = 0ms;
     std::string format = "";
 
     switch (num_colons) {

@@ -37,7 +37,7 @@ cc_library(
 
 cc_test(
     name = "commands_test",
-    size = "medium",
+    size = "small",
     srcs = ["commands_test.cpp"],
     # Run serially since there are file system dependencies.
     tags = ["exclusive"],

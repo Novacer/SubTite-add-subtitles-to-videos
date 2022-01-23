@@ -4,6 +4,7 @@
 
 #include <windows.h>
 
+#include <algorithm>
 #include <future>
 #include <sstream>
 #include <stdexcept>
@@ -126,6 +127,9 @@ void SubprocessExecutor::Start() {
     if (is_running_) {
         throw std::runtime_error(
             "You must call WaitUntilFinished() before starting again.");
+    }
+    if (std::all_of(command_.begin(), command_.end(), isspace)) {
+        throw std::runtime_error("Cannot start process with empty command!");
     }
 
     SECURITY_ATTRIBUTES security_attributes;

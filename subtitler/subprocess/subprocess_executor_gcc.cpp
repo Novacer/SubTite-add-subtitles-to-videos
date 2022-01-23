@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <wordexp.h>
 
+#include <algorithm>
 #include <chrono>
 #include <future>
 #include <sstream>
@@ -15,6 +16,8 @@
 #include "subtitler/subprocess/subprocess_executor.h"
 #include "subtitler/util/unicode.h"
 
+// From <unistd.h>, defines the current environment variables.
+// Can be passed to posix_spawnp to inherit the same environment.
 extern char **environ;
 
 namespace subtitler {
@@ -142,11 +145,15 @@ void SubprocessExecutor::Start() {
         throw std::runtime_error(
             "You must call WaitUntilFinished() before starting again.");
     }
+    if (std::all_of(command_.begin(), command_.end(), isspace)) {
+        throw std::runtime_error("Cannot start process with empty command!");
+    }
+
     // pipe[0] is for our side, pipe[1] is for subprocess side.
     int cout_pipe[2];
     int cerr_pipe[2];
-    // save as unique ptr?
     auto action = std::make_unique<posix_spawn_file_actions_t>();
+
     if (pipe(cout_pipe) < 0) {
         throw std::runtime_error("Could not create stdout pipe");
     }
@@ -178,6 +185,8 @@ void SubprocessExecutor::Start() {
         throw std::runtime_error("Error while configuring subprocess");
     }
 
+    // Expands command str into an array of args
+    // Ex: foo bar "baz ham" -> ["foo", "bar", "baz ham"] etc.
     wordexp_t arg_expansion;
     if (wordexp(command_.c_str(), &arg_expansion, WRDE_NOCMD)) {
         throw std::runtime_error("Could not expand command!");
@@ -186,6 +195,7 @@ void SubprocessExecutor::Start() {
     pid_t pid = 0;
     if (posix_spawnp(&pid, arg_expansion.we_wordv[0], action.get(), nullptr,
                      arg_expansion.we_wordv, environ)) {
+        wordfree(&arg_expansion);
         throw std::runtime_error("Unable to create process to run: " +
                                  command_);
     }

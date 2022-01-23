@@ -88,7 +88,7 @@ TEST(SubprocessExecutor, InvalidCommandThrowsError_EmptyString) {
         executor.Start();
         FAIL() << "Expected std::runtime_error";
     } catch (const std::runtime_error &e) {
-        ASSERT_STREQ(e.what(), "Unable to create process to run: ");
+        ASSERT_STREQ(e.what(), "Cannot start process with empty command!");
     }
 }
 

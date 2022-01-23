@@ -17,7 +17,7 @@ TEST(SubprocessExecutorTest, SanityCheck) {
     ASSERT_EQ(captured_ouptut.subproc_stdout, "hello world\n");
     ASSERT_THAT(captured_ouptut.subproc_stderr, IsEmpty());
 
-    executor.SetCommand("echo hello world 1>&2");
+    executor.SetCommand("bash -c \"echo hello world 1>&2\"");
     executor.Start();
     captured_ouptut = executor.WaitUntilFinished(5000);
 

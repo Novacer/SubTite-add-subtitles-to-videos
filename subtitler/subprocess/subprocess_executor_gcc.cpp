@@ -179,7 +179,7 @@ void SubprocessExecutor::Start() {
     }
 
     wordexp_t arg_expansion;
-    if (wordexp(command_, &arg_expansion, WRDE_NOCMD)) {
+    if (wordexp(command_.c_str(), &arg_expansion, WRDE_NOCMD)) {
         throw std::runtime_error("Could not expand command!");
     }
 
@@ -188,7 +188,7 @@ void SubprocessExecutor::Start() {
                      arg_expansion.we_wordv, environ)) {
         throw std::runtime_error("Failed to spawn subprocess");
     }
-    wordfree(arg_expansion);
+    wordfree(&arg_expansion);
 
     // Close pipe ends on subprocess' side.
     close(cout_pipe[1]);

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <wordexp.h>
 
 #include <chrono>
 #include <future>
@@ -177,17 +178,17 @@ void SubprocessExecutor::Start() {
         throw std::runtime_error("Error while configuring subprocess");
     }
 
-    // We run sh -c {command}, so we don't have to worry about arg splitting.
-    // Using an array is a workaround so we can get non-const ptr later.
-    std::string sh_prefix[] = {"sh", "-c"};
-    char *args[] = {&sh_prefix[0][0],  // sh
-                    &sh_prefix[1][0],  // -c
-                    &command_[0],      // {command}
-                    nullptr};
+    wordexp_t arg_expansion;
+    if (wordexp(command_, &arg_expansion, WRDE_NOCMD)) {
+        throw std::runtime_error("Could not expand command!");
+    }
+
     pid_t pid = 0;
-    if (posix_spawnp(&pid, args[0], action.get(), nullptr, args, environ)) {
+    if (posix_spawnp(&pid, arg_expansion.we_wordv[0], action.get(), nullptr,
+                     arg_expansion.we_wordv, environ)) {
         throw std::runtime_error("Failed to spawn subprocess");
     }
+    wordfree(arg_expansion);
 
     // Close pipe ends on subprocess' side.
     close(cout_pipe[1]);

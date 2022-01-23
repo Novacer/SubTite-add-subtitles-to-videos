@@ -66,7 +66,8 @@ void FixInputPath(std::string &path, bool should_have_quotes) {
     if (path.empty() || path.length() < 2) {
         return;
     }
-    bool already_in_quotes = path.front() == '"' && path.back() == '"';
+    bool already_in_quotes = (path.front() == '"' && path.back() == '"') ||
+                             (path.front() == '\'' && path.back() == '\'');
     if (should_have_quotes && !already_in_quotes) {
         // Any input paths with a space in them needs to be wrapped in quotes.
         bool contains_space = path.find(' ') != std::string::npos;

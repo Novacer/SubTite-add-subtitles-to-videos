@@ -247,7 +247,7 @@ SubprocessExecutor::Output SubprocessExecutor::WaitUntilFinished(
         output.subproc_stdout = fields->captured_output->get();
     }
     if (fields->captured_error) {
-        // Block until stdout thread finishes
+        // Block until stderr thread finishes
         output.subproc_stderr = fields->captured_error->get();
     }
 

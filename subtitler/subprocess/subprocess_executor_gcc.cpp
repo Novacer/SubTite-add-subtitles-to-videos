@@ -186,7 +186,8 @@ void SubprocessExecutor::Start() {
     pid_t pid = 0;
     if (posix_spawnp(&pid, arg_expansion.we_wordv[0], action.get(), nullptr,
                      arg_expansion.we_wordv, environ)) {
-        throw std::runtime_error("Failed to spawn subprocess");
+        throw std::runtime_error("Unable to create process to run: " +
+                                 command_);
     }
     wordfree(&arg_expansion);
 

@@ -17,7 +17,7 @@ cc_library(
 
 cc_test(
     name = "subprocess_executor_test",
-    size = "small",
+    timeout = "short",
     srcs = select({
         "@bazel_tools//src/conditions:windows": ["subprocess_executor_msvc_test.cpp"],
         "@bazel_tools//src/conditions:darwin": ["subprocess_executor_gcc_test.cpp"],

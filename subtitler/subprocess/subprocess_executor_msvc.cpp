@@ -4,6 +4,7 @@
 
 #include <windows.h>
 
+#include <algorithm>
 #include <future>
 #include <sstream>
 #include <stdexcept>
@@ -94,7 +95,25 @@ SubprocessExecutor::SubprocessExecutor(const std::string &command,
       is_running_{false},
       fields{std::make_unique<PlatformDependentFields>()} {}
 
-SubprocessExecutor::~SubprocessExecutor() = default;
+SubprocessExecutor::~SubprocessExecutor() {
+    if (is_running_ && fields->hProcess) {
+        // Force kill other process.
+        // No throw and no block so it's "safe" to call in dtor.
+        TerminateProcess(fields->hProcess, /* uExitCode= */ 1);
+        // Dtor of future will block until both threads terminate.
+        // Since we have killed the other process, this should terminate
+        // eventually.
+        fields->captured_output.reset();
+        fields->captured_error.reset();
+
+        CleanupHandle(fields->hStdOutPipeRead);
+        CleanupHandle(fields->hStdOutPipeWrite);
+        CleanupHandle(fields->hStdErrPipeRead);
+        CleanupHandle(fields->hStdErrPipeWrite);
+        CleanupHandle(fields->hProcess);
+        fields->dwProcessId = 0;
+    }
+}
 
 void SubprocessExecutor::SetCommand(const std::string &command) {
     command_ = command;
@@ -108,6 +127,9 @@ void SubprocessExecutor::Start() {
     if (is_running_) {
         throw std::runtime_error(
             "You must call WaitUntilFinished() before starting again.");
+    }
+    if (std::all_of(command_.begin(), command_.end(), isspace)) {
+        throw std::runtime_error("Cannot start process with empty command!");
     }
 
     SECURITY_ATTRIBUTES security_attributes;

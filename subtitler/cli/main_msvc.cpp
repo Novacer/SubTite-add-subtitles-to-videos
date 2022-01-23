@@ -33,18 +33,29 @@ bool ValidateFlagNonEmpty(const char *flagname, const std::string &value) {
 
 // Checks that binaries FFmpeg, FFplay, FFprobe all exist.
 void ValidateFFBinaries() {
-    subtitler::subprocess::SubprocessExecutor executor;
-    executor.CaptureOutput(true);
+    using subtitler::subprocess::SubprocessExecutor;
+    std::vector<std::unique_ptr<SubprocessExecutor>> executors;
+    std::vector<std::string> binaries = {FLAGS_ffplay_path, FLAGS_ffmpeg_path,
+                                         FLAGS_ffprobe_path};
+    executors.reserve(3);
 
-    for (const auto &binary :
-         {FLAGS_ffplay_path, FLAGS_ffmpeg_path, FLAGS_ffprobe_path}) {
-        executor.SetCommand(binary + " -version");
-        executor.Start();
-        auto output = executor.WaitUntilFinished(5000);
+    for (const auto &binary : binaries) {
+        auto &executor = executors.emplace_back(
+            std::make_unique<SubprocessExecutor>(binary + " -version",
+                                                 /* capture_output= */ true));
+        executor->Start();
+    }
+    std::ostringstream errors;
+    for (std::size_t i = 0; i < executors.size(); ++i) {
+        auto &executor = executors.at(i);
+        auto output = executor->WaitUntilFinished(2000);
         if (output.subproc_stdout.empty() || !output.subproc_stderr.empty()) {
-            throw std::runtime_error("Error trying to detect binary at " +
-                                     binary);
+            errors << " " << binaries.at(i);
         }
+    }
+    auto binary_error_list = errors.str();
+    if (!binary_error_list.empty()) {
+        throw std::runtime_error("Failed to detect:" + binary_error_list);
     }
 }
 
@@ -56,7 +67,8 @@ void FixInputPath(std::string &path, bool should_have_quotes) {
     if (path.empty() || path.length() < 2) {
         return;
     }
-    bool already_in_quotes = path.front() == '"' && path.back() == '"';
+    bool already_in_quotes = (path.front() == '"' && path.back() == '"') ||
+                             (path.front() == '\'' && path.back() == '\'');
     if (should_have_quotes && !already_in_quotes) {
         // Any input paths with a space in them needs to be wrapped in quotes.
         bool contains_space = path.find(' ') != std::string::npos;

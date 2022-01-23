@@ -1,7 +1,6 @@
 #include "subtitler/util/temp_file.h"
 
 #include <glog/logging.h>
-#include <io.h>
 
 #include <cstdio>
 #include <filesystem>

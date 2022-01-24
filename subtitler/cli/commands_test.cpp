@@ -317,7 +317,7 @@ TEST_F(CommandsTest, AddedSubtitleIsThenPrintable) {
 
     ASSERT_THAT(output.str(), HasSubstr("1\n"
                                         "00:00:00,000 --> 00:00:05,000\n"
-                                        "{\\an6} some subtitle\n"
+                                        "{\\an6}some subtitle\n"
                                         "\n"));
 }
 
@@ -364,7 +364,7 @@ TEST_F(CommandsTest, AddedSubtitleCanReplayVideoDuringInput) {
 
     ASSERT_THAT(output.str(), HasSubstr("1\n"
                                         "00:00:00,000 --> 00:00:05,000\n"
-                                        "{\\an6} line 1\n"
+                                        "{\\an6}line 1\n"
                                         "line 2\n"
                                         "\n"));
 }
@@ -384,7 +384,7 @@ TEST_F(CommandsTest, AddedSubtitleIsThenSaveable) {
     ASSERT_EQ(file,
               "1\n"
               "00:00:00,000 --> 00:00:05,000\n"
-              "{\\an6} some subtitle\n"
+              "{\\an6}some subtitle\n"
               "\n");
 }
 
@@ -404,7 +404,7 @@ TEST_F(CommandsTest, AddedSubtitleCanBeSavedWhileQuitting) {
     ASSERT_EQ(file,
               "1\n"
               "00:00:00,000 --> 00:00:05,000\n"
-              "{\\an8} some subtitle\n"
+              "{\\an8}some subtitle\n"
               "\n");
 }
 
@@ -435,7 +435,7 @@ TEST_F(CommandsTest, DeleteSubInRangeCanBeDoneWithoutForce) {
 
     ASSERT_THAT(output.str(), HasSubstr("Deleted: 1\n"
                                         "00:00:00,000 --> 00:00:05,000\n"
-                                        "{\\an8} some subtitle\n"
+                                        "{\\an8}some subtitle\n"
                                         "\n"));
 }
 
@@ -454,7 +454,7 @@ TEST_F(CommandsTest, DeleteSubOutOfRangeCannotBeDoneWithoutForce) {
                           "current player position."));
     ASSERT_THAT(output.str(), Not(HasSubstr("Deleted: 1\n"
                                             "00:00:00,000 --> 00:00:05,000\n"
-                                            "{\\an8} some subtitle\n"
+                                            "{\\an8}some subtitle\n"
                                             "\n")));
 }
 
@@ -469,7 +469,7 @@ TEST_F(CommandsTest, DeleteSubOutOfRangeWithForce) {
 
     ASSERT_THAT(output.str(), HasSubstr("Deleted: 1\n"
                                         "00:00:00,000 --> 00:00:05,000\n"
-                                        "{\\an8} some subtitle\n"
+                                        "{\\an8}some subtitle\n"
                                         "\n"));
 }
 
@@ -500,7 +500,7 @@ TEST_F(CommandsTest, EditSubPositionAfterAdding) {
 
     ASSERT_THAT(output.str(), HasSubstr("1\n"
                                         "00:00:00,000 --> 00:00:05,000\n"
-                                        "{\\an1} some subtitle\n"
+                                        "{\\an1}some subtitle\n"
                                         "\n"));
 }
 

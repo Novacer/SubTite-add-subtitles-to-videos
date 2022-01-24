@@ -118,7 +118,7 @@ TEST(SubRipItemTest, CopySemantics) {
     const auto expected =
         "456\n"
         "00:00:01,000 --> 00:00:03,000\n"
-        "{\\an1} hello world\n";
+        "{\\an1}hello world\n";
 
     ASSERT_EQ(expected, output_b.str());
 
@@ -144,7 +144,7 @@ TEST(SubRipItemTest, MoveSemantics) {
     const auto expected =
         "456\n"
         "00:00:01,000 --> 00:00:03,000\n"
-        "{\\an1} hello world\n";
+        "{\\an1}hello world\n";
 
     ASSERT_EQ(expected, output_b.str());
 

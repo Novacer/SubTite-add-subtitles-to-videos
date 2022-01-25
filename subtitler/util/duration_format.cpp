@@ -58,6 +58,13 @@ std::string FormatDuration(const std::chrono::milliseconds &duration) {
     return stream.str();
 }
 
+std::optional<std::chrono::milliseconds> FromSubRipDuration(
+    std::string duration) {
+    // Replace comma with decimals
+    std::replace(duration.begin(), duration.end(), ',', '.');
+    return ParseDuration(duration);
+}
+
 std::string ToSubRipDuration(const std::chrono::milliseconds &duration) {
     // First convert to standard duration, then replace any decimals with comma.
     // Ex: 00:00:12.340 => 00:00:12,340

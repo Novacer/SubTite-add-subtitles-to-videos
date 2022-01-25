@@ -134,7 +134,7 @@ TEST_F(SubRipFileTest, ChangePosition) {
     ASSERT_EQ(
         "1\n"
         "00:00:00,000 --> 00:00:20,000\n"
-        "{\\an1} first\n"
+        "{\\an1}first\n"
         "\n"
         "2\n"
         "00:00:01,000 --> 00:00:05,000\n"
@@ -142,7 +142,7 @@ TEST_F(SubRipFileTest, ChangePosition) {
         "\n"
         "3\n"
         "00:00:01,000 --> 00:00:06,000\n"
-        "{\\an9} third\n"
+        "{\\an9}third\n"
         "\n"
         "4\n"
         "00:00:02,000 --> 00:00:07,000\n"

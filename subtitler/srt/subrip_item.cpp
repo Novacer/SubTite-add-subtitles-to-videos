@@ -22,7 +22,7 @@ int ParseSequenceNumber(const std::string &line) {
     }
 }
 
-// Parses start end timestamps.
+// Parses start & end timestamps.
 std::tuple<std::chrono::milliseconds, std::chrono::milliseconds>
 ParseTimestamps(const std::string &line) {
     std::istringstream stream{line};
@@ -50,7 +50,7 @@ ParseTimestamps(const std::string &line) {
 }
 
 // Should be called on the FIRST line of the subtitle body.
-// If line is "{\anX}Hello Word!" then returns X
+// If line is "{\anX}Hello World!" then returns X
 // and modifies line to be "Hello World!"
 std::optional<int> ExtractPosIdIfExists(std::string &line) {
     static const std::regex pos_token_matcher{"^\\{\\\\an([0-9]+)\\}(.*)"};
@@ -78,10 +78,10 @@ std::optional<int> ExtractPosIdIfExists(std::string &line) {
 
 SubRipItem::SubRipItem(const std::string &payload) {
     std::istringstream stream{payload};
-    // First line is original sequence number.
+    // First line is the sequence number.
     // This is required to be present but ignored,
     // since in the context of the entire file we will reorder
-    // the sequence numebrs.
+    // the sequence numbers.
     std::string line;
     if (!std::getline(stream, line)) {
         throw std::runtime_error{"Sequence number was missing."};

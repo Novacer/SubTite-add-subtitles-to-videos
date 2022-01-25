@@ -45,11 +45,11 @@ class CommandsTest : public ::testing::Test {
         video_path = "path/to/test.mp4";
         ffplay_path = "path/to/ffplay";
         std::string temp_dir = std::getenv("TEST_TMPDIR");
-        auto fs_srt_path =
-            fs::path(fs::u8path(temp_dir)) / fs::path("test.srt");
+        auto fs_srt_path = fs::u8path(temp_dir) / fs::path("test.srt");
         srt_path = fs_srt_path.string();
         // Clear the file beforehand.
-        std::ofstream file{srt_path, std::ofstream::out | std::ofstream::trunc};
+        std::ofstream file{fs_srt_path,
+                           std::ofstream::out | std::ofstream::trunc};
 
         ffplay = std::make_unique<FFPlay>(ffplay_path, std::move(executor));
         paths = Commands::Paths{video_path, srt_path};
@@ -528,4 +528,60 @@ TEST_F(CommandsTest, EditSubPositionInvalidCommandsPrintErrorMessages) {
     ASSERT_THAT(
         output.str(),
         HasSubstr("Unable to edit position of 9999. Valid positions are:"));
+}
+
+TEST_F(CommandsTest, LoadsExistingSubtitles) {
+    std::string expected_subtitles =
+        "1\n"
+        "00:00:00,000 --> 00:01:23,456\n"
+        "{\\an6}Hello world\n"
+        "Goodbye world\n\n"
+        "2\n"
+        "00:02:00,000 --> 00:03:00,123\n"
+        "Another subtitle\n\n"
+        "3\n"
+        "00:03:00,000 --> 00:04:00,000\n\n";
+    {
+        std::ofstream srt_file_stream{paths.output_subtitle_path};
+        srt_file_stream << expected_subtitles;
+    }
+
+    std::istringstream input{"play d 5:0 \n printsubs \n"};
+    std::ostringstream output;
+
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
+                      output, std::move(metadata)};
+    commands.MainLoop();
+
+    ASSERT_THAT(output.str(), HasSubstr("Loaded existing subtitles!"));
+    ASSERT_THAT(output.str(), HasSubstr("1\n"
+                                        "00:00:00,000 --> 00:01:23,456\n"
+                                        "{\\an6}Hello world\n"));
+    ASSERT_THAT(output.str(), HasSubstr("2\n"
+                                        "00:02:00,000 --> 00:03:00,123\n"
+                                        "Another subtitle\n\n"));
+    ASSERT_THAT(output.str(), HasSubstr("3\n"
+                                        "00:03:00,000 --> 00:04:00,000\n\n"));
+}
+
+TEST_F(CommandsTest, LoadingInvalidSubtitlesPrintsErrorButDoesNotCrash) {
+    std::string existing_subtitles =
+        "1\n"
+        "00:00:00,abc --> 00:01:23,def\n"
+        "{\\an6}Hello world\n"
+        "Goodbye world\n";
+    {
+        std::ofstream srt_file_stream{paths.output_subtitle_path};
+        srt_file_stream << existing_subtitles;
+    }
+
+    std::istringstream input{"printsubs \n"};
+    std::ostringstream output;
+
+    Commands commands{paths, std::move(ffplay), CreateInputGetter(input),
+                      output, std::move(metadata)};
+    commands.MainLoop();
+
+    ASSERT_THAT(output.str(), HasSubstr("Could not parse timestamp values: "
+                                        "00:00:00,abc --> 00:01:23,def\n"));
 }

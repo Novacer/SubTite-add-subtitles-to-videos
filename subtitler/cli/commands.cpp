@@ -119,7 +119,7 @@ void Commands::MainLoop() {
                 output_ << "Loaded existing subtitles!" << std::endl;
             }
         } catch (const std::exception &e) {
-            output_ << e.what();
+            output_ << e.what() << std::endl;
         }
     }
 

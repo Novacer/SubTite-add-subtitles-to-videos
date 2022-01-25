@@ -582,8 +582,6 @@ TEST_F(CommandsTest, LoadingInvalidSubtitlesPrintsErrorButDoesNotCrash) {
                       output, std::move(metadata)};
     commands.MainLoop();
 
-    ASSERT_THAT(
-        output.str(),
-        HasSubstr(
-            "Could not parse timestamp values: 00:00:00,abc --> 00:01:23,def"));
+    ASSERT_THAT(output.str(), HasSubstr("Could not parse timestamp values: "
+                                        "00:00:00,abc --> 00:01:23,def\n"));
 }

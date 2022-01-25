@@ -538,7 +538,9 @@ TEST_F(CommandsTest, LoadsExistingSubtitles) {
         "Goodbye world\n\n"
         "2\n"
         "00:02:00,000 --> 00:03:00,123\n"
-        "Another subtitle\n";
+        "Another subtitle\n\n"
+        "3\n"
+        "00:03:00,000 --> 00:04:00,000\n\n";
     {
         std::ofstream srt_file_stream{paths.output_subtitle_path};
         srt_file_stream << expected_subtitles;

@@ -12,7 +12,8 @@ std::optional<std::chrono::milliseconds> ParseDuration(
 
 std::string FormatDuration(const std::chrono::milliseconds &duration);
 
-std::optional<std::chrono::milliseconds> FromSubRipDuration(std::string duration);
+std::optional<std::chrono::milliseconds> FromSubRipDuration(
+    std::string duration);
 
 std::string ToSubRipDuration(const std::chrono::milliseconds &duration);
 

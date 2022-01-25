@@ -554,7 +554,14 @@ TEST_F(CommandsTest, LoadsExistingSubtitles) {
     commands.MainLoop();
 
     ASSERT_THAT(output.str(), HasSubstr("Loaded existing subtitles!"));
-    ASSERT_THAT(output.str(), HasSubstr(expected_subtitles));
+    ASSERT_THAT(output.str(), HasSubstr("1\n"
+                                        "00:00:00,000 --> 00:01:23,456\n"
+                                        "{\\an6}Hello world\n"));
+    ASSERT_THAT(output.str(), HasSubstr("2\n"
+                                        "00:02:00,000 --> 00:03:00,123\n"
+                                        "Another subtitle\n\n"));
+    ASSERT_THAT(output.str(), HasSubstr("3\n"
+                                        "00:03:00,000 --> 00:04:00,000\n\n"));
 }
 
 TEST_F(CommandsTest, LoadingInvalidSubtitlesPrintsErrorButDoesNotCrash) {

@@ -14,6 +14,7 @@ namespace srt {
 class SubRipItem {
   public:
     SubRipItem() = default;
+    explicit SubRipItem(const std::string &payload);
     SubRipItem(const SubRipItem& other);
     SubRipItem& operator=(const SubRipItem& other);
     // Sort by start and then by duration.

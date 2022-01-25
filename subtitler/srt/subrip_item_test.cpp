@@ -154,3 +154,114 @@ TEST(SubRipItemTest, MoveSemantics) {
 
     ASSERT_EQ(expected, output_c.str());
 }
+
+TEST(SubRipItemTest, ConstructFromString_NoBody) {
+    std::string subtitles =
+        "456\n"
+        "00:00:01,000 --> 00:00:03,000\n";
+
+    SubRipItem item{subtitles};
+    std::ostringstream output;
+    item.ToStream(456, output);
+
+    ASSERT_EQ(subtitles, output.str());
+}
+
+TEST(SubRipItemTest, ConstructFromString_TimestampsEqual) {
+    std::string subtitles =
+        "456\n"
+        "00:00:03,000 --> 00:00:03,000\n";
+
+    SubRipItem item{subtitles};
+    std::ostringstream output;
+    item.ToStream(456, output);
+
+    ASSERT_EQ(subtitles, output.str());
+}
+
+TEST(SubRipItemTest, ConstructFromString_WithoutPositionTag) {
+    std::string subtitles =
+        "456\n"
+        "00:00:01,000 --> 00:00:03,000\n"
+        "Hello world\n"
+        "Goodbye world\n";
+
+    SubRipItem item{subtitles};
+    std::ostringstream output;
+    item.ToStream(456, output);
+
+    ASSERT_EQ(subtitles, output.str());
+}
+
+TEST(SubRipItemTest, ConstructFromString_WithPositionTag) {
+    std::string subtitles =
+        "456\n"
+        "00:00:01,000 --> 00:00:03,000\n"
+        "{\\an7}Hello world\n"
+        "Goodbye world\n";
+
+    SubRipItem item{subtitles};
+    std::ostringstream output;
+    item.ToStream(456, output);
+
+    ASSERT_EQ(subtitles, output.str());
+}
+
+TEST(SubRipItemTest, ConstructFromString_InvalidSequenceNumThrowsError) {
+    std::string subtitles =
+        "abc456\n"
+        "00:00:01,000 --> 00:00:03,000\n";
+
+    try {
+        SubRipItem item{subtitles};
+        FAIL() << "Expected std::runtime_error";
+    } catch (const std::runtime_error &e) {
+        ASSERT_STREQ("Could not parse sequence number from: abc456", e.what());
+    }
+}
+
+TEST(SubRipItemTest, ConstructFromString_InvalidStartTimeThrowsError) {
+    std::string subtitles =
+        "456\n"
+        "00:00:03,000 --> 00:00:02,000\n";
+
+    try {
+        SubRipItem item{subtitles};
+        FAIL() << "Expected std::runtime_error";
+    } catch (const std::runtime_error &e) {
+        ASSERT_STREQ(
+            "Start time cannot be greater than end: 00:00:03,000 --> "
+            "00:00:02,000",
+            e.what());
+    }
+}
+
+TEST(SubRipItemTest, ConstructFromString_InvalidPositionIdThrowsError) {
+    std::string subtitles =
+        "456\n"
+        "00:00:01,000 --> 00:00:03,000\n"
+        "{\\an10}Hello world\n";
+
+    try {
+        SubRipItem item{subtitles};
+        FAIL() << "Expected std::runtime_error";
+    } catch (const std::runtime_error &e) {
+        ASSERT_STREQ("Position id must be between [1, 9]: {\\an10}Hello world",
+                     e.what());
+    }
+}
+
+TEST(SubRipItemTest, ConstructFromString_UsingLegacyPositionTagThrowsError) {
+    std::string subtitles =
+        "456\n"
+        "00:00:01,000 --> 00:00:03,000\n"
+        "{\\a4}Hello world\n";
+
+    try {
+        SubRipItem item{subtitles};
+        FAIL() << "Expected std::runtime_error here";
+    } catch (const std::runtime_error &e) {
+        ASSERT_STREQ("Unsupported position token format: {\\a4}Hello world",
+                     e.what());
+    }
+}

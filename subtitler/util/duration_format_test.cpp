@@ -41,12 +41,12 @@ TEST(DurationFormatTest, RoundTrip_Hours) {
     EXPECT_EQ("01:12:34.567", FormatDuration(parsed_with_decimal));
 }
 
-TEST(DurationFormatTest, ToSubRipFormat) {
+TEST(DurationFormatTest, RoundTrip_SubRipFormat) {
     std::string hours = "1:12:34";
-    std::string with_decimal = "1:12:34.567";
+    std::string with_comma = "1:12:34,567";
 
-    auto parsed = *ParseDuration(hours);
-    auto parsed_with_decimal = *ParseDuration(with_decimal);
+    auto parsed = *FromSubRipDuration(hours);
+    auto parsed_with_decimal = *FromSubRipDuration(with_comma);
 
     EXPECT_EQ("01:12:34,000", ToSubRipDuration(parsed));
     EXPECT_EQ("01:12:34,567", ToSubRipDuration(parsed_with_decimal));

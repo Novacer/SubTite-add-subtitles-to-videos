@@ -229,7 +229,7 @@ int main(int argc, char **argv) {
     LOG(INFO) << output_path;
 
     // IMPORTANT - This must be generated BEFORE the path is fixed with ""
-    auto output_path_wrapper = fs::path(fs::u8path(output_path));
+    auto output_path_wrapper = fs::u8path(output_path);
 
     // Make sure input file path is wrapped/unwrapped with quotes as needed.
     // Paths passed to command args should have quotes
@@ -294,7 +294,7 @@ int main(int argc, char **argv) {
         return 1;
     }
     std::ofstream file_names{
-        fs::path(fs::u8path(file_containing_file_names->FileName()))};
+        fs::u8path(file_containing_file_names->FileName())};
     LOG(INFO) << "Created the first temp file...";
 
     subtitler::subprocess::SubprocessExecutor executor{};

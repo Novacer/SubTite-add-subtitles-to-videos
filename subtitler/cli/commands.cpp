@@ -111,6 +111,18 @@ void Commands::MainLoop() {
     output_ << "Starting interactive mode. Type help for instructions."
             << std::endl;
 
+    // Load existing subtitles if any.
+    if (fs::exists(fs::u8path(paths_.output_subtitle_path))) {
+        try {
+            srt_file_.LoadState(paths_.output_subtitle_path);
+            if (srt_file_.NumItems() > 0) {
+                output_ << "Loaded existing subtitles!" << std::endl;
+            }
+        } catch (const std::exception &e) {
+            output_ << e.what();
+        }
+    }
+
     std::string command;
     while (input_getter_->getline(command)) {
         auto tokens = Tokenize(command);
@@ -416,7 +428,7 @@ void Commands::EditSub(const std::vector<std::string> &tokens) {
 
 void Commands::Save() {
     namespace fs = std::filesystem;
-    auto path_wrapper = fs::path(fs::u8path(paths_.output_subtitle_path));
+    auto path_wrapper = fs::u8path(paths_.output_subtitle_path);
     std::ofstream file{path_wrapper, std::ofstream::out | std::ofstream::trunc};
     if (!file) {
         throw std::runtime_error("Could not open file " +
@@ -449,7 +461,7 @@ void Commands::_GeneratePreviewSubs() {
     srt_file_.ToStream(temp_subtitles_stream, start_, duration_);
     std::string temp_subtitles = temp_subtitles_stream.str();
     if (!temp_subtitles.empty()) {
-        auto output_path = fs::path(fs::u8path(paths_.output_subtitle_path));
+        auto output_path = fs::u8path(paths_.output_subtitle_path);
         temp_file_ = std::make_unique<TempFile>(
             temp_subtitles, output_path.parent_path(), ".srt");
         if (!temp_file_) {

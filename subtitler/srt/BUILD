@@ -38,6 +38,7 @@ cc_test(
     deps = [
         ":subrip_file",
         ":subrip_item",
+        "//subtitler/util:temp_file",
         "@com_google_googletest//:gtest_main",
     ],
 )

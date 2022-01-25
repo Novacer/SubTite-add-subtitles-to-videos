@@ -1,18 +1,57 @@
 #include "subtitler/srt/subrip_file.h"
 
 #include <algorithm>
+#include <filesystem>
+#include <fstream>
 #include <stdexcept>
 
 #include "subtitler/srt/subrip_item.h"
 
+namespace fs = std::filesystem;
+
 namespace subtitler {
 namespace srt {
+
+namespace {
+
+void InsertSortedItem(std::vector<SubRipItem> &container,
+                      const SubRipItem &item) {
+    // Inserts in sorted order
+    auto insert_here =
+        std::lower_bound(container.begin(), container.end(), item);
+    container.insert(insert_here, item);
+}
+
+}  // namespace
 
 void SubRipFile::ToStream(std::ostream &output) const {
     for (std::size_t i = 0; i < items_.size(); ++i) {
         items_[i].ToStream(i + 1, output);
         output << std::endl;
     }
+}
+
+void SubRipFile::LoadState(const std::string &file_name) {
+    auto path = fs::u8path(file_name);
+    std::ifstream stream{path};
+
+    std::vector<SubRipItem> new_items;
+    std::string line;
+    while (std::getline(stream, line)) {
+        if (line.empty()) {
+            continue;
+        }
+        // Encountered first non-empty line
+        std::ostringstream item_stream;
+        item_stream << line << std::endl;
+        while (std::getline(stream, line) && !line.empty()) {
+            item_stream << line << std::endl;
+        }
+        InsertSortedItem(new_items, SubRipItem{item_stream.str()});
+    }
+
+    // Overwrite previous state.
+    items_ = std::move(new_items);
 }
 
 void SubRipFile::ToStream(std::ostream &output, std::chrono::milliseconds start,

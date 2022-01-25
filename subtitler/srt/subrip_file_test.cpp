@@ -4,10 +4,14 @@
 #include <gtest/gtest.h>
 
 #include <chrono>
+#include <filesystem>
+#include <fstream>
 #include <sstream>
 
 #include "subtitler/srt/subrip_item.h"
+#include "subtitler/util/temp_file.h"
 
+namespace fs = std::filesystem;
 using namespace std::chrono_literals;
 using namespace subtitler;
 using namespace subtitler::srt;
@@ -143,6 +147,91 @@ TEST_F(SubRipFileTest, ChangePosition) {
         "3\n"
         "00:00:01,000 --> 00:00:06,000\n"
         "{\\an9}third\n"
+        "\n"
+        "4\n"
+        "00:00:02,000 --> 00:00:07,000\n"
+        "fourth\n"
+        "\n",
+        output.str());
+}
+
+TEST_F(SubRipFileTest, OverwritesPreviousState) {
+    std::string temp_dir = std::getenv("TEST_TMPDIR");
+    TempFile temp_file{"", fs::u8path(temp_dir), ".srt"};
+    auto path_wrapper = fs::u8path(temp_file.FileName());
+
+    // First write existing contents to a file
+    {
+        std::ofstream stream{path_wrapper};
+        file.ToStream(stream);
+    }
+    // Now modify internal state.
+    file.RemoveItem(4);
+    file.RemoveItem(3);
+    // Now load it back
+    file.LoadState(path_wrapper.string());
+
+    std::ostringstream output;
+    file.ToStream(output);
+    ASSERT_EQ(4, file.NumItems());
+    ASSERT_EQ(
+        "1\n"
+        "00:00:00,000 --> 00:00:20,000\n"
+        "first\n"
+        "\n"
+        "2\n"
+        "00:00:01,000 --> 00:00:05,000\n"
+        "second\n"
+        "\n"
+        "3\n"
+        "00:00:01,000 --> 00:00:06,000\n"
+        "third\n"
+        "\n"
+        "4\n"
+        "00:00:02,000 --> 00:00:07,000\n"
+        "fourth\n"
+        "\n",
+        output.str());
+}
+
+TEST_F(SubRipFileTest, FailureToLoadRetainsPreviousState) {
+    std::string temp_dir = std::getenv("TEST_TMPDIR");
+    TempFile temp_file{"", fs::u8path(temp_dir), ".srt"};
+    auto path_wrapper = fs::u8path(temp_file.FileName());
+
+    // Write incorrect srt file
+    {
+        std::ofstream stream{path_wrapper};
+        stream << std::endl;
+        stream << "1" << std::endl;
+        stream << "abc --> efg" << std::endl;
+        stream << std::endl;
+    }
+
+    // Attempt to load
+    try {
+        file.LoadState(path_wrapper.string());
+        FAIL() << "Expected std::runtime_error";
+    } catch (const std::runtime_error& e) {
+        ASSERT_STREQ("Could not parse timestamp values: abc --> efg", e.what());
+    }
+
+    std::ostringstream output;
+    file.ToStream(output);
+    // Previous state not changed.
+    ASSERT_EQ(4, file.NumItems());
+    ASSERT_EQ(
+        "1\n"
+        "00:00:00,000 --> 00:00:20,000\n"
+        "first\n"
+        "\n"
+        "2\n"
+        "00:00:01,000 --> 00:00:05,000\n"
+        "second\n"
+        "\n"
+        "3\n"
+        "00:00:01,000 --> 00:00:06,000\n"
+        "third\n"
         "\n"
         "4\n"
         "00:00:02,000 --> 00:00:07,000\n"

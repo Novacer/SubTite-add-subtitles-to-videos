@@ -118,7 +118,7 @@ Ex:
 ```
 add p mc
 Enter the subtitles, multiple lines allowed. A blank line (enter) represents end of input.
-Use /play to replay the video, /cancel to discard all input.Or, add blank line (enter) immediately to exit out of this mode.
+Use /play to replay the video, /cancel to discard all input. Or, add blank line (enter) immediately to exit out of this mode.
 top of the world
 
 ```

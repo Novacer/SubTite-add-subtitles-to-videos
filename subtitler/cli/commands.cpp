@@ -302,7 +302,7 @@ void Commands::AddSub(const std::vector<std::string> &tokens) {
         << "Enter the subtitles, multiple lines allowed. A blank line (enter) "
            "represents end of input."
         << std::endl
-        << "Use /play to replay the video, /cancel to discard all input."
+        << "Use /play to replay the video, /cancel to discard all input. "
         << "Or, add blank line (enter) immediately to exit out of this mode."
         << std::endl;
 

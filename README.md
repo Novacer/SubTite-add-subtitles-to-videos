@@ -153,7 +153,7 @@ $ bazel test --config=gcc ...    # used for running on linux
 ```
 
 ## Experimental
-Some experimental binaries are also places in the `subtitler/experimental/` folder.
+Some experimental binaries are also placed in the `subtitler/experimental` folder.
 These contain some methods which are not ready to use in production but are interesting demos.
 
 `subtitler/experimental/trimmer_msvc.cpp` implements trimming of a video on windows.
@@ -164,6 +164,7 @@ The timestamp file is of the syntax:
 ```
 00:00:00 - 00:01:00
 00:03:00 - 00:03:30
+... etc ...
 ```
 Will produce an output video with **only** the sections from `0s - 1min` and `3min - 3min 30s` of the original input video.
 

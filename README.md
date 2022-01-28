@@ -1,5 +1,5 @@
 # SubTite: Easy way to create and add subtitles for your videos
-**TLDR:** SubTite allows you to add subtitles and preview it immediately in the video player. The subtitles will be output as a separate SRT file. Existing SRT files can be imported and edited efforlessly. The subtitles can be positioned in 9 different locations along the video. Support for adding images and trimming video coming soon!
+**TLDR:** SubTite allows you to add subtitles and preview it immediately in the video player. The subtitles will be output as a separate SRT file. Existing SRT files can be imported and edited effortlessly. The subtitles can be positioned in 9 different locations along the video. Support for adding images and trimming video coming soon!
 
 ![demo](https://user-images.githubusercontent.com/29148427/151613092-e7dcf2c3-80dd-4f72-a3c9-8bdd220594b8.gif)
 
@@ -151,6 +151,28 @@ Unit tests can be run using
 $ bazel test --config=vs2019 ... # used for running on windows
 $ bazel test --config=gcc ...    # used for running on linux
 ```
+
+## Experimental
+Some experimental binaries are also places in the `subtitler/experimental/` folder.
+These contain some methods which are not ready to use in production but are interesting demos.
+
+`subtitler/experimental/trimmer_msvc.cpp` implements trimming of a video on windows.
+You select a video, a timestamp file, and an output video path.
+
+The timestamp file is of the syntax:
+
+```
+00:00:00 - 00:01:00
+00:03:00 - 00:03:30
+```
+Will produce an output video with **only** the sections from `0s - 1min` and `3min - 3min 30s` of the original input video.
+
+Trimmer can be built using
+```
+$ bazel build --config=vs2019 //subtitler/experimental:trimmer
+```
+
+This functionality will eventually be integrated in the SubTite binary. See planned features below.
 
 ## Planned Features
 ### V0.2-0.9

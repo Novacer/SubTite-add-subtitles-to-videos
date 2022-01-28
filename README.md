@@ -1,7 +1,7 @@
 # SubTite: Easy way to create and add subtitles for your videos
 **TLDR:** SubTite allows you to add subtitles and preview it immediately in the video player. The subtitles will be output as a separate SRT file. Existing SRT files can be imported and edited efforlessly. The subtitles can be positioned in 9 different locations along the video. Support for adding images and trimming video coming soon!
 
-[](https://user-images.githubusercontent.com/29148427/151613092-e7dcf2c3-80dd-4f72-a3c9-8bdd220594b8.gif)
+![demo](https://user-images.githubusercontent.com/29148427/151613092-e7dcf2c3-80dd-4f72-a3c9-8bdd220594b8.gif)
 
 
 ## Feature Overview (Current v0.1)

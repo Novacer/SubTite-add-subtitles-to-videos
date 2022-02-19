@@ -1,7 +1,7 @@
 #ifndef SUBTITLER_EXPERIMENTAL_QT_GUI_MAIN_WINDOW_H
 #define SUBTITLER_EXPERIMENTAL_QT_GUI_MAIN_WINDOW_H
 
-#include <QMainWindow>
+#include <QtWidgets/QMainWindow>
 
 class MainWindow : public QMainWindow {
     Q_OBJECT

@@ -1,10 +1,17 @@
 load("@com_justbuchanan_rules_qt//:qt.bzl", "qt_cc_library")
 
-PLATFORM_SPECIFIC_WILDCARDS = [
+WINDOWS_EXCLUDE_LIST = [
     "**/qavhwdevice_vaapi_drm_egl.*",
     "**/qavhwdevice_vaapi_x11_glx.*",
-    # We use this one on windows so we do not exclude it.
     # "**/qavhwdevice_d3d11.*",
+    "**/qavhwdevice_mediacodec.*",
+    "**/qavhwdevice_videotoolbox.*",
+]
+
+LINUX_EXCLUDE_LIST = [
+    "**/qavhwdevice_vaapi_drm_egl.*",
+    # "**/qavhwdevice_vaapi_x11_glx.*",
+    "**/qavhwdevice_d3d11.*",
     "**/qavhwdevice_mediacodec.*",
     "**/qavhwdevice_videotoolbox.*",
 ]
@@ -12,12 +19,20 @@ PLATFORM_SPECIFIC_WILDCARDS = [
 qt_cc_library(
     name = "qt_av_player",
     srcs = glob(
-        exclude = PLATFORM_SPECIFIC_WILDCARDS,
         include = ["src/QtAvPlayer/*.cpp"],
+        exclude = select({
+            "@bazel_tools//src/conditions:windows": WINDOWS_EXCLUDE_LIST,
+            "@bazel_tools//src/conditions:darwin": LINUX_EXCLUDE_LIST,
+            "//conditions:default": LINUX_EXCLUDE_LIST,
+        }),
     ),
     hdrs = glob(
-        exclude = PLATFORM_SPECIFIC_WILDCARDS,
         include = ["src/QtAvPlayer/*.h"],
+        exclude = select({
+            "@bazel_tools//src/conditions:windows": WINDOWS_EXCLUDE_LIST,
+            "@bazel_tools//src/conditions:darwin": LINUX_EXCLUDE_LIST,
+            "//conditions:default": LINUX_EXCLUDE_LIST,
+        }),
     ),
     # includes = ["src/QtAvPlayer"],
     strip_include_prefix = "src/",

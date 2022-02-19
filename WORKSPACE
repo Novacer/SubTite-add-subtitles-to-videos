@@ -37,3 +37,29 @@ http_archive(
     strip_prefix = "date-3.0.1",
     urls = ["https://github.com/HowardHinnant/date/archive/v3.0.1.tar.gz"],
 )
+
+# Configure QT Toolchains
+http_archive(
+    name = "com_justbuchanan_rules_qt",
+    sha256 = "055a3d66c0637b6f079be303cb84bec26bc053447f2c79c5bae8861151a593d5",
+    strip_prefix = "bazel_rules_qt-master",
+    # Use custom fork which includes some fixes
+    urls = ["https://github.com/Novacer/bazel_rules_qt/archive/refs/heads/master.zip"],
+)
+
+load("@com_justbuchanan_rules_qt//:qt_configure.bzl", "qt_configure")
+
+qt_configure()
+
+load("@local_config_qt//:local_qt.bzl", "local_qt_path")
+
+new_local_repository(
+    name = "qt",
+    build_file = "@com_justbuchanan_rules_qt//:qt.BUILD",
+    path = local_qt_path(),
+)
+
+load("@com_justbuchanan_rules_qt//tools:qt_toolchain.bzl", "register_qt_toolchains")
+
+register_qt_toolchains()
+# End Configure QT Toolchains

@@ -23,7 +23,29 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      
+
+      - name: Cache Qt
+        id: cache-qt
+        uses: actions/cache@v1  # not v2!
+        with:
+          path: "${{ github.workspace }}/Qt"
+          key: ${{ runner.os }}-QtCache
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2
+        with:
+          version: '5.15.2'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_msvc2019_64'
+          dir: '${{ github.workspace }}/Qt/'
+          install-deps: 'true'
+          cached: ${{ steps.cache-qt.outputs.cache-hit }}
+
+      - name: Debug print contents
+        run: ls $Qt5_Dir
+        shell: bash
+
       - name: Setup Bazelisk
         uses: bazelbuild/setup-bazelisk@v1.0.1
         
@@ -50,7 +72,11 @@ jobs:
       steps:
         # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
         - uses: actions/checkout@v2
-        
+
+        - name: Install QT 5
+          run: sudo apt-get install -y qt5-default
+          shell: bash
+
         - name: Setup Bazelisk
           uses: bazelbuild/setup-bazelisk@v1.0.1
           

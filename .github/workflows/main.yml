@@ -21,6 +21,9 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
       - name: Cache Qt
         id: cache-qt
         uses: actions/cache@v1  # not v2!
@@ -39,9 +42,6 @@ jobs:
           install-deps: 'true'
           cached: ${{ steps.cache-qt.outputs.cache-hit }}
 
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-      
       - name: Setup Bazelisk
         uses: bazelbuild/setup-bazelisk@v1.0.1
         

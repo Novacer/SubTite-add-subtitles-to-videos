@@ -42,6 +42,10 @@ jobs:
           install-deps: 'true'
           cached: ${{ steps.cache-qt.outputs.cache-hit }}
 
+      - name: Debug print contents
+        run: ls $Qt5_Dir
+        shell: bash
+
       - name: Setup Bazelisk
         uses: bazelbuild/setup-bazelisk@v1.0.1
         

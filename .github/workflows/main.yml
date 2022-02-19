@@ -25,7 +25,7 @@ jobs:
         id: cache-qt
         uses: actions/cache@v1  # not v2!
         with:
-          path: ../Qt
+          path: ${{ github.workspace }}/Qt
           key: ${{ runner.os }}-QtCache
 
       - name: Install Qt

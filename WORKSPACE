@@ -41,10 +41,10 @@ http_archive(
 # Configure QT Toolchains
 http_archive(
     name = "com_justbuchanan_rules_qt",
-    # sha256 = "ab9a186178a1fc1478e1f8959267eabf18d6dc06a757831c2e35e0c3f13aed91",
-    strip_prefix = "bazel_rules_qt-set-default-env",
+    sha256 = "055a3d66c0637b6f079be303cb84bec26bc053447f2c79c5bae8861151a593d5",
+    strip_prefix = "bazel_rules_qt-master",
     # Use custom fork which includes some fixes
-    urls = ["https://github.com/Novacer/bazel_rules_qt/archive/refs/heads/set-default-env.zip"],
+    urls = ["https://github.com/Novacer/bazel_rules_qt/archive/refs/heads/master.zip"],
 )
 
 load("@com_justbuchanan_rules_qt//:qt_configure.bzl", "qt_configure")

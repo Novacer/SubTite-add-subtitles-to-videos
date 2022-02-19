@@ -73,25 +73,8 @@ jobs:
         # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
         - uses: actions/checkout@v2
 
-        - name: Cache Qt
-          id: cache-qt
-          uses: actions/cache@v1  # not v2!
-          with:
-            path: "${{ github.workspace }}/Qt"
-            key: ${{ runner.os }}-QtCache
-
-        - name: Install Qt
-          uses: jurplel/install-qt-action@v2
-          with:
-            version: '5.15.2'
-            host: 'linux'
-            target: 'desktop'
-            dir: '${{ github.workspace }}/Qt/'
-            install-deps: 'true'
-            cached: ${{ steps.cache-qt.outputs.cache-hit }}
-
-        - name: Debug print contents
-          run: ls $Qt5_Dir
+        - name: Install qt5
+          run: sudo apt install -y qt5-default
           shell: bash
 
         - name: Setup Bazelisk

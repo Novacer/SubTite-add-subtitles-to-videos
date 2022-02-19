@@ -14,5 +14,8 @@ cc_binary(
     deps = [
         ":main_window",
         "@qt//:qt_widgets",
+        "@qt//:qt_multimedia",
+        "@qt//:qt_multimediawidgets",
+        "@qt_av_player//:qt_av_player",
     ],
 )

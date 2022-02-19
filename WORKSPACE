@@ -41,10 +41,9 @@ http_archive(
 # Configure QT Toolchains
 http_archive(
     name = "com_justbuchanan_rules_qt",
-    sha256 = "055a3d66c0637b6f079be303cb84bec26bc053447f2c79c5bae8861151a593d5",
-    strip_prefix = "bazel_rules_qt-master",
+    strip_prefix = "bazel_rules_qt-strip-include",
     # Use custom fork which includes some fixes
-    urls = ["https://github.com/Novacer/bazel_rules_qt/archive/refs/heads/master.zip"],
+    urls = ["https://github.com/Novacer/bazel_rules_qt/archive/refs/heads/strip-include.zip"],
 )
 
 load("@com_justbuchanan_rules_qt//:qt_configure.bzl", "qt_configure")
@@ -63,3 +62,34 @@ load("@com_justbuchanan_rules_qt//tools:qt_toolchain.bzl", "register_qt_toolchai
 
 register_qt_toolchains()
 # End Configure QT Toolchains
+
+# http_archive(
+#     name = "ffmpeg",
+#     build_file = "//third_party:ffmpeg.BUILD",
+#     strip_prefix = select({
+#         "@bazel_tools//src/conditions:windows": "ffmpeg-n4.4-latest-win64-lgpl-shared-4.4.zip",
+#         "@bazel_tools//src/conditions:darwin": "ffmpeg-n4.4-latest-linux64-lgpl-shared-4.4.tar.xz",
+#         "//conditions:default": "ffmpeg-n4.4-latest-linux64-lgpl-shared-4.4.tar.xz",
+#     }),
+#     urls = select({
+#         "@bazel_tools//src/conditions:windows": ["https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n4.4-latest-win64-lgpl-shared-4.4.zip"],
+#         "@bazel_tools//src/conditions:darwin": ["https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n4.4-latest-linux64-lgpl-shared-4.4.tar.xz"],
+#         "//conditions:default": ["https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n4.4-latest-linux64-lgpl-shared-4.4.tar.xz"],
+#     }),
+# )
+
+http_archive(
+    name = "ffmpeg_windows",
+    sha256 = "5f94b0849b5de4421c55be77f133d33f7e6093e74deb43dc0ad66ad68b4e55d8",
+    build_file = "//third_party:ffmpeg_windows.BUILD",
+    strip_prefix = "ffmpeg-n4.4-latest-win64-lgpl-shared-4.4",
+    urls = ["https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n4.4-latest-win64-lgpl-shared-4.4.zip"],
+)
+
+http_archive(
+    name = "qt_av_player",
+    build_file = "//third_party:qt_av_player.BUILD",
+    strip_prefix = "QtAVPlayer-remove-cmake-config",
+    urls = ["https://github.com/Novacer/QtAVPlayer/archive/refs/heads/remove-cmake-config.zip"],
+    
+)

@@ -21,23 +21,23 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    - name: Cache Qt
-      id: cache-qt
-      uses: actions/cache@v1  # not v2!
-      with:
-        path: ../Qt
-        key: ${{ runner.os }}-QtCache
+      - name: Cache Qt
+        id: cache-qt
+        uses: actions/cache@v1  # not v2!
+        with:
+          path: ../Qt
+          key: ${{ runner.os }}-QtCache
 
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v2
-      with:
-        version: '5.15.2'
-        host: 'windows'
-        target: 'desktop'
-        arch: 'win64_msvc2019_64'
-        dir: '${{ github.workspace }}/Qt/'
-        install-deps: 'true'
-        cached: ${{ steps.cache-qt.outputs.cache-hit }}
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2
+        with:
+          version: '5.15.2'
+          host: 'windows'
+          target: 'desktop'
+          arch: 'win64_msvc2019_64'
+          dir: '${{ github.workspace }}/Qt/'
+          install-deps: 'true'
+          cached: ${{ steps.cache-qt.outputs.cache-hit }}
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2

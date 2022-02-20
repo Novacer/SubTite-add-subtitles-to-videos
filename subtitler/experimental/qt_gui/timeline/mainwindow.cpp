@@ -7,12 +7,15 @@
 MainWindow::MainWindow(QWidget* parent /* = Q_NULLPTR */)
     : QScrollArea(parent) {
     setWindowIcon(QIcon(":/images/logo"));
-    resize(800, 150);
+    resize(1000, 150);
+
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    mZoomer = new Zoomer(this);
+    quint32 duration = 600;
+    mZoomer = new Zoomer(this, duration);
+    mZoomer->setMinimumWidth(300);
     addScrollBarWidget(mZoomer, Qt::AlignLeft);
 
-    mRuler = new Ruler(this);
+    mRuler = new Ruler(this, duration, mZoomer->max_zoom_level());
     setWidget(mRuler);
 
     connect(mZoomer, &Zoomer::zoomerIn, mRuler, &Ruler::onZoomerIn);

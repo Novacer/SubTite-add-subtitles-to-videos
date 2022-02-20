@@ -8,9 +8,12 @@
 class Zoomer : public QWidget {
     Q_OBJECT
   public:
-    Zoomer(QWidget* parent = Q_NULLPTR);
-    void initializeControls();
+    Zoomer(QWidget* parent, quint32 duration);
     ~Zoomer() = default;
+
+    void InitializeControls(quint32 duration);
+
+    int max_zoom_level() const { return max_zoom_level_; };
 
   signals:
     void zoomerIn(int level);
@@ -23,10 +26,12 @@ class Zoomer : public QWidget {
     void onChangeSliderPosition(int level);
 
   private:
-    QToolButton* mZoomIn;
-    QToolButton* mZoomOut;
-    QSlider* mZoomSlider;
-    int mCurrentLevel;
+    QToolButton* zoom_in_;
+    QToolButton* zoom_out_;
+    QSlider* zoom_slider_;
+    int current_level_;
+    int min_zoom_level_;
+    int max_zoom_level_;
 };
 
 #endif

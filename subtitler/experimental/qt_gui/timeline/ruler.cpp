@@ -15,13 +15,13 @@
 #define CUT_MARKER_HEIGHT 86
 #define TIME_LABEL_OFFSET 10
 
-Ruler::Ruler(QWidget* parent /* = Q_NULLPTR */, int duration)
+Ruler::Ruler(QWidget* parent, int duration, int sliderLevel)
     : QWidget(parent),
       mOrigin(10.0),
       mBodyBgrd(37, 38, 39),
       mHeaderBgrd(32, 32, 32),
       mIntervalLength(130.0),
-      mSliderLevel(1),
+      mSliderLevel(sliderLevel),
       mDuration(duration),
       mRectWidth(mIntervalLength * mDuration / secondsPerInterval()) {
     setAttribute(Qt::WA_OpaquePaintEvent);
@@ -72,6 +72,7 @@ void Ruler::resetChildren(quint32 duration) {
     mRectBox->setGeometry(mBeginMarker->rect().right(), mBeginMarker->y(),
                           mEndMarker->x() - mBeginMarker->rect().right(),
                           BODY_HEIGHT);
+    resize(mRectWidth + START_END_PADDING, 120);
 }
 
 void Ruler::onMoveIndicator(qreal frameTime) {
@@ -95,6 +96,7 @@ void Ruler::updateChildren() {
         mEndMarker->x() - mBeginMarker->x() - CUT_MARKER_WIDTH, BODY_HEIGHT);
     mIndicator->move(mIndicatorTime * mIntervalLength / secondsPerInterval(),
                      mIndicator->y());
+    resize(mRectWidth + START_END_PADDING, 120);
     update();
 }
 
@@ -171,12 +173,11 @@ void Ruler::wheelEvent(QWheelEvent* event) {
     QPoint numDegrees = event->angleDelta() / 8;
     if (!numDegrees.isNull()) {
         if (numDegrees.y() > 0) {
-            onZoomerIn(mSliderLevel);
+            emit changeSliderPosition(mSliderLevel + 1);
         }
-        if (numDegrees.y() < 0) {
-            onZoomerOut(mSliderLevel);
+        else if (numDegrees.y() < 0) {
+            emit changeSliderPosition(mSliderLevel - 1);
         }
-        emit changeSliderPosition(mSliderLevel);
     }
     event->accept();
 }
@@ -209,40 +210,16 @@ void Ruler::paintEvent(QPaintEvent* event) {
     }
 }
 
-qreal Ruler::lengthPerSecond() {
-    switch (mSliderLevel) {
-        case 1:
-            return mIntervalLength / 16.0;
-        case 2:
-            return mIntervalLength / 8.0;
-        case 3:
-            return mIntervalLength / 4.0;
-        case 4:
-        case 5:
-        case 6:
-        case 7:
-        case 8:
-        default:
-            return mIntervalLength / 2.0;
+int Ruler::secondsPerInterval() {
+    if (mSliderLevel <= 1) {
+        return 1;
     }
+    // Seconds increase linearly as slider level increases.
+    return (mSliderLevel - 1) * 10;
 }
 
-int Ruler::secondsPerInterval() {
-    switch (mSliderLevel) {
-        case 1:
-            return 16;
-        case 2:
-            return 8;
-        case 3:
-            return 4;
-        case 4:
-        case 5:
-        case 6:
-        case 7:
-        case 8:
-        default:
-            return 2;
-    }
+qreal Ruler::lengthPerSecond() {
+    return mIntervalLength / secondsPerInterval();
 }
 
 QString Ruler::getTickerString(qreal currentPos) {
@@ -264,18 +241,12 @@ QString Ruler::getTickerString(qreal currentPos) {
 
 void Ruler::onZoomerIn(int level) {
     mSliderLevel = level;
-    if (mIntervalLength > MIN_INTERVAL) {
-        mIntervalLength -= 2;
-        updateChildren();
-    }
+    updateChildren();
 }
 
 void Ruler::onZoomerOut(int level) {
     mSliderLevel = level;
-    if (mIntervalLength < MAX_INTERVAL) {
-        mIntervalLength += 2;
-        updateChildren();
-    }
+    updateChildren();
 }
 
 void Ruler::drawScaleRuler(QPainter* painter, QRectF rulerRect) {

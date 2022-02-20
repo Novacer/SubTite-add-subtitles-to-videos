@@ -11,12 +11,12 @@ LINUX_EXCLUDE_LIST = [
 qt_cc_library(
     name = "qt_av_player",
     srcs = glob(
-        exclude = LINUX_EXCLUDE_LIST,
         include = ["src/QtAVPlayer/*.cpp"],
+        exclude = LINUX_EXCLUDE_LIST,
     ),
     hdrs = glob(
-        exclude = LINUX_EXCLUDE_LIST,
         include = ["src/QtAVPlayer/*.h"],
+        exclude = LINUX_EXCLUDE_LIST,
     ),
     # includes = ["src/QtAvPlayer"],
     strip_include_prefix = "src/",
@@ -30,6 +30,7 @@ qt_cc_library(
         "@ffmpeg_linux//:ffmpeg_libavutil",
         "@ffmpeg_linux//:ffmpeg_libswresample",
         "@ffmpeg_linux//:ffmpeg_libswscale",
+        "@qt//:qt_concurrent",
         "@qt//:qt_core",
         "@qt//:qt_gui",
         "@qt//:qt_multimedia",

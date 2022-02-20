@@ -11,12 +11,12 @@ WINDOWS_EXCLUDE_LIST = [
 qt_cc_library(
     name = "qt_av_player",
     srcs = glob(
-        exclude = WINDOWS_EXCLUDE_LIST,
         include = ["src/QtAVPlayer/*.cpp"],
+        exclude = WINDOWS_EXCLUDE_LIST,
     ),
     hdrs = glob(
-        exclude = WINDOWS_EXCLUDE_LIST,
         include = ["src/QtAVPlayer/*.h"],
+        exclude = WINDOWS_EXCLUDE_LIST,
     ),
     strip_include_prefix = "src/",
     target_compatible_with = ["@platforms//os:windows"],
@@ -29,6 +29,7 @@ qt_cc_library(
         "@ffmpeg_windows//:ffmpeg_libavutil",
         "@ffmpeg_windows//:ffmpeg_libswresample",
         "@ffmpeg_windows//:ffmpeg_libswscale",
+        "@qt//:qt_concurrent",
         "@qt//:qt_core",
         "@qt//:qt_gui",
         "@qt//:qt_multimedia",

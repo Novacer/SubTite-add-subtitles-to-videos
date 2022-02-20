@@ -26,7 +26,7 @@ FFMPEG_LIBRARIES = [
         hdrs = glob(["include/%s/**" % name]),
         includes = ["include"],
         strip_include_prefix = "include/",
-        target_compatible_with = ["@platforms//os:windows"],
+        target_compatible_with = ["@platforms//os:linux"],
         visibility = ["//visibility:public"],
         deps = dependencies + [":ffmpeg_%s_import" % name],
     )

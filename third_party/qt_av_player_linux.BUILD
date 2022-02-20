@@ -35,4 +35,5 @@ qt_cc_library(
         "@qt//:qt_gui",
         "@qt//:qt_multimedia",
     ],
+    linkopts = ["-lGL", "-lX11", "-lva", "-lva-x11"],
 )

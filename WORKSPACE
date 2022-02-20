@@ -67,7 +67,6 @@ register_qt_toolchains()
 http_archive(
     name = "ffmpeg_windows",
     build_file = "//third_party:ffmpeg_windows.BUILD",
-    sha256 = "5f94b0849b5de4421c55be77f133d33f7e6093e74deb43dc0ad66ad68b4e55d8",
     strip_prefix = "ffmpeg-n4.4-latest-win64-lgpl-shared-4.4",
     urls = ["https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n4.4-latest-win64-lgpl-shared-4.4.zip"],
 )
@@ -75,7 +74,6 @@ http_archive(
 http_archive(
     name = "ffmpeg_linux",
     build_file = "//third_party:ffmpeg_linux.BUILD",
-    sha256 = "a6d32c28d755b11dfee0f093b81d1490fcc7a7befc56f9795ee9ca050fab478b",
     strip_prefix = "ffmpeg-n4.4-latest-linux64-lgpl-shared-4.4",
     urls = ["https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n4.4-latest-linux64-lgpl-shared-4.4.tar.xz"],
 )

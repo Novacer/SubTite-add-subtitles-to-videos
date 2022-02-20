@@ -18,7 +18,15 @@ qt_cc_library(
         include = ["src/QtAVPlayer/*.h"],
         exclude = LINUX_EXCLUDE_LIST,
     ),
-    # includes = ["src/QtAvPlayer"],
+    copts = [
+        "-DQT_BUILD_QTAVPLAYER_LIB",
+    ],
+    linkopts = [
+        "-lGL",
+        "-lX11",
+        "-lva",
+        "-lva-x11",
+    ],
     strip_include_prefix = "src/",
     target_compatible_with = ["@platforms//os:linux"],
     visibility = ["//visibility:public"],
@@ -35,5 +43,4 @@ qt_cc_library(
         "@qt//:qt_gui",
         "@qt//:qt_multimedia",
     ],
-    linkopts = ["-lGL", "-lX11", "-lva", "-lva-x11"],
 )

@@ -1,9 +1,8 @@
-build:vs2019 --cxxopt='/std:c++17' --cxxopt='/WX' --cxxopt='/DQT_BUILD_QTAVPLAYER_LIB'
+build:vs2019 --cxxopt='/std:c++17' --cxxopt='/WX'
 build:vs2019-asan --cxxopt='/std:c++17' --cxxopt='/WX' --cxxopt='/fsanitize=address' -c dbg
-build:vs2019-asan --cxxopt='/DQT_BUILD_QTAVPLAYER_LIB'
-build:vs2019-prod --cxxopt='/std:c++17' -c opt --cxxopt='/DQT_BUILD_QTAVPLAYER_LIB'
+build:vs2019-prod --cxxopt='/std:c++17' -c opt
 
-build:gcc --cxxopt='-std=c++17' --cxxopt='-Werror' --cxxopt='-DQT_BUILD_QTAVPLAYER_LIB'
-build:gcc-asan --cxxopt='-std=c++17' --cxxopt='-Werror' -c dbg --cxxopt='-DQT_BUILD_QTAVPLAYER_LIB'
+build:gcc --cxxopt='-std=c++17' --cxxopt='-Werror'
+build:gcc-asan --cxxopt='-std=c++17' --cxxopt='-Werror' -c dbg
 build:gcc-asan --cxxopt='-fsanitize=address' --linkopt='-fsanitize=address'
-build:gcc-prod --cxxopt='-std=c++17' -c opt --cxxopt='-DQT_BUILD_QTAVPLAYER_LIB'
+build:gcc-prod --cxxopt='-std=c++17' -c opt

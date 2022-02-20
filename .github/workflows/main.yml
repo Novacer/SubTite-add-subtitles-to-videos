@@ -81,6 +81,10 @@ jobs:
           run: sudo apt-get install -y qtmultimedia5-dev
           shell: bash
 
+        - name: Install Video Acceleration drivers
+          run: sudo apt-get install -y libva-dev
+          shell: bash
+
         - name: Setup Bazelisk
           uses: bazelbuild/setup-bazelisk@v1.0.1
           

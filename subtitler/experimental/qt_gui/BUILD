@@ -11,6 +11,11 @@ qt_cc_library(
 cc_binary(
     name = "main",
     srcs = ["main.cpp"],
+    copts = select({
+        "@bazel_tools//src/conditions:windows": ["/DQT_BUILD_QTAVPLAYER_LIB"],
+        "@bazel_tools//src/conditions:darwin": ["-DQT_BUILD_QTAVPLAYER_LIB"],
+        "//conditions:default": ["-DQT_BUILD_QTAVPLAYER_LIB"],
+    }),
     deps = [
         ":main_window",
         "@qt//:qt_widgets",

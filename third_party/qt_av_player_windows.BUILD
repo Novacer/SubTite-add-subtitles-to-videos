@@ -18,6 +18,9 @@ qt_cc_library(
         include = ["src/QtAVPlayer/*.h"],
         exclude = WINDOWS_EXCLUDE_LIST,
     ),
+    copts = [
+        "/DQT_BUILD_QTAVPLAYER_LIB",
+    ],
     strip_include_prefix = "src/",
     target_compatible_with = ["@platforms//os:windows"],
     visibility = ["//visibility:public"],

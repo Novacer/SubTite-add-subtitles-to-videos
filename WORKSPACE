@@ -41,9 +41,10 @@ http_archive(
 # Configure QT Toolchains
 http_archive(
     name = "com_justbuchanan_rules_qt",
-    strip_prefix = "bazel_rules_qt-strip-include",
+    sha256 = "0ec127c6f60dc1900e915c420b990b9bec46dabdf9fa038adf5208284e1a4eb1",
+    strip_prefix = "bazel_rules_qt-master",
     # Use custom fork which includes some fixes
-    urls = ["https://github.com/Novacer/bazel_rules_qt/archive/refs/heads/strip-include.zip"],
+    urls = ["https://github.com/Novacer/bazel_rules_qt/archive/refs/heads/master.zip"],
 )
 
 load("@com_justbuchanan_rules_qt//:qt_configure.bzl", "qt_configure")
@@ -62,21 +63,6 @@ load("@com_justbuchanan_rules_qt//tools:qt_toolchain.bzl", "register_qt_toolchai
 
 register_qt_toolchains()
 # End Configure QT Toolchains
-
-# http_archive(
-#     name = "ffmpeg",
-#     build_file = "//third_party:ffmpeg.BUILD",
-#     strip_prefix = select({
-#         "@bazel_tools//src/conditions:windows": "ffmpeg-n4.4-latest-win64-lgpl-shared-4.4.zip",
-#         "@bazel_tools//src/conditions:darwin": "ffmpeg-n4.4-latest-linux64-lgpl-shared-4.4.tar.xz",
-#         "//conditions:default": "ffmpeg-n4.4-latest-linux64-lgpl-shared-4.4.tar.xz",
-#     }),
-#     urls = select({
-#         "@bazel_tools//src/conditions:windows": ["https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n4.4-latest-win64-lgpl-shared-4.4.zip"],
-#         "@bazel_tools//src/conditions:darwin": ["https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n4.4-latest-linux64-lgpl-shared-4.4.tar.xz"],
-#         "//conditions:default": ["https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n4.4-latest-linux64-lgpl-shared-4.4.tar.xz"],
-#     }),
-# )
 
 http_archive(
     name = "ffmpeg_windows",
@@ -98,13 +84,15 @@ http_archive(
 http_archive(
     name = "qt_av_player_windows",
     build_file = "//third_party:qt_av_player_windows.BUILD",
-    strip_prefix = "QtAVPlayer-remove-cmake-config",
-    urls = ["https://github.com/Novacer/QtAVPlayer/archive/refs/heads/remove-cmake-config.zip"],
+    sha256 = "255d8841dd271fafdc216562fb5b8c6c6713ad0aa6b1e0ca52abc5fe642d8157",
+    strip_prefix = "QtAVPlayer-master",
+    urls = ["https://github.com/Novacer/QtAVPlayer/archive/refs/heads/master.zip"],
 )
 
 http_archive(
     name = "qt_av_player_linux",
     build_file = "//third_party:qt_av_player_linux.BUILD",
-    strip_prefix = "QtAVPlayer-remove-cmake-config",
-    urls = ["https://github.com/Novacer/QtAVPlayer/archive/refs/heads/remove-cmake-config.zip"],
+    sha256 = "255d8841dd271fafdc216562fb5b8c6c6713ad0aa6b1e0ca52abc5fe642d8157",
+    strip_prefix = "QtAVPlayer-master",
+    urls = ["https://github.com/Novacer/QtAVPlayer/archive/refs/heads/master.zip"],
 )

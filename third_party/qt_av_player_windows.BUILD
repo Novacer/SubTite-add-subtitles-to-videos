@@ -12,13 +12,12 @@ qt_cc_library(
     name = "qt_av_player",
     srcs = glob(
         exclude = WINDOWS_EXCLUDE_LIST,
-        include = ["src/QtAvPlayer/*.cpp"],
+        include = ["src/QtAVPlayer/*.cpp"],
     ),
     hdrs = glob(
         exclude = WINDOWS_EXCLUDE_LIST,
-        include = ["src/QtAvPlayer/*.h"],
+        include = ["src/QtAVPlayer/*.h"],
     ),
-    # includes = ["src/QtAvPlayer"],
     strip_include_prefix = "src/",
     target_compatible_with = ["@platforms//os:windows"],
     visibility = ["//visibility:public"],

@@ -12,11 +12,11 @@ qt_cc_library(
     name = "qt_av_player",
     srcs = glob(
         exclude = LINUX_EXCLUDE_LIST,
-        include = ["src/QtAvPlayer/*.cpp"],
+        include = ["src/QtAVPlayer/*.cpp"],
     ),
     hdrs = glob(
         exclude = LINUX_EXCLUDE_LIST,
-        include = ["src/QtAvPlayer/*.h"],
+        include = ["src/QtAVPlayer/*.h"],
     ),
     # includes = ["src/QtAvPlayer"],
     strip_include_prefix = "src/",

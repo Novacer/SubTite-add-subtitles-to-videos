@@ -80,16 +80,31 @@ register_qt_toolchains()
 
 http_archive(
     name = "ffmpeg_windows",
-    sha256 = "5f94b0849b5de4421c55be77f133d33f7e6093e74deb43dc0ad66ad68b4e55d8",
     build_file = "//third_party:ffmpeg_windows.BUILD",
+    sha256 = "5f94b0849b5de4421c55be77f133d33f7e6093e74deb43dc0ad66ad68b4e55d8",
     strip_prefix = "ffmpeg-n4.4-latest-win64-lgpl-shared-4.4",
     urls = ["https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n4.4-latest-win64-lgpl-shared-4.4.zip"],
 )
 
 http_archive(
-    name = "qt_av_player",
-    build_file = "//third_party:qt_av_player.BUILD",
+    name = "ffmpeg_linux",
+    build_file = "//third_party:ffmpeg_linux.BUILD",
+    sha256 = "5f94b0849b5de4421c55be77f133d33f7e6093e74deb43dc0ad66ad68b4e55d8",
+    strip_prefix = "ffmpeg-n4.4-latest-linux64-lgpl-shared-4.4.tar.xz",
+    urls = ["https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n4.4-latest-linux64-lgpl-shared-4.4.tar.xz"],
+)
+
+# Need qt_av_player twice to work around genrule issue between Windows and Linux.
+http_archive(
+    name = "qt_av_player_windows",
+    build_file = "//third_party:qt_av_player_windows.BUILD",
     strip_prefix = "QtAVPlayer-remove-cmake-config",
     urls = ["https://github.com/Novacer/QtAVPlayer/archive/refs/heads/remove-cmake-config.zip"],
-    
+)
+
+http_archive(
+    name = "qt_av_player_linux",
+    build_file = "//third_party:qt_av_player_linux.BUILD",
+    strip_prefix = "QtAVPlayer-remove-cmake-config",
+    urls = ["https://github.com/Novacer/QtAVPlayer/archive/refs/heads/remove-cmake-config.zip"],
 )

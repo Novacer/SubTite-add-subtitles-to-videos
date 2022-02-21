@@ -14,10 +14,21 @@ class Timeline : public QScrollArea {
     ~Timeline() = default;
 
   signals:
-    void changeTime(std::chrono::milliseconds ms);
+    void rulerChangedTime(std::chrono::milliseconds ms);
+    void playerChangedTime(std::chrono::milliseconds ms);
+    void userDraggedRulerChangeTime(std::chrono::milliseconds ms);
   
   public slots:
-    void onChangeTime(std::chrono::milliseconds ms);
+    // Handles outgoing time changes from the ruler.
+    void onRulerChangedTime(std::chrono::milliseconds ms);
+    // Handles outgoing time changes of the ruler
+    // caused by the user dragging the indicator with their mouse.
+    void onUserDraggedRulerChangeTime(std::chrono::milliseconds ms);
+    // Handles incoming time changes from the player.
+    void onPlayerChangedTime(std::chrono::milliseconds ms);
+    
+    void onPlayerPause();
+    void onPlayerPlay();
 
   private:
     Ruler* ruler_;

@@ -1,5 +1,7 @@
 load("@com_justbuchanan_rules_qt//:qt.bzl", "qt_cc_library")
 
+package(default_visibility = ["//subtitler/experimental:__subpackages__"])
+
 qt_cc_library(
     name = "indicator",
     srcs = ["indicator.cpp"],

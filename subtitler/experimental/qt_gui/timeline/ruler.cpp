@@ -29,7 +29,8 @@ Ruler::Ruler(QWidget* parent, std::chrono::milliseconds duration,
       zoom_level_{zoom_level},
       duration_{duration},
       rect_width_{interval_width_ * duration_.count() / msPerInterval()},
-      scroll_bar_{Q_NULLPTR} {
+      scroll_bar_{Q_NULLPTR},
+      playing_{false} {
     setAttribute(Qt::WA_OpaquePaintEvent);
 
     if (auto scroll_area = dynamic_cast<QAbstractScrollArea*>(parent)) {
@@ -92,6 +93,7 @@ void Ruler::onMoveIndicator(std::chrono::milliseconds frame_time) {
     }
     indicator_->move(frame_time.count() * lengthPerMs(), indicator_->y());
     indicator_time_ = frame_time;
+    emit changeIndicatorTime(indicator_time_);
 }
 
 // update children when the ruler scaled up or down
@@ -154,8 +156,8 @@ bool Ruler::eventFilter(QObject* watched, QEvent* event) {
             int dx = e->pos().x() - lastPnt.x();
             int dy = e->pos().y() - lastPnt.y();
 
-            // TODO: possibly disable indicator mouse movement while isplaying.
-            if (watched == indicator_) {
+            // For now, disable moving indicator while video is playing.
+            if (watched == indicator_ && !playing_) {
                 if (indicator_->x() + dx <= rect_width_ - CUT_MARKER_WIDTH &&
                     indicator_->x() + dx >= 0) {
                     qreal new_indicator_time =
@@ -163,8 +165,8 @@ bool Ruler::eventFilter(QObject* watched, QEvent* event) {
                     indicator_time_ =
                         std::chrono::milliseconds((quint64)new_indicator_time);
                     indicator_->move(indicator_->x() + dx, indicator_->y());
-                    // TODO: change it so we don't have to convert to ms
                     emit changeIndicatorTime(indicator_time_);
+                    emit userChangedIndicatorTime(indicator_time_);
                 }
             }
             if (watched == begin_marker_) {

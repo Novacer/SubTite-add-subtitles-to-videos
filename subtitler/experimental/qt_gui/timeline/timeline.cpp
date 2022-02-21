@@ -7,8 +7,7 @@
 
 using namespace std::chrono_literals;
 
-Timeline::Timeline(QWidget* parent /* = Q_NULLPTR */)
-    : QScrollArea(parent) {
+Timeline::Timeline(QWidget* parent /* = Q_NULLPTR */) : QScrollArea(parent) {
     setMinimumSize(1000, 150);
 
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -24,9 +23,30 @@ Timeline::Timeline(QWidget* parent /* = Q_NULLPTR */)
     connect(zoomer_, &Zoomer::zoomOut, ruler_, &Ruler::onZoomOut);
     connect(ruler_, &Ruler::changeZoomPosition, zoomer_,
             &Zoomer::onSliderChanged);
-    connect(ruler_, &Ruler::changeIndicatorTime, this, &Timeline::onChangeTime);
+    connect(ruler_, &Ruler::changeIndicatorTime, this,
+            &Timeline::onRulerChangedTime);
+    connect(this, &Timeline::playerChangedTime, ruler_,
+            &Ruler::onMoveIndicator);
+    connect(ruler_, &Ruler::userChangedIndicatorTime, this,
+            &Timeline::onUserDraggedRulerChangeTime);
 }
 
-void Timeline::onChangeTime(std::chrono::milliseconds ms) {
-    emit changeTime(ms);
+void Timeline::onRulerChangedTime(std::chrono::milliseconds ms) {
+    emit rulerChangedTime(ms);
+}
+
+void Timeline::onPlayerChangedTime(std::chrono::milliseconds ms) {
+    emit playerChangedTime(ms);
+}
+
+void Timeline::onUserDraggedRulerChangeTime(std::chrono::milliseconds ms) {
+    emit userDraggedRulerChangeTime(ms);
+}
+
+void Timeline::onPlayerPause() {
+    ruler_->setPlaying(false);
+}
+
+void Timeline::onPlayerPlay() {
+    ruler_->setPlaying(true);
 }

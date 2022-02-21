@@ -27,6 +27,8 @@ class Ruler : public QWidget {
 
     void setBodyColor(const QColor& color) { body_bgrnd_ = color; }
 
+    void setPlaying(bool playing) { playing_ = playing; }
+
     std::chrono::milliseconds beginTime() const {
         return begin_marker_time_;
     }
@@ -38,6 +40,7 @@ class Ruler : public QWidget {
   signals:
     void changeZoomPosition(int level);
     void changeIndicatorTime(std::chrono::milliseconds ms);
+    void userChangedIndicatorTime(std::chrono::milliseconds ms);
 
   public slots:
     void onZoomIn(int level);
@@ -90,6 +93,7 @@ class Ruler : public QWidget {
     QColor header_bgrnd_;
     std::chrono::milliseconds duration_;
     qreal rect_width_;
+    bool playing_;
 };
 
 #endif

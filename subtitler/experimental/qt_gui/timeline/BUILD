@@ -38,6 +38,7 @@ qt_cc_library(
     deps = [
         ":indicator",
         "//subtitler/experimental/qt_gui/timeline/resource:resources",
+        "//subtitler/util:duration_format",
         "@qt//:qt_core",
         "@qt//:qt_gui",
         "@qt//:qt_widgets",
@@ -85,8 +86,8 @@ qt_cc_library(
     srcs = ["mainwindow.cpp"],
     hdrs = ["mainwindow.h"],
     deps = [
-        ":timer",
         ":timeline_window",
+        ":timer",
         "//subtitler/experimental/qt_gui/timeline/resource:resources",
         "@qt//:qt_core",
         "@qt//:qt_widgets",

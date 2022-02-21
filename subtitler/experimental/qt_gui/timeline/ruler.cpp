@@ -8,6 +8,8 @@
 #include <QPainter>
 #include <QScrollBar>
 
+#include "subtitler/util/duration_format.h"
+
 #define HEADER_HEIGHT 40
 #define BODY_HEIGHT 80
 #define START_END_PADDING 60
@@ -186,8 +188,8 @@ bool Ruler::eventFilter(QObject* watched, QEvent* event) {
                         begin_marker_->x()) {
                     qreal new_end_marker_time =
                         (end_marker_->x() + dx) / lengthPerMs();
-                    end_marker_time_ = std::chrono::milliseconds(
-                        (quint64)new_end_marker_time);
+                    end_marker_time_ =
+                        std::chrono::milliseconds((quint64)new_end_marker_time);
                     end_marker_->move(end_marker_->x() + dx, end_marker_->y());
                     updateRectBox();
                 }
@@ -271,13 +273,17 @@ QString Ruler::getTickerString(qreal current_pos) {
         return "00:00:00";
     }
 
-    quint32 current_time_sec = (interval_num * msPerInterval()) / 1000;
-    QTime current_time(current_time_sec / 3600,
-                      current_time_sec / 60,
-                      current_time_sec % 60);
+    std::chrono::milliseconds current_time_ms{interval_num * msPerInterval()};
+    auto current_time_rounded_sec =
+        std::chrono::floor<std::chrono::seconds>(current_time_ms);
 
     if (interval_num % 2 == 0) {
-        return current_time.toString("hh:mm:ss");
+        auto with_milli_precision = subtitler::FormatDuration(current_time_rounded_sec);
+        // remove ".000" from the end
+        if (int remove_from_here = with_milli_precision.length() - 4; remove_from_here > 0) {
+            with_milli_precision.erase(remove_from_here);
+        }
+        return QString::fromStdString(with_milli_precision);
     }
 
     return "";

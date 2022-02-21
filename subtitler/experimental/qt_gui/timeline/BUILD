@@ -45,6 +45,18 @@ qt_cc_library(
 )
 
 qt_cc_library(
+    name = "timer",
+    srcs = ["timer.cpp"],
+    hdrs = ["timer.h"],
+    deps = [
+        "//subtitler/util:duration_format",
+        "@qt//:qt_core",
+        "@qt//:qt_gui",
+        "@qt//:qt_widgets",
+    ],
+)
+
+qt_cc_library(
     name = "zoomer",
     srcs = ["zoomer.cpp"],
     hdrs = ["zoomer.h"],
@@ -56,12 +68,25 @@ qt_cc_library(
 )
 
 qt_cc_library(
+    name = "timeline_window",
+    srcs = ["timeline.cpp"],
+    hdrs = ["timeline.h"],
+    deps = [
+        ":ruler",
+        ":zoomer",
+        "//subtitler/experimental/qt_gui/timeline/resource:resources",
+        "@qt//:qt_core",
+        "@qt//:qt_widgets",
+    ],
+)
+
+qt_cc_library(
     name = "mainwindow",
     srcs = ["mainwindow.cpp"],
     hdrs = ["mainwindow.h"],
     deps = [
-        ":ruler",
-        ":zoomer",
+        ":timer",
+        ":timeline_window",
         "//subtitler/experimental/qt_gui/timeline/resource:resources",
         "@qt//:qt_core",
         "@qt//:qt_widgets",

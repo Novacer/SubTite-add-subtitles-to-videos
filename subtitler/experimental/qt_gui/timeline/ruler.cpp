@@ -153,6 +153,9 @@ bool Ruler::eventFilter(QObject* watched, QEvent* event) {
                     indicator_time_ =
                         (indicator_->x() + dx) / lengthPerSecond();
                     indicator_->move(indicator_->x() + dx, indicator_->y());
+                    // TODO: change it so we don't have to convert to ms
+                    emit changeIndicatorTime(
+                        std::chrono::milliseconds{(int)indicator_time_ * 1000});
                 }
             }
             if (watched == begin_marker_) {
@@ -204,9 +207,9 @@ void Ruler::wheelEvent(QWheelEvent* event) {
     QPoint numDegrees = event->angleDelta() / 8;
     if (!numDegrees.isNull()) {
         if (numDegrees.y() > 0) {
-            emit changeSliderPosition(zoom_level_ - 1);
+            emit changeZoomPosition(zoom_level_ - 1);
         } else if (numDegrees.y() < 0) {
-            emit changeSliderPosition(zoom_level_ + 1);
+            emit changeZoomPosition(zoom_level_ + 1);
         }
     }
     event->accept();

@@ -1,25 +1,27 @@
 #include "subtitler/experimental/qt_gui/timeline/mainwindow.h"
 
-#include <QDebug>
-#include <QScrollBar>
 #include <QVBoxLayout>
+#include <QWidget>
 
-MainWindow::MainWindow(QWidget* parent /* = Q_NULLPTR */)
-    : QScrollArea(parent) {
+#include "subtitler/experimental/qt_gui/timeline/timeline.h"
+#include "subtitler/experimental/qt_gui/timeline/timer.h"
+
+MainWindow::MainWindow(QWidget *parent): QMainWindow(parent) {
+    setWindowTitle("Video Timeline Demo");
+    setMinimumSize(1000, 150);
     setWindowIcon(QIcon(":/images/logo"));
-    resize(1000, 150);
 
-    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    quint32 duration = 600;
-    zoomer_ = new Zoomer(this, duration);
-    zoomer_->setMinimumWidth(300);
-    addScrollBarWidget(zoomer_, Qt::AlignLeft);
+    QWidget * placeholder = new QWidget{this};
+    QVBoxLayout *layout = new QVBoxLayout(placeholder);
 
-    ruler_ = new Ruler(this, duration, zoomer_->max_zoom_level());
-    setWidget(ruler_);
+    Timer *timer = new Timer{this};
+    Timeline *timeline = new Timeline{this};
 
-    connect(zoomer_, &Zoomer::zoomIn, ruler_, &Ruler::onZoomIn);
-    connect(zoomer_, &Zoomer::zoomOut, ruler_, &Ruler::onZoomOut);
-    connect(ruler_, &Ruler::changeSliderPosition, zoomer_,
-            &Zoomer::onSliderChanged);
+    timer->setAlignment(Qt::AlignCenter);
+    layout->addWidget(timer);
+    layout->addWidget(timeline);
+
+    connect(timeline, &Timeline::changeTime, timer, &Timer::onTimerChanged);
+
+    setCentralWidget(placeholder);
 }

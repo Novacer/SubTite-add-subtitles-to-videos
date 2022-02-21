@@ -4,6 +4,7 @@
 #include <QTime>
 #include <QTimer>
 #include <QWidget>
+#include <chrono>
 
 #include "subtitler/experimental/qt_gui/timeline/indicator.h"
 
@@ -29,7 +30,8 @@ class Ruler : public QWidget {
     inline int endTime() const { return end_marker_time_; }
 
   signals:
-    void changeSliderPosition(int level);
+    void changeZoomPosition(int level);
+    void changeIndicatorTime(std::chrono::milliseconds ms);
 
   public slots:
     void onZoomIn(int level);

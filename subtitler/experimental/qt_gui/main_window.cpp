@@ -1,8 +1,8 @@
 #include "subtitler/experimental/qt_gui/main_window.h"
 
-#include <QtWidgets/QAction>
-#include <QtWidgets/QMenuBar>
-#include <QtWidgets/QStatusBar>
+#include <QAction>
+#include <QMenuBar>
+#include <QStatusBar>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     setWindowTitle("QT Demo");

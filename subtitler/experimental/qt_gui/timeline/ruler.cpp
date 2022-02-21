@@ -22,14 +22,14 @@ using namespace std::chrono_literals;
 Ruler::Ruler(QWidget* parent, std::chrono::milliseconds duration,
              int zoom_level)
     : QWidget{parent},
+      zoom_level_{zoom_level},
+      scroll_bar_{Q_NULLPTR},
       origin_{10.0},
+      interval_width_{130.0},
       body_bgrnd_{37, 38, 39},
       header_bgrnd_{32, 32, 32},
-      interval_width_{130.0},
-      zoom_level_{zoom_level},
       duration_{duration},
       rect_width_{interval_width_ * duration_.count() / msPerInterval()},
-      scroll_bar_{Q_NULLPTR},
       playing_{false} {
     setAttribute(Qt::WA_OpaquePaintEvent);
 
@@ -154,7 +154,6 @@ bool Ruler::eventFilter(QObject* watched, QEvent* event) {
         } else if (event->type() == QEvent::MouseMove && isHover) {
             QMouseEvent* e = dynamic_cast<QMouseEvent*>(event);
             int dx = e->pos().x() - lastPnt.x();
-            int dy = e->pos().y() - lastPnt.y();
 
             // For now, disable moving indicator while video is playing.
             if (watched == indicator_ && !playing_) {
@@ -306,7 +305,6 @@ void Ruler::onZoomOut(int level) {
 }
 
 void Ruler::drawScaleRuler(QPainter* painter, QRectF ruler_rect) {
-    qreal ruler_start_mark = ruler_rect.left();
     qreal ruler_end_mark = ruler_rect.right();
 
     for (qreal current = origin_; current <= ruler_end_mark;

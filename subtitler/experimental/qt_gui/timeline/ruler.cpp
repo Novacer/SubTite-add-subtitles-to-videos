@@ -241,11 +241,15 @@ QString Ruler::getTickerString(qreal currentPos) {
 
 void Ruler::onZoomerIn(int level) {
     mSliderLevel = level;
+    // Give user visual confirmation that they have zoomed in.
+    mIntervalLength += 5;
     updateChildren();
 }
 
 void Ruler::onZoomerOut(int level) {
     mSliderLevel = level;
+    // Give user visual confirmation that they have zoomed out.
+    mIntervalLength -= 5;
     updateChildren();
 }
 

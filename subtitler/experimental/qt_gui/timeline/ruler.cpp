@@ -24,8 +24,7 @@ Ruler::Ruler(QWidget* parent, quint32 duration, int sliderLevel)
       zoom_level_{sliderLevel},
       duration_{duration},
       rect_width_{interval_width_ * duration_ / secondsPerInterval()},
-      scroll_bar_{Q_NULLPTR},
-      is_mouse_scroll_change_{false} {
+      scroll_bar_{Q_NULLPTR} {
     setAttribute(Qt::WA_OpaquePaintEvent);
 
     if (auto scroll_area = dynamic_cast<QAbstractScrollArea*>(parent)) {

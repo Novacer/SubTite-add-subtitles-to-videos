@@ -16,14 +16,13 @@ class Zoomer : public QWidget {
     int max_zoom_level() const { return max_zoom_level_; };
 
   signals:
-    void zoomerIn(int level);
-    void zoomerOut(int level);
+    void zoomIn(int level);
+    void zoomOut(int level);
 
   public slots:
     void onZoomInClicked(bool checked);
     void onZoomOutClicked(bool checked);
     void onSliderChanged(int value);
-    void onChangeSliderPosition(int level);
 
   private:
     QToolButton* zoom_in_;

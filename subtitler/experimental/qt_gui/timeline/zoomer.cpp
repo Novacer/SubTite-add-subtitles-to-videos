@@ -61,7 +61,7 @@ void Zoomer::onZoomInClicked(bool checked) {
     int currentValue = zoom_slider_->value();
     if (currentValue > min_zoom_level_) {
         zoom_slider_->setSliderPosition(--currentValue);
-        emit zoomerIn(currentValue);
+        emit zoomIn(currentValue);
     }
 }
 
@@ -69,7 +69,7 @@ void Zoomer::onZoomOutClicked(bool checked) {
     int currentValue = zoom_slider_->value();
     if (currentValue < max_zoom_level_) {
         zoom_slider_->setSliderPosition(++currentValue);
-        emit zoomerOut(currentValue);
+        emit zoomOut(currentValue);
     }
 }
 
@@ -78,14 +78,10 @@ void Zoomer::onSliderChanged(int value) {
         return;
     }
     if (value > current_level_) {
-        emit zoomerOut(value);
+        emit zoomOut(value);
     } else if (value < current_level_) {
-        emit zoomerIn(value);
+        emit zoomIn(value);
     }
     current_level_ = value;
     zoom_slider_->setSliderPosition(current_level_);
-}
-
-void Zoomer::onChangeSliderPosition(int level) {
-    onSliderChanged(level);
 }

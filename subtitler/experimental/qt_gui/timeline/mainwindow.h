@@ -13,8 +13,8 @@ class MainWindow : public QScrollArea {
     ~MainWindow() = default;
 
   private:
-    Ruler* mRuler;
-    Zoomer* mZoomer;
+    Ruler* ruler_;
+    Zoomer* zoomer_;
 };
 
 #endif

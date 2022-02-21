@@ -9,29 +9,31 @@
 
 QT_FORWARD_DECLARE_CLASS(QAction)
 QT_FORWARD_DECLARE_CLASS(QMenu)
+QT_FORWARD_DECLARE_CLASS(QScrollBar)
 
 class Ruler : public QWidget {
     Q_OBJECT
   public:
-    explicit Ruler(QWidget* parent = Q_NULLPTR, int duration = 126, int sliderLevel = 1);
+    explicit Ruler(QWidget* parent = Q_NULLPTR, quint32 duration = 126,
+                   int sliderLevel = 1);
     ~Ruler() = default;
 
-    inline void setHeaderColor(const QColor& color) { mHeaderBgrd = color; }
+    inline void setHeaderColor(const QColor& color) { header_bgrnd_ = color; }
 
     inline void setDuration(quint32 duration) { resetChildren(duration); }
 
-    inline void setBodyColor(const QColor& color) { mBodyBgrd = color; }
+    inline void setBodyColor(const QColor& color) { body_bgrnd_ = color; }
 
-    inline int beginTime() const { return mBeginMarkerTime; }
+    inline int beginTime() const { return begin_marker_time_; }
 
-    inline int endTime() const { return mEndMarkerTime; }
+    inline int endTime() const { return end_marker_time_; }
 
   signals:
     void changeSliderPosition(int level);
 
   public slots:
-    void onZoomerIn(int level);
-    void onZoomerOut(int level);
+    void onZoomIn(int level);
+    void onZoomOut(int level);
     void onMoveIndicator(qreal frameTime);
 
   protected:
@@ -45,38 +47,44 @@ class Ruler : public QWidget {
   private:
     void setupChildren();
     void resetChildren(quint32 duration);
-    void updateChildren();
+    void updateChildren(quint32 prev_seconds_per_interval,
+                        qreal prev_interval_width);
     void drawScaleRuler(QPainter* painter, QRectF rulerRect);
     QString getTickerString(qreal tickerNo);
-    int secondsPerInterval();
+    quint32 secondsPerInterval();
     qreal lengthPerSecond();
     void updateRectBox();
 
-  private:
     // sub controls
-    Indicator* mIndicator;
-    QLabel* mBeginMarker;
-    QLabel* mEndMarker;
-    QFrame* mRectBox;
-    int mSliderLevel;
-    qreal mBeginMarkerTime;  // time unit/s
-    qreal mEndMarkerTime;    // time unit/s
-    qreal mIndicatorTime;    // time unit/s
+    Indicator* indicator_;
+    QLabel* begin_marker_;
+    QLabel* end_marker_;
+    QFrame* rect_box_;
+    int zoom_level_;
+
+    // Scroll bar of the parent, since this may manipulate its position.
+    QScrollBar* scroll_bar_;
+
+    // TODO: convert this to std::chrono::duration
+    qreal begin_marker_time_;
+    qreal end_marker_time_;
+    qreal indicator_time_;
 
     // context menu
-    QMenu* mContextMenu;
-    QAction* mClearPoints;
-    QAction* mMakeCurrentPoint;
-    QAction* mCutWithCurrentPos;
+    QMenu* context_menu_;
+    QAction* clear_points_;
+    QAction* make_current_point_;
+    QAction* cut_with_current_pos_;
 
     // ruler members
-    qreal mOrigin;
-    qreal mIntervalLength;
-    QPoint mCursorPos;
-    QColor mBodyBgrd;
-    QColor mHeaderBgrd;
-    quint32 mDuration;  // time unit/s
-    qreal mRectWidth;
+    qreal origin_;
+    qreal interval_width_;
+    QPoint cursor_pos_;
+    QColor body_bgrnd_;
+    QColor header_bgrnd_;
+    // TODO: convert to chrono duration
+    quint32 duration_;
+    qreal rect_width_;
 };
 
 #endif

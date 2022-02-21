@@ -11,15 +11,15 @@ MainWindow::MainWindow(QWidget* parent /* = Q_NULLPTR */)
 
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     quint32 duration = 600;
-    mZoomer = new Zoomer(this, duration);
-    mZoomer->setMinimumWidth(300);
-    addScrollBarWidget(mZoomer, Qt::AlignLeft);
+    zoomer_ = new Zoomer(this, duration);
+    zoomer_->setMinimumWidth(300);
+    addScrollBarWidget(zoomer_, Qt::AlignLeft);
 
-    mRuler = new Ruler(this, duration, mZoomer->max_zoom_level());
-    setWidget(mRuler);
+    ruler_ = new Ruler(this, duration, zoomer_->max_zoom_level());
+    setWidget(ruler_);
 
-    connect(mZoomer, &Zoomer::zoomerIn, mRuler, &Ruler::onZoomerIn);
-    connect(mZoomer, &Zoomer::zoomerOut, mRuler, &Ruler::onZoomerOut);
-    connect(mRuler, &Ruler::changeSliderPosition, mZoomer,
-            &Zoomer::onChangeSliderPosition);
+    connect(zoomer_, &Zoomer::zoomIn, ruler_, &Ruler::onZoomIn);
+    connect(zoomer_, &Zoomer::zoomOut, ruler_, &Ruler::onZoomOut);
+    connect(ruler_, &Ruler::changeSliderPosition, zoomer_,
+            &Zoomer::onSliderChanged);
 }

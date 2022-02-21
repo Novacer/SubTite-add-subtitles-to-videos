@@ -15,19 +15,25 @@ QT_FORWARD_DECLARE_CLASS(QScrollBar)
 class Ruler : public QWidget {
     Q_OBJECT
   public:
-    explicit Ruler(QWidget* parent = Q_NULLPTR, quint32 duration = 126,
-                   int sliderLevel = 1);
+    explicit Ruler(QWidget* parent, std::chrono::milliseconds duration,
+                   int zoom_level = 1);
     ~Ruler() = default;
 
-    inline void setHeaderColor(const QColor& color) { header_bgrnd_ = color; }
+    void setHeaderColor(const QColor& color) { header_bgrnd_ = color; }
 
-    inline void setDuration(quint32 duration) { resetChildren(duration); }
+    void setDuration(std::chrono::milliseconds duration) {
+        resetChildren(duration);
+    }
 
-    inline void setBodyColor(const QColor& color) { body_bgrnd_ = color; }
+    void setBodyColor(const QColor& color) { body_bgrnd_ = color; }
 
-    inline int beginTime() const { return begin_marker_time_; }
+    std::chrono::milliseconds beginTime() const {
+        return begin_marker_time_;
+    }
 
-    inline int endTime() const { return end_marker_time_; }
+    std::chrono::milliseconds endTime() const {
+        return end_marker_time_;
+    }
 
   signals:
     void changeZoomPosition(int level);
@@ -36,7 +42,7 @@ class Ruler : public QWidget {
   public slots:
     void onZoomIn(int level);
     void onZoomOut(int level);
-    void onMoveIndicator(qreal frameTime);
+    void onMoveIndicator(std::chrono::milliseconds frame_time);
 
   protected:
     virtual void paintEvent(QPaintEvent* event) override;
@@ -48,13 +54,12 @@ class Ruler : public QWidget {
 
   private:
     void setupChildren();
-    void resetChildren(quint32 duration);
-    void updateChildren(quint32 prev_seconds_per_interval,
-                        qreal prev_interval_width);
-    void drawScaleRuler(QPainter* painter, QRectF rulerRect);
-    QString getTickerString(qreal tickerNo);
-    quint32 secondsPerInterval();
-    qreal lengthPerSecond();
+    void resetChildren(std::chrono::milliseconds duration);
+    void updateChildren();
+    void drawScaleRuler(QPainter* painter, QRectF ruler_rect);
+    QString getTickerString(qreal current_pos);
+    quint32 msPerInterval();
+    qreal lengthPerMs();
     void updateRectBox();
 
     // sub controls
@@ -67,10 +72,9 @@ class Ruler : public QWidget {
     // Scroll bar of the parent, since this may manipulate its position.
     QScrollBar* scroll_bar_;
 
-    // TODO: convert this to std::chrono::duration
-    qreal begin_marker_time_;
-    qreal end_marker_time_;
-    qreal indicator_time_;
+    std::chrono::milliseconds begin_marker_time_;
+    std::chrono::milliseconds end_marker_time_;
+    std::chrono::milliseconds indicator_time_;
 
     // context menu
     QMenu* context_menu_;
@@ -84,8 +88,7 @@ class Ruler : public QWidget {
     QPoint cursor_pos_;
     QColor body_bgrnd_;
     QColor header_bgrnd_;
-    // TODO: convert to chrono duration
-    quint32 duration_;
+    std::chrono::milliseconds duration_;
     qreal rect_width_;
 };
 

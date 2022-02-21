@@ -1,22 +1,23 @@
 #include "subtitler/experimental/qt_gui/timeline/zoomer.h"
 
 #include <QHBoxLayout>
-#include <iostream>
 #include <cmath>
+#include <iostream>
 
 namespace {
 
-int computeZoomRange(quint32 duration) {
+int computeZoomRange(std::chrono::milliseconds duration) {
     // The max interval size should be 10% of the total duration.
-    double max_interval_size = duration / 10.0;
+    double max_interval_size_secs = duration.count() / (10.0 * 1000);
     // Each increase in the zoom level adds 10 secs to the interval.
     // Therefore, the range of the zoom levels is max_interval_size / 10.
-    return std::max(1, static_cast<int>(std::ceil(max_interval_size / 10.0)));
+    return std::max(1,
+                    static_cast<int>(std::ceil(max_interval_size_secs / 10.0)));
 }
 
-} // namespace
+}  // namespace
 
-Zoomer::Zoomer(QWidget* parent, quint32 duration)
+Zoomer::Zoomer(QWidget* parent, std::chrono::milliseconds duration)
     : QWidget(parent),
       zoom_in_{Q_NULLPTR},
       zoom_out_{Q_NULLPTR},
@@ -27,16 +28,15 @@ Zoomer::Zoomer(QWidget* parent, quint32 duration)
     setFixedWidth(150);
     setCursor(Qt::PointingHandCursor);
     InitializeControls(duration);
-    QHBoxLayout* mainLayout = new QHBoxLayout(this);
-    mainLayout->setSpacing(5);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
-    mainLayout->addWidget(zoom_in_);
-    mainLayout->addWidget(zoom_slider_);
-    mainLayout->addWidget(zoom_out_);
-    setLayout(mainLayout);
+    QHBoxLayout* main_layout = new QHBoxLayout(this);
+    main_layout->setSpacing(5);
+    main_layout->setContentsMargins(0, 0, 0, 0);
+    main_layout->addWidget(zoom_in_);
+    main_layout->addWidget(zoom_slider_);
+    main_layout->addWidget(zoom_out_);
 }
 
-void Zoomer::InitializeControls(quint32 duration) {
+void Zoomer::InitializeControls(std::chrono::milliseconds duration) {
     zoom_slider_ = new QSlider(Qt::Horizontal, this);
     // Double the width
     min_zoom_level_ = 1;
@@ -52,7 +52,8 @@ void Zoomer::InitializeControls(quint32 duration) {
 
     connect(zoom_slider_, &QAbstractSlider::valueChanged, this,
             &Zoomer::onSliderChanged);
-    connect(zoom_in_, &QAbstractButton::clicked, this, &Zoomer::onZoomInClicked);
+    connect(zoom_in_, &QAbstractButton::clicked, this,
+            &Zoomer::onZoomInClicked);
     connect(zoom_out_, &QAbstractButton::clicked, this,
             &Zoomer::onZoomOutClicked);
 }

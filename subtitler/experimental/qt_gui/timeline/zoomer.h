@@ -4,14 +4,15 @@
 #include <QSlider>
 #include <QToolButton>
 #include <QWidget>
+#include <chrono>
 
 class Zoomer : public QWidget {
     Q_OBJECT
   public:
-    Zoomer(QWidget* parent, quint32 duration);
+    Zoomer(QWidget* parent, std::chrono::milliseconds duration);
     ~Zoomer() = default;
 
-    void InitializeControls(quint32 duration);
+    void InitializeControls(std::chrono::milliseconds duration);
 
     int max_zoom_level() const { return max_zoom_level_; };
 

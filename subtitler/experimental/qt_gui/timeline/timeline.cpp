@@ -3,13 +3,16 @@
 #include <QDebug>
 #include <QScrollBar>
 #include <QVBoxLayout>
+#include <chrono>
+
+using namespace std::chrono_literals;
 
 Timeline::Timeline(QWidget* parent /* = Q_NULLPTR */)
     : QScrollArea(parent) {
     setMinimumSize(1000, 150);
 
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    quint32 duration = 600;
+    std::chrono::milliseconds duration = 10min;
     zoomer_ = new Zoomer(this, duration);
     zoomer_->setMinimumWidth(300);
     addScrollBarWidget(zoomer_, Qt::AlignLeft);

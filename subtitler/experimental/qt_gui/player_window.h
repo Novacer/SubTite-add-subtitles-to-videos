@@ -6,6 +6,7 @@
 #include <memory>
 
 class QAVPlayer;
+class QAVAudioOutput;
 
 class PlayerWindow : public QMainWindow {
     Q_OBJECT
@@ -22,6 +23,7 @@ class PlayerWindow : public QMainWindow {
   
   private:
     std::unique_ptr<QAVPlayer> player_;
+    std::unique_ptr<QAVAudioOutput> audio_output_;
 };
 
 #endif

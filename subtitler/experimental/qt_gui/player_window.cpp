@@ -9,6 +9,7 @@ extern "C" {
 #include <QtAVPlayer/qavvideoframe.h>
 
 #include <QAbstractVideoSurface>
+#include <QFileDialog>
 #include <QMediaObject>
 #include <QMediaService>
 #include <QVBoxLayout>
@@ -80,10 +81,11 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent) {
 
     player_ = std::make_unique<QAVPlayer>();
 
-    // TODO: build a component to select files dynamically.
-    QString file = QLatin1String(
-        "D:\\Lecture Videos\\CLAS_201 Videos\\Week "
-        "1ii - Introduction.mp4");
+    QString file = QFileDialog::getOpenFileName(
+        /* parent= */this, 
+        /* caption= */ tr("Open Video"),
+        /* directory= */ "",
+        /* filter= */ tr("Video Files (*.mp4)"));
     player_->setSource(file);
 
     PlayButton *play_button = new PlayButton(placeholder);
@@ -91,7 +93,7 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Get video duration
     // TODO: make util class?
-    AVFormatContext* pFormatCtx = avformat_alloc_context();
+    AVFormatContext *pFormatCtx = avformat_alloc_context();
     auto file_stdstr = file.toStdString();
     avformat_open_input(&pFormatCtx, file_stdstr.c_str(), NULL, NULL);
     avformat_find_stream_info(pFormatCtx, NULL);
@@ -112,8 +114,10 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent) {
     // Play/Pause connections
     connect(play_button, &PlayButton::play, player_.get(), &QAVPlayer::play);
     connect(play_button, &PlayButton::pause, player_.get(), &QAVPlayer::pause);
-    connect(player_.get(), &QAVPlayer::played, timeline, &Timeline::onPlayerPlay);
-    connect(player_.get(), &QAVPlayer::paused, timeline, &Timeline::onPlayerPause);
+    connect(player_.get(), &QAVPlayer::played, timeline,
+            &Timeline::onPlayerPlay);
+    connect(player_.get(), &QAVPlayer::paused, timeline,
+            &Timeline::onPlayerPause);
 
     // Connections to synchronize time between ruler, player, and timer.
     connect(timeline, &Timeline::rulerChangedTime, timer,
@@ -123,12 +127,11 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent) {
     connect(this, &PlayerWindow::playerChangedTime, timeline,
             &Timeline::onPlayerChangedTime);
 
-    // TODO: unique_ptr?
-    QAVAudioOutput *audioOutput = new QAVAudioOutput;
+    audio_output_ = std::make_unique<QAVAudioOutput>();
     connect(player_.get(), &QAVPlayer::audioFrame, player_.get(),
             [=](const QAVAudioFrame &frame) {
                 if (this->player_->state() == QAVPlayer::State::PlayingState) {
-                    audioOutput->play(frame);
+                    this->audio_output_->play(frame);
                 }
             });
 
@@ -152,7 +155,7 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent) {
             });
 
     // Init the first frame.
-    player_->seek(0);
+    player_->pause();
 }
 
 void PlayerWindow::onRulerChangedTime(std::chrono::milliseconds ms) {

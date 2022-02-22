@@ -7,13 +7,17 @@ extern "C" {
 #include <QApplication>
 #include <QDir>
 #include <QFile>
+#include <QByteArray>
 
 #include "subtitler/experimental/qt_gui/player_window.h"
 
 int main(int argc, char *argv[]) {
-    av_log_set_level(AV_LOG_FATAL);
-
+    // av_log_set_level(AV_LOG_FATAL);
     QApplication app(argc, argv);
+
+    // Force software decoding for now, until I can figure out
+    // how to make hw decoding work...
+    qputenv("QT_AVPLAYER_NO_HWDEVICE", QByteArray("1"));
 
     Q_INIT_RESOURCE(timeline);
 
@@ -26,6 +30,8 @@ int main(int argc, char *argv[]) {
 
     PlayerWindow player_window;
     player_window.show();
+
+    qunsetenv("QT_AVPLAYER_NO_HWDEVICE");
     
     return app.exec();
 }

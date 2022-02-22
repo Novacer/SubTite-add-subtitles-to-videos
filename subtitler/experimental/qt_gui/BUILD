@@ -50,5 +50,9 @@ cc_binary(
         "//subtitler/experimental/qt_gui/timeline/resource:resources",
         "@qt//:qt_core",
         "@qt//:qt_widgets",
-    ],
+    ] + select({
+        "@bazel_tools//src/conditions:windows": ["@ffmpeg_windows//:ffmpeg_libavutil"],
+        "@bazel_tools//src/conditions:darwin": ["@ffmpeg_linux//:ffmpeg_libavutil"],
+        "//conditions:default": ["@ffmpeg_linux//:ffmpeg_libavutil"],
+    }),
 )

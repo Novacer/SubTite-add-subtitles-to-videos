@@ -6,4 +6,5 @@ package(default_visibility = ["//subtitler/experimental:__subpackages__"])
 qt_resource_file(
     name = "resources",
     qrc_file = "timeline.qrc",
+    files = ["app.qss"] + glob(["images/*"])
 )

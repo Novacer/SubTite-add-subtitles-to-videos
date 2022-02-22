@@ -1,5 +1,9 @@
 #include "subtitler/experimental/qt_gui/player_window.h"
 
+extern "C" {
+#include <libavformat/avformat.h>
+}
+
 #include <QtAVPlayer/qavaudiooutput.h>
 #include <QtAVPlayer/qavplayer.h>
 #include <QtAVPlayer/qavvideoframe.h>
@@ -13,6 +17,7 @@
 #include <QVideoWidget>
 #include <QWidget>
 #include <chrono>
+#include <iostream>
 
 #include "subtitler/experimental/qt_gui/play_button.h"
 #include "subtitler/experimental/qt_gui/timeline/timeline.h"
@@ -62,7 +67,7 @@ PlayerWindow::~PlayerWindow() = default;
 
 PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent) {
     setWindowTitle("Video Player Demo");
-    setMinimumSize(1000, 1000);
+    setMinimumSize(1000, 500);
     QWidget *placeholder = new QWidget{this};
     QVBoxLayout *layout = new QVBoxLayout(placeholder);
 
@@ -83,7 +88,19 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent) {
 
     PlayButton *play_button = new PlayButton(placeholder);
     Timer *timer = new Timer{placeholder};
-    Timeline *timeline = new Timeline{placeholder};
+
+    // Get video duration
+    // TODO: make util class?
+    AVFormatContext* pFormatCtx = avformat_alloc_context();
+    auto file_stdstr = file.toStdString();
+    avformat_open_input(&pFormatCtx, file_stdstr.c_str(), NULL, NULL);
+    avformat_find_stream_info(pFormatCtx, NULL);
+    auto duration_us = pFormatCtx->duration;
+    avformat_close_input(&pFormatCtx);
+    avformat_free_context(pFormatCtx);
+
+    std::chrono::milliseconds duration{duration_us / 1000};
+    Timeline *timeline = new Timeline{duration, placeholder};
 
     layout->addWidget(w);
     layout->addWidget(play_button);

@@ -30,6 +30,10 @@ qt_cc_library(
         "@bazel_tools//src/conditions:windows": ["@qt_av_player_windows//:qt_av_player"],
         "@bazel_tools//src/conditions:darwin": ["@qt_av_player_linux//:qt_av_player"],
         "//conditions:default": ["@qt_av_player_linux//:qt_av_player"],
+    }) + select({
+        "@bazel_tools//src/conditions:windows": ["@ffmpeg_windows//:ffmpeg_libavformat"],
+        "@bazel_tools//src/conditions:darwin": ["@ffmpeg_linux//:ffmpeg_libavformat"],
+        "//conditions:default": ["@ffmpeg_linux//:ffmpeg_libavformat"],
     }),
 )
 

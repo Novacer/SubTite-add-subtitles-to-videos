@@ -10,7 +10,7 @@
 class Timeline : public QScrollArea {
     Q_OBJECT
   public:
-    Timeline(QWidget* parent = Q_NULLPTR);
+    Timeline(std::chrono::milliseconds duration, QWidget* parent = Q_NULLPTR);
     ~Timeline() = default;
 
   signals:

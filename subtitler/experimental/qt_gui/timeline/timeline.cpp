@@ -7,11 +7,11 @@
 
 using namespace std::chrono_literals;
 
-Timeline::Timeline(QWidget* parent /* = Q_NULLPTR */) : QScrollArea(parent) {
+Timeline::Timeline(std::chrono::milliseconds duration, QWidget* parent) : QScrollArea(parent) {
     setMinimumSize(1000, 150);
 
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    std::chrono::milliseconds duration = 10min;
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
     zoomer_ = new Zoomer(this, duration);
     zoomer_->setMinimumWidth(300);
     addScrollBarWidget(zoomer_, Qt::AlignLeft);

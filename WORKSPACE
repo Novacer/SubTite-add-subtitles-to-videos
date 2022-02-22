@@ -41,10 +41,9 @@ http_archive(
 # Configure QT Toolchains
 http_archive(
     name = "com_justbuchanan_rules_qt",
-    sha256 = "0ec127c6f60dc1900e915c420b990b9bec46dabdf9fa038adf5208284e1a4eb1",
-    strip_prefix = "bazel_rules_qt-master",
+    strip_prefix = "bazel_rules_qt-qt-resource-file",
     # Use custom fork which includes some fixes
-    urls = ["https://github.com/Novacer/bazel_rules_qt/archive/refs/heads/master.zip"],
+    urls = ["https://github.com/Novacer/bazel_rules_qt/archive/refs/heads/qt-resource-file.zip"],
 )
 
 load("@com_justbuchanan_rules_qt//:qt_configure.bzl", "qt_configure")

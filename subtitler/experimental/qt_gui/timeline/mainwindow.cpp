@@ -2,9 +2,12 @@
 
 #include <QVBoxLayout>
 #include <QWidget>
+#include <chrono>
 
 #include "subtitler/experimental/qt_gui/timeline/timeline.h"
 #include "subtitler/experimental/qt_gui/timeline/timer.h"
+
+using namespace std::chrono_literals;
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     setWindowTitle("Video Timeline Demo");
@@ -13,9 +16,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     QWidget *placeholder = new QWidget{this};
     QVBoxLayout *layout = new QVBoxLayout(placeholder);
-
     Timer *timer = new Timer{placeholder};
-    Timeline *timeline = new Timeline{placeholder};
+    Timeline *timeline = new Timeline{10min, placeholder};
 
     timer->setAlignment(Qt::AlignCenter);
     layout->addWidget(timer);

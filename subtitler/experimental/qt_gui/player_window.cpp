@@ -37,21 +37,20 @@ class VideoRenderer : public QVideoRendererControl {
 
 class MediaService : public QMediaService {
   public:
-    MediaService(VideoRenderer *vr, QObject *parent = nullptr)
-        : QMediaService(parent), m_renderer(vr) {}
-    ~MediaService() {
-        delete m_renderer;
-    }
+    MediaService(std::unique_ptr<VideoRenderer> vr, QObject *parent = nullptr)
+        : QMediaService(parent), renderer_(std::move(vr)) {}
 
     QMediaControl *requestControl(const char *name) override {
-        if (qstrcmp(name, QVideoRendererControl_iid) == 0) return m_renderer;
+        if (qstrcmp(name, QVideoRendererControl_iid) == 0)
+            return renderer_.get();
 
         return nullptr;
     }
 
     void releaseControl(QMediaControl *) override {}
 
-    VideoRenderer *m_renderer = nullptr;
+  private:
+    std::unique_ptr<VideoRenderer> renderer_ = nullptr;
 };
 
 class MediaObject : public QMediaObject {
@@ -68,14 +67,13 @@ class MediaObject : public QMediaObject {
 class VideoWidget : public QVideoWidget {
   public:
     explicit VideoWidget(QWidget *parent = nullptr) : QVideoWidget(parent) {}
-    ~VideoWidget() {
-        delete media_object_;
-    }
+    ~VideoWidget() { delete media_object_; }
     bool setMediaObject(QMediaObject *object) override {
         delete media_object_;
         media_object_ = object;
         return QVideoWidget::setMediaObject(object);
     }
+
   private:
     QMediaObject *media_object_ = nullptr;
 };
@@ -88,12 +86,14 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent) {
     QWidget *placeholder = new QWidget{this};
     QVBoxLayout *layout = new QVBoxLayout(placeholder);
 
-    video_renderer_ = new VideoRenderer;
+    auto video_renderer = std::make_unique<VideoRenderer>();
+    video_renderer_ = video_renderer.get();
 
     VideoWidget *video_widget = new VideoWidget{placeholder};
 
     MediaObject *media_object = new MediaObject(
-        std::make_unique<MediaService>(video_renderer_), video_widget);
+        std::make_unique<MediaService>(std::move(video_renderer)),
+        video_widget);
     video_widget->setMediaObject(media_object);
 
     player_ = std::make_unique<QAVPlayer>();

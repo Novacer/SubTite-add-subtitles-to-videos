@@ -29,7 +29,7 @@ class PlayerWindow : public QMainWindow {
   private:
     std::unique_ptr<QAVPlayer> player_;
     std::unique_ptr<QAVAudioOutput> audio_output_;
-    VideoRenderer *video_renderer_;
+    std::unique_ptr<VideoRenderer> video_renderer_;
     bool user_seeked_;
 };
 

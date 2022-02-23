@@ -78,12 +78,12 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent) {
     QWidget *placeholder = new QWidget{this};
     QVBoxLayout *layout = new QVBoxLayout(placeholder);
 
-    video_renderer_ = new VideoRenderer;
+    video_renderer_ = std::make_unique<VideoRenderer>();
 
     VideoWidget *video_widget = new VideoWidget{placeholder};
 
     MediaObject *media_object = new MediaObject(
-        std::make_unique<MediaService>(video_renderer_));
+        std::make_unique<MediaService>(video_renderer_.get()), video_widget);
     video_widget->setMediaObject(media_object);
 
     player_ = std::make_unique<QAVPlayer>();

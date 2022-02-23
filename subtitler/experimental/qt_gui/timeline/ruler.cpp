@@ -165,7 +165,6 @@ bool Ruler::eventFilter(QObject* watched, QEvent* event) {
                         std::chrono::milliseconds((quint64)new_indicator_time);
                     indicator_->move(indicator_->x() + dx, indicator_->y());
                     emit changeIndicatorTime(indicator_time_);
-                    // emit userChangedIndicatorTime(indicator_time_);
                 }
             }
             if (watched == begin_marker_) {

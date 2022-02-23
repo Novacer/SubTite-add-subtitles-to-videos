@@ -2,7 +2,6 @@
 
 #include <QHBoxLayout>
 #include <cmath>
-#include <iostream>
 
 namespace {
 
@@ -11,7 +10,7 @@ int computeZoomRange(std::chrono::milliseconds duration) {
     double max_interval_size_secs = duration.count() / (10.0 * 1000);
     // Each increase in the zoom level adds 10 secs to the interval.
     // Therefore, the range of the zoom levels is max_interval_size / 10.
-    return std::max(1,
+    return std::max(2,
                     static_cast<int>(std::ceil(max_interval_size_secs / 10.0)));
 }
 

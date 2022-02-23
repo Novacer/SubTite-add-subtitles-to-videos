@@ -72,10 +72,12 @@ class VideoWidget : public QVideoWidget {
         delete media_object_;
     }
     bool setMediaObject(QMediaObject *object) override {
+        delete media_object_;
+        media_object_ = object;
         return QVideoWidget::setMediaObject(object);
     }
   private:
-    QMediaObject *media_object_;
+    QMediaObject *media_object_ = nullptr;
 };
 
 PlayerWindow::~PlayerWindow() = default;

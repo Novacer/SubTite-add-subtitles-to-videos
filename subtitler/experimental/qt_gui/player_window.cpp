@@ -64,6 +64,7 @@ class MediaObject : public QMediaObject {
 
 class VideoWidget : public QVideoWidget {
   public:
+    explicit VideoWidget(QWidget *parent = nullptr) : QVideoWidget(parent) {}
     bool setMediaObject(QMediaObject *object) override {
         return QVideoWidget::setMediaObject(object);
     }
@@ -77,13 +78,13 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent) {
     QWidget *placeholder = new QWidget{this};
     QVBoxLayout *layout = new QVBoxLayout(placeholder);
 
-    video_renderer_ = std::make_unique<VideoRenderer>();
+    video_renderer_ = new VideoRenderer;
 
-    VideoWidget *w = new VideoWidget;
+    VideoWidget *video_widget = new VideoWidget{placeholder};
 
-    MediaObject *mo = new MediaObject(
-        std::make_unique<MediaService>(video_renderer_.get()));
-    w->setMediaObject(mo);
+    MediaObject *media_object = new MediaObject(
+        std::make_unique<MediaService>(video_renderer_));
+    video_widget->setMediaObject(media_object);
 
     player_ = std::make_unique<QAVPlayer>();
 
@@ -110,7 +111,7 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent) {
     std::chrono::milliseconds duration{duration_us / 1000};
     Timeline *timeline = new Timeline{duration, placeholder};
 
-    layout->addWidget(w);
+    layout->addWidget(video_widget);
     layout->addWidget(play_button);
     layout->addWidget(timer);
     layout->addWidget(timeline);

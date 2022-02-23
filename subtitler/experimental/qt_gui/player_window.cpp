@@ -53,8 +53,13 @@ class MediaService : public QMediaService {
 
 class MediaObject : public QMediaObject {
   public:
-    explicit MediaObject(VideoRenderer *vr, QObject *parent = nullptr)
-        : QMediaObject(parent, new MediaService(vr, parent)) {}
+    MediaObject(std::unique_ptr<MediaService> media_service,
+                QObject *parent = nullptr)
+        : QMediaObject(parent, media_service.get()),
+          media_service_{std::move(media_service)} {}
+
+  private:
+    std::unique_ptr<MediaService> media_service_;
 };
 
 class VideoWidget : public QVideoWidget {
@@ -72,17 +77,18 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent) {
     QWidget *placeholder = new QWidget{this};
     QVBoxLayout *layout = new QVBoxLayout(placeholder);
 
-    VideoRenderer *vr = new VideoRenderer;
+    video_renderer_ = std::make_unique<VideoRenderer>();
 
     VideoWidget *w = new VideoWidget;
 
-    MediaObject *mo = new MediaObject(vr);
+    MediaObject *mo = new MediaObject(
+        std::make_unique<MediaService>(video_renderer_.get()));
     w->setMediaObject(mo);
 
     player_ = std::make_unique<QAVPlayer>();
 
     QString file = QFileDialog::getOpenFileName(
-        /* parent= */this, 
+        /* parent= */ this,
         /* caption= */ tr("Open Video"),
         /* directory= */ "",
         /* filter= */ tr("Video Files (*.mp4)"));
@@ -128,36 +134,48 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent) {
             &Timeline::onPlayerChangedTime);
 
     audio_output_ = std::make_unique<QAVAudioOutput>();
-    connect(player_.get(), &QAVPlayer::audioFrame, player_.get(),
-            [=](const QAVAudioFrame &frame) {
-                if (this->player_->state() == QAVPlayer::State::PlayingState) {
-                    this->audio_output_->play(frame);
-                }
-            });
+    // Handle decoded frames.
+    connect(player_.get(), &QAVPlayer::audioFrame, this,
+            &PlayerWindow::onAudioFrameDecoded);
+    connect(player_.get(), &QAVPlayer::videoFrame, this,
+            &PlayerWindow::onVideoFrameDecoded);
 
-    connect(player_.get(), &QAVPlayer::videoFrame, player_.get(),
-            [=](const QAVVideoFrame &frame) {
-                if (vr->m_surface == nullptr) return;
-                QVideoFrame videoFrame = frame.convertTo(AV_PIX_FMT_RGB32);
-                if (!vr->m_surface->isActive() ||
-                    vr->m_surface->surfaceFormat().frameSize() !=
-                        videoFrame.size()) {
-                    QVideoSurfaceFormat f(videoFrame.size(),
-                                          videoFrame.pixelFormat(),
-                                          videoFrame.handleType());
-                    vr->m_surface->start(f);
-                }
-                if (vr->m_surface->isActive()) {
-                    vr->m_surface->present(videoFrame);
-                    std::chrono::milliseconds ms{(quint64)(frame.pts() * 1000)};
-                    emit this->playerChangedTime(ms);
-                }
-            });
+    user_seeked_ = false;
 
     // Init the first frame.
     player_->pause();
 }
 
 void PlayerWindow::onRulerChangedTime(std::chrono::milliseconds ms) {
+    user_seeked_ = true;
     player_->seek(ms.count());
+}
+
+void PlayerWindow::onAudioFrameDecoded(const QAVAudioFrame &audio_frame) {
+    if (player_->state() == QAVPlayer::State::PlayingState) {
+        audio_output_->play(audio_frame);
+    }
+}
+
+void PlayerWindow::onVideoFrameDecoded(const QAVVideoFrame &video_frame) {
+    if (video_renderer_->m_surface == nullptr) return;
+    QVideoFrame videoFrame = video_frame.convertTo(AV_PIX_FMT_RGB32);
+    if (!video_renderer_->m_surface->isActive() ||
+        video_renderer_->m_surface->surfaceFormat().frameSize() !=
+            videoFrame.size()) {
+        QVideoSurfaceFormat f(videoFrame.size(), videoFrame.pixelFormat(),
+                              videoFrame.handleType());
+        video_renderer_->m_surface->start(f);
+    }
+    if (video_renderer_->m_surface->isActive()) {
+        video_renderer_->m_surface->present(videoFrame);
+        std::chrono::milliseconds ms{(quint64)(video_frame.pts() * 1000)};
+        if (!user_seeked_) {
+            // Only emit if the user did not seek.
+            // If user seeked, then the player is not changing the time!
+            emit this->playerChangedTime(ms);
+        } else {
+            user_seeked_ = false;
+        }
+    }
 }

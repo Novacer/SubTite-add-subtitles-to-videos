@@ -9,6 +9,9 @@ extern "C" {
 #include <QtAVPlayer/qavvideoframe.h>
 
 #include <QAbstractVideoSurface>
+#include <QCoreApplication>
+#include <QDebug>
+#include <QFile>
 #include <QFileDialog>
 #include <QMediaObject>
 #include <QMediaService>
@@ -16,7 +19,6 @@ extern "C" {
 #include <QVideoRendererControl>
 #include <QVideoSurfaceFormat>
 #include <QVideoWidget>
-#include <QWidget>
 #include <chrono>
 #include <iostream>
 
@@ -98,12 +100,21 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent) {
 
     player_ = std::make_unique<QAVPlayer>();
 
-    QString file = QFileDialog::getOpenFileName(
+    QString file_name = QFileDialog::getOpenFileName(
         /* parent= */ this,
         /* caption= */ tr("Open Video"),
         /* directory= */ "",
         /* filter= */ tr("Video Files (*.mp4)"));
-    player_->setSource(file);
+    if (file_name.isEmpty()) {
+        qDebug() << "No video file selected";
+        QCoreApplication::exit(1);
+    }
+    video_file_ = std::make_unique<QFile>(file_name);
+    if (!video_file_->open(QFile::ReadOnly)) {
+        qDebug() << "Video file could not be opened";
+        QCoreApplication::exit(1);
+    }
+    player_->setSource(file_name, video_file_.get());
 
     PlayButton *play_button = new PlayButton(placeholder);
     Timer *timer = new Timer{placeholder};
@@ -111,7 +122,7 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent) {
     // Get video duration
     // TODO: make util class?
     AVFormatContext *pFormatCtx = avformat_alloc_context();
-    auto file_stdstr = file.toStdString();
+    auto file_stdstr = file_name.toStdString();
     avformat_open_input(&pFormatCtx, file_stdstr.c_str(), NULL, NULL);
     avformat_find_stream_info(pFormatCtx, NULL);
     auto duration_us = pFormatCtx->duration;

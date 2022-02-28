@@ -165,7 +165,6 @@ bool Ruler::eventFilter(QObject* watched, QEvent* event) {
                         std::chrono::milliseconds((quint64)new_indicator_time);
                     indicator_->move(indicator_->x() + dx, indicator_->y());
                     emit changeIndicatorTime(indicator_time_);
-                    emit userChangedIndicatorTime(indicator_time_);
                 }
             }
             if (watched == begin_marker_) {
@@ -197,6 +196,11 @@ bool Ruler::eventFilter(QObject* watched, QEvent* event) {
             }
         } else if (event->type() == QEvent::MouseButtonRelease && isHover) {
             isHover = false;
+            if (watched == indicator_ && !playing_) {
+                // Only emit this when user releases mouse to prevent
+                // spamming video player with seeks and overloading the decoder.
+                emit userChangedIndicatorTime(indicator_time_);
+            }
         }
     }
 

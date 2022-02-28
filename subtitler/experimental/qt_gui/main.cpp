@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
     PlayerWindow player_window;
     player_window.show();
 
+    int res = app.exec();
     qunsetenv("QT_AVPLAYER_NO_HWDEVICE");
-    
-    return app.exec();
+    return res;
 }

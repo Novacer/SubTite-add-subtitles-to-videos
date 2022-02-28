@@ -32,6 +32,8 @@ class PlayerWindow : public QMainWindow {
     std::unique_ptr<QAVAudioOutput> audio_output_;
     std::unique_ptr<QFile> video_file_;
     VideoRenderer *video_renderer_;
+    // Flag var which is set when user moves the ruler,
+    // and reset once the next video frame is decoded.
     bool user_seeked_;
 };
 

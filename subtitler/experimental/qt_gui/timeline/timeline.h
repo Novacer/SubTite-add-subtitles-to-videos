@@ -7,6 +7,8 @@
 #include "subtitler/experimental/qt_gui/timeline/ruler.h"
 #include "subtitler/experimental/qt_gui/timeline/zoomer.h"
 
+QT_FORWARD_DECLARE_CLASS(SubtitleInterval);
+
 class Timeline : public QScrollArea {
     Q_OBJECT
   public:
@@ -17,6 +19,7 @@ class Timeline : public QScrollArea {
     void rulerChangedTime(std::chrono::milliseconds ms);
     void playerChangedTime(std::chrono::milliseconds ms);
     void userDraggedRulerChangeTime(std::chrono::milliseconds ms);
+    void openSubtitleEditor(SubtitleInterval* subtitle);
   
   public slots:
     // Handles outgoing time changes from the ruler.
@@ -29,6 +32,8 @@ class Timeline : public QScrollArea {
     
     void onPlayerPause();
     void onPlayerPlay();
+
+    void onSubtitleIntervalClicked(SubtitleInterval* subtitle);
 
   private:
     Ruler* ruler_;

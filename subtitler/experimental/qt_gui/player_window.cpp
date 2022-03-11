@@ -23,6 +23,7 @@ extern "C" {
 #include <iostream>
 
 #include "subtitler/experimental/qt_gui/play_button.h"
+#include "subtitler/experimental/qt_gui/subtitle_editor.h"
 #include "subtitler/experimental/qt_gui/timeline/timeline.h"
 #include "subtitler/experimental/qt_gui/timeline/timer.h"
 
@@ -34,31 +35,31 @@ class VideoRenderer : public QVideoRendererControl {
         m_surface = surface;
     }
 
-    QAbstractVideoSurface *m_surface = nullptr;
+    QAbstractVideoSurface *m_surface = Q_NULLPTR;
 };
 
 class MediaService : public QMediaService {
   public:
-    MediaService(std::unique_ptr<VideoRenderer> vr, QObject *parent = nullptr)
+    MediaService(std::unique_ptr<VideoRenderer> vr, QObject *parent = Q_NULLPTR)
         : QMediaService(parent), renderer_(std::move(vr)) {}
 
     QMediaControl *requestControl(const char *name) override {
         if (qstrcmp(name, QVideoRendererControl_iid) == 0)
             return renderer_.get();
 
-        return nullptr;
+        return Q_NULLPTR;
     }
 
     void releaseControl(QMediaControl *) override {}
 
   private:
-    std::unique_ptr<VideoRenderer> renderer_ = nullptr;
+    std::unique_ptr<VideoRenderer> renderer_ = Q_NULLPTR;
 };
 
 class MediaObject : public QMediaObject {
   public:
     MediaObject(std::unique_ptr<MediaService> media_service,
-                QObject *parent = nullptr)
+                QObject *parent = Q_NULLPTR)
         : QMediaObject(parent, media_service.get()),
           media_service_{std::move(media_service)} {}
 
@@ -68,7 +69,7 @@ class MediaObject : public QMediaObject {
 
 class VideoWidget : public QVideoWidget {
   public:
-    explicit VideoWidget(QWidget *parent = nullptr) : QVideoWidget(parent) {}
+    explicit VideoWidget(QWidget *parent = Q_NULLPTR) : QVideoWidget(parent) {}
     ~VideoWidget() { delete media_object_; }
     bool setMediaObject(QMediaObject *object) override {
         delete media_object_;
@@ -77,14 +78,14 @@ class VideoWidget : public QVideoWidget {
     }
 
   private:
-    QMediaObject *media_object_ = nullptr;
+    QMediaObject *media_object_ = Q_NULLPTR;
 };
 
 PlayerWindow::~PlayerWindow() = default;
 
 PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent) {
     setWindowTitle("Video Player Demo");
-    setMinimumSize(1000, 500);
+    setMinimumSize(1280, 500);
     QWidget *placeholder = new QWidget{this};
     QVBoxLayout *layout = new QVBoxLayout(placeholder);
 
@@ -139,6 +140,11 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent) {
 
     setCentralWidget(placeholder);
 
+    SubtitleEditor *editor = new SubtitleEditor{this};
+    editor->setWindowTitle(tr("Subtitle Editor"));
+    editor->setVisible(false);
+    addDockWidget(Qt::RightDockWidgetArea, editor);
+
     // Play/Pause connections
     connect(play_button, &PlayButton::play, player_.get(), &QAVPlayer::play);
     connect(play_button, &PlayButton::pause, player_.get(), &QAVPlayer::pause);
@@ -161,6 +167,10 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent) {
             &PlayerWindow::onAudioFrameDecoded);
     connect(player_.get(), &QAVPlayer::videoFrame, this,
             &PlayerWindow::onVideoFrameDecoded);
+
+    // Handle opening/closing subtitle editor
+    connect(timeline, &Timeline::openSubtitleEditor, editor,
+            &SubtitleEditor::onOpenSubtitle);
 
     user_seeked_ = false;
 

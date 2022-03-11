@@ -19,6 +19,9 @@ class SubtitleIntervalContainer : public QWidget {
     // Unique_ptr required to memory manage SubtitleInterval since it is
     // not a widget. See documentation below on why that is.
     void AddInterval(std::unique_ptr<SubtitleInterval> interval);
+
+    // TODO: RemoveInterval(). This should also call CleanupWithoutParentAsking.
+
     void DeleteAll();
 
     SubtitleInterval* GetIntervalFromMarker(QObject* marker);
@@ -47,11 +50,11 @@ struct SubtitleIntervalArgs {
 /**
  * A Plain Old Object containing various labels and rectangles
  * representing an interval of time for which a subtitle should be displayed.
- * 
+ *
  * NOTE: Despite having a QWidget parent in the ctor, this is NOT a widget.
  * This means you must manually manage the memory of this class!
  * It is recommended to be used in conjunction with SubtitleIntervalContainer.
- * 
+ *
  * It is not a widget because we want to make the members begin_marker_ etc.
  * direct children of the widget containing SubtitlerIntervalContainer.
  * This allows a "flat" hierarchy which avoids a lot of geometry issues.
@@ -73,6 +76,12 @@ class SubtitleInterval {
     QLabel* GetBeginMarker() const { return begin_marker_; }
     QLabel* GetEndMarker() const { return end_marker_; }
 
+    // Cleans up child widgets. Should only be used if SubtitleInterval
+    // is going to be destroyed from a context where it is NOT the parent
+    // widget destroying it's children. (Parent refers to the parent of
+    // SubtitleIntervalContainer as well).
+    void CleanupWithoutParentAsking();
+
   private:
     QLabel* begin_marker_;
     std::chrono::milliseconds begin_marker_time_;
@@ -80,7 +89,7 @@ class SubtitleInterval {
     QLabel* end_marker_;
     std::chrono::milliseconds end_marker_time_;
 
-    QFrame* rect_box_;
+    QLabel* rect_box_;
 
     void updateRect();
 };

@@ -71,8 +71,9 @@ SubtitleInterval::SubtitleInterval(const SubtitleIntervalArgs& args,
     end_marker_->installEventFilter(parent);
     end_marker_time_ = args.end_time;
 
-    rect_box_ = new QFrame(parent);
+    rect_box_ = new QLabel(parent);
     rect_box_->setObjectName("cutrect");
+    rect_box_->setText("hello world this is kinda cool sometimes");
     updateRect();
 }
 
@@ -88,6 +89,15 @@ void SubtitleInterval::MoveEndMarker(const std::chrono::milliseconds& end_time,
     end_marker_time_ = end_time;
     end_marker_->move(x_pos, end_marker_->y());
     updateRect();
+}
+
+void SubtitleInterval::CleanupWithoutParentAsking() {
+    delete begin_marker_;
+    begin_marker_ = Q_NULLPTR;
+    delete end_marker_;
+    end_marker_ = Q_NULLPTR;
+    delete rect_box_;
+    rect_box_ = Q_NULLPTR;
 }
 
 void SubtitleInterval::updateRect() {

@@ -10,7 +10,6 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <vector>
-#include <iostream>
 
 #include "subtitler/util/duration_format.h"
 
@@ -196,6 +195,12 @@ bool Ruler::eventFilter(QObject* watched, QEvent* event) {
                 // spamming video player with seeks and overloading the decoder.
                 emit userChangedIndicatorTime(indicator_time_);
             }
+        }
+    } else if (auto* interval =
+                   subtitle_intervals_->GetIntervalFromRect(watched);
+               interval != Q_NULLPTR) {
+        if (event->type() == QEvent::MouseButtonRelease) {
+            emit subtitleIntervalClicked(interval);
         }
     }
 

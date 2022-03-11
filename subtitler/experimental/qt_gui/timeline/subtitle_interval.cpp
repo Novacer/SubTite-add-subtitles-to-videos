@@ -22,27 +22,42 @@ void SubtitleIntervalContainer::AddInterval(
     }
     auto* interval_raw_ptr = interval.get();
     intervals_.push_back(std::move(interval));
-    auto [ignore, ok] = marker_to_interval_map.insert(
+    auto [ignore, ok] = marker_to_interval_map_.insert(
         {interval_raw_ptr->GetBeginMarker(), interval_raw_ptr});
     if (!ok) {
         throw std::runtime_error{"Cannot insert duplicate label to container"};
     }
-    std::tie(ignore, ok) = marker_to_interval_map.insert(
+    std::tie(ignore, ok) = marker_to_interval_map_.insert(
         {interval_raw_ptr->GetEndMarker(), interval_raw_ptr});
     if (!ok) {
         throw std::runtime_error{"Cannot insert duplicate label to container"};
+    }
+    std::tie(ignore, ok) = rect_to_interval_map_.insert(
+        {interval_raw_ptr->GetRect(), interval_raw_ptr});
+    if (!ok) {
+        throw std::runtime_error{"Cannot insert duplicate rect to container"};
     }
 }
 
 void SubtitleIntervalContainer::DeleteAll() {
     intervals_.clear();
-    marker_to_interval_map.clear();
+    marker_to_interval_map_.clear();
+    rect_to_interval_map_.clear();
 }
 
 SubtitleInterval* SubtitleIntervalContainer::GetIntervalFromMarker(
     QObject* marker) {
-    if (auto it = marker_to_interval_map.find(marker);
-        it != marker_to_interval_map.end()) {
+    if (auto it = marker_to_interval_map_.find(marker);
+        it != marker_to_interval_map_.end()) {
+        return it->second;
+    }
+    return Q_NULLPTR;
+}
+
+SubtitleInterval* SubtitleIntervalContainer::GetIntervalFromRect(
+    QObject* rect) {
+    if (auto it = rect_to_interval_map_.find(rect);
+        it != rect_to_interval_map_.end()) {
         return it->second;
     }
     return Q_NULLPTR;
@@ -75,7 +90,7 @@ SubtitleInterval::SubtitleInterval(const SubtitleIntervalArgs& args,
 
     rect_box_ = new QLabel(parent);
     rect_box_->setObjectName("cutrect");
-    rect_box_->setText("hello world this is kinda cool sometimes");
+    rect_box_->installEventFilter(parent);
     updateRect();
     rect_box_->show();
 }
@@ -92,6 +107,11 @@ void SubtitleInterval::MoveEndMarker(const std::chrono::milliseconds& end_time,
     end_marker_time_ = end_time;
     end_marker_->move(x_pos, end_marker_->y());
     updateRect();
+}
+
+void SubtitleInterval::SetSubtitleText(const QString& subtitle) {
+    subtitle_ = subtitle;
+    rect_box_->setText(subtitle_);
 }
 
 void SubtitleInterval::CleanupWithoutParentAsking() {

@@ -7,7 +7,8 @@
 
 using namespace std::chrono_literals;
 
-Timeline::Timeline(std::chrono::milliseconds duration, QWidget* parent) : QScrollArea(parent) {
+Timeline::Timeline(std::chrono::milliseconds duration, QWidget* parent)
+    : QScrollArea(parent) {
     setMinimumSize(1000, 150);
 
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -29,6 +30,8 @@ Timeline::Timeline(std::chrono::milliseconds duration, QWidget* parent) : QScrol
             &Ruler::onMoveIndicator);
     connect(ruler_, &Ruler::userChangedIndicatorTime, this,
             &Timeline::onUserDraggedRulerChangeTime);
+    connect(ruler_, &Ruler::subtitleIntervalClicked, this,
+            &Timeline::onSubtitleIntervalClicked);
 }
 
 void Timeline::onRulerChangedTime(std::chrono::milliseconds ms) {
@@ -43,10 +46,10 @@ void Timeline::onUserDraggedRulerChangeTime(std::chrono::milliseconds ms) {
     emit userDraggedRulerChangeTime(ms);
 }
 
-void Timeline::onPlayerPause() {
-    ruler_->setPlaying(false);
-}
+void Timeline::onPlayerPause() { ruler_->setPlaying(false); }
 
-void Timeline::onPlayerPlay() {
-    ruler_->setPlaying(true);
+void Timeline::onPlayerPlay() { ruler_->setPlaying(true); }
+
+void Timeline::onSubtitleIntervalClicked(SubtitleInterval* subtitle) {
+    emit openSubtitleEditor(subtitle);
 }

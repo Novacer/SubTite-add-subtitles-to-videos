@@ -1,6 +1,7 @@
 #ifndef SUBTITLER_SUBTITLE_INTERVAL_H
 #define SUBTITLER_SUBTITLE_INTERVAL_H
 
+#include <QString>
 #include <QWidget>
 #include <chrono>
 #include <memory>
@@ -25,6 +26,7 @@ class SubtitleIntervalContainer : public QWidget {
     void DeleteAll();
 
     SubtitleInterval* GetIntervalFromMarker(QObject* marker);
+    SubtitleInterval* GetIntervalFromRect(QObject* rect);
 
     std::vector<std::unique_ptr<SubtitleInterval>>& intervals() {
         return intervals_;
@@ -32,7 +34,8 @@ class SubtitleIntervalContainer : public QWidget {
 
   private:
     std::vector<std::unique_ptr<SubtitleInterval>> intervals_;
-    std::unordered_map<QObject*, SubtitleInterval*> marker_to_interval_map;
+    std::unordered_map<QObject*, SubtitleInterval*> marker_to_interval_map_;
+    std::unordered_map<QObject*, SubtitleInterval*> rect_to_interval_map_;
 };
 
 /**
@@ -68,6 +71,7 @@ class SubtitleInterval {
     void MoveBeginMarker(const std::chrono::milliseconds& start_time,
                          int x_pos);
     void MoveEndMarker(const std::chrono::milliseconds& end_time, int x_pos);
+    void SetSubtitleText(const QString& subtitle);
 
     std::chrono::milliseconds GetBeginTime() const {
         return begin_marker_time_;
@@ -75,6 +79,8 @@ class SubtitleInterval {
     std::chrono::milliseconds GetEndTime() const { return end_marker_time_; }
     QLabel* GetBeginMarker() const { return begin_marker_; }
     QLabel* GetEndMarker() const { return end_marker_; }
+    QLabel* GetRect() const { return rect_box_; }
+    QString GetSubtitleText() const { return subtitle_; }
 
     // Cleans up child widgets. Should only be used if SubtitleInterval
     // is going to be destroyed from a context where it is NOT the parent
@@ -90,6 +96,8 @@ class SubtitleInterval {
     std::chrono::milliseconds end_marker_time_;
 
     QLabel* rect_box_;
+
+    QString subtitle_;
 
     void updateRect();
 };

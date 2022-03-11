@@ -7,7 +7,7 @@ qt_cc_library(
     srcs = ["indicator.cpp"],
     hdrs = ["indicator.h"],
     deps = [
-        "//subtitler/gui/timeline/resource:resources",
+        "//subtitler/gui/resource:resources",
         "@qt//:qt_widgets",
     ],
 )
@@ -19,7 +19,7 @@ qt_cc_library(
     deps = [
         ":indicator",
         ":subtitle_interval",
-        "//subtitler/gui/timeline/resource:resources",
+        "//subtitler/gui/resource:resources",
         "//subtitler/util:duration_format",
         "@qt//:qt_core",
         "@qt//:qt_gui",
@@ -45,7 +45,7 @@ qt_cc_library(
     hdrs = ["zoomer.h"],
     deps = [
         ":indicator",
-        "//subtitler/gui/timeline/resource:resources",
+        "//subtitler/gui/resource:resources",
         "@qt//:qt_widgets",
     ],
 )
@@ -57,7 +57,7 @@ qt_cc_library(
     deps = [
         ":ruler",
         ":zoomer",
-        "//subtitler/gui/timeline/resource:resources",
+        "//subtitler/gui/resource:resources",
         "@qt//:qt_core",
         "@qt//:qt_widgets",
     ],
@@ -68,7 +68,7 @@ qt_cc_library(
     srcs = ["subtitle_interval.cpp"],
     hdrs = ["subtitle_interval.h"],
     deps = [
-        "//subtitler/gui/timeline/resource:resources",
+        "//subtitler/gui/resource:resources",
         "@qt//:qt_core",
         "@qt//:qt_widgets",
     ],

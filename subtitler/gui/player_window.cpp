@@ -27,6 +27,9 @@ extern "C" {
 #include "subtitler/gui/timeline/timeline.h"
 #include "subtitler/gui/timeline/timer.h"
 
+namespace subtitler {
+namespace gui {
+
 class VideoRenderer : public QVideoRendererControl {
   public:
     QAbstractVideoSurface *surface() const override { return m_surface; }
@@ -37,6 +40,8 @@ class VideoRenderer : public QVideoRendererControl {
 
     QAbstractVideoSurface *m_surface = Q_NULLPTR;
 };
+
+namespace {
 
 class MediaService : public QMediaService {
   public:
@@ -80,6 +85,8 @@ class VideoWidget : public QVideoWidget {
   private:
     QMediaObject *media_object_ = Q_NULLPTR;
 };
+
+}  // namespace
 
 PlayerWindow::~PlayerWindow() = default;
 
@@ -211,3 +218,6 @@ void PlayerWindow::onVideoFrameDecoded(const QAVVideoFrame &video_frame) {
         }
     }
 }
+
+}  // namespace gui
+}  // namespace subtitler

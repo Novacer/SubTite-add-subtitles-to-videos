@@ -7,6 +7,9 @@
 
 using namespace std::chrono_literals;
 
+namespace subtitler {
+namespace gui {
+
 Timeline::Timeline(std::chrono::milliseconds duration, QWidget* parent)
     : QScrollArea(parent) {
     setMinimumSize(1000, 150);
@@ -53,3 +56,6 @@ void Timeline::onPlayerPlay() { ruler_->setPlaying(true); }
 void Timeline::onSubtitleIntervalClicked(SubtitleInterval* subtitle) {
     emit openSubtitleEditor(subtitle);
 }
+
+}  // namespace gui
+}  // namespace subtitler

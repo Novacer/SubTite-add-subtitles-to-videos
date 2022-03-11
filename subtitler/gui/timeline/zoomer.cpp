@@ -3,6 +3,8 @@
 #include <QHBoxLayout>
 #include <cmath>
 
+namespace subtitler {
+namespace gui {
 namespace {
 
 int computeZoomRange(std::chrono::milliseconds duration) {
@@ -85,3 +87,6 @@ void Zoomer::onSliderChanged(int value) {
     current_level_ = value;
     zoom_slider_->setSliderPosition(current_level_);
 }
+
+}  // namespace gui
+}  // namespace subtitler

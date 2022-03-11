@@ -4,6 +4,9 @@
 
 using namespace std::chrono_literals;
 
+namespace subtitler {
+namespace gui {
+
 Timer::Timer(QWidget* parent) : QLabel{parent} {
     setText(QString::fromStdString(subtitler::FormatDuration(0ms)));
 }
@@ -11,3 +14,6 @@ Timer::Timer(QWidget* parent) : QLabel{parent} {
 void Timer::onTimerChanged(std::chrono::milliseconds ms) {
     setText(QString::fromStdString(subtitler::FormatDuration(ms)));
 }
+
+}  // namespace gui
+}  // namespace subtitler

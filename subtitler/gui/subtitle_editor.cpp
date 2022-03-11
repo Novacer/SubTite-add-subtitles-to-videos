@@ -4,6 +4,8 @@
 
 #include "subtitler/gui/timeline/subtitle_interval.h"
 
+namespace subtitler {
+namespace gui {
 SubtitleEditor::SubtitleEditor(QWidget* parent)
     : QDockWidget{parent}, currently_editing_{Q_NULLPTR} {
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
@@ -29,3 +31,6 @@ void SubtitleEditor::onSubtitleTextChanged() {
     }
     currently_editing_->SetSubtitleText(text_edit_->toPlainText());
 }
+
+}  // namespace gui
+}  // namespace subtitler

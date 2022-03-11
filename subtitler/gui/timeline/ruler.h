@@ -1,5 +1,5 @@
-#ifndef SUBTITLER_RULER_H
-#define SUBTITLER_RULER_H
+#ifndef SUBTITLER_GUI_RULER_H
+#define SUBTITLER_GUI_RULER_H
 
 #include <QTime>
 #include <QTimer>
@@ -12,6 +12,9 @@
 QT_FORWARD_DECLARE_CLASS(QAction)
 QT_FORWARD_DECLARE_CLASS(QMenu)
 QT_FORWARD_DECLARE_CLASS(QScrollBar)
+
+namespace subtitler {
+namespace gui {
 
 class Ruler : public QWidget {
     Q_OBJECT
@@ -84,5 +87,8 @@ class Ruler : public QWidget {
     qreal rect_width_;
     bool playing_;
 };
+
+}  // namespace gui
+}  // namespace subtitler
 
 #endif

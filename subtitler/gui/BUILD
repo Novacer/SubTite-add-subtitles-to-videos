@@ -58,7 +58,7 @@ cc_binary(
     }),
     deps = [
         ":player_window",
-        "//subtitler/gui/timeline/resource:resources",
+        "//subtitler/gui/resource:resources",
         "@qt//:qt_core",
         "@qt//:qt_widgets",
     ] + select({

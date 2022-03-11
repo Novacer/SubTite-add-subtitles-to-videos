@@ -1,7 +1,10 @@
-#ifndef SUBTITLER_INDICATOR_H
-#define SUBTITLER_INDICATOR_H
+#ifndef SUBTITLER_GUI_INDICATOR_H
+#define SUBTITLER_GUI_INDICATOR_H
 
 #include <QLabel>
+
+namespace subtitler {
+namespace gui {
 
 class Indicator : public QLabel {
     Q_OBJECT
@@ -9,5 +12,8 @@ class Indicator : public QLabel {
     Indicator(QWidget* parent = Q_NULLPTR);
     ~Indicator() = default;
 };
+
+}  // namespace gui
+}  // namespace subtitler
 
 #endif

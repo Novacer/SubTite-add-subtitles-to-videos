@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
         file.close();
     }
 
-    PlayerWindow player_window;
+    subtitler::gui::PlayerWindow player_window;
     player_window.show();
 
     int res = app.exec();

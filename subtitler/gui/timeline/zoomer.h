@@ -1,10 +1,13 @@
-#ifndef SUBTITLER_ZOOMER_H
-#define SUBTITLER_ZOOMER_H
+#ifndef SUBTITLER_GUI_ZOOMER_H
+#define SUBTITLER_GUI_ZOOMER_H
 
 #include <QSlider>
 #include <QToolButton>
 #include <QWidget>
 #include <chrono>
+
+namespace subtitler {
+namespace gui {
 
 class Zoomer : public QWidget {
     Q_OBJECT
@@ -33,5 +36,8 @@ class Zoomer : public QWidget {
     int min_zoom_level_;
     int max_zoom_level_;
 };
+
+}  // namespace gui
+}  // namespace subtitler
 
 #endif

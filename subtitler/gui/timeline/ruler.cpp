@@ -21,6 +21,9 @@
 
 using namespace std::chrono_literals;
 
+namespace subtitler {
+namespace gui {
+
 Ruler::Ruler(QWidget* parent, std::chrono::milliseconds duration,
              int zoom_level)
     : QWidget{parent},
@@ -346,3 +349,6 @@ void Ruler::drawScaleRuler(QPainter* painter, QRectF ruler_rect) {
         }
     }
 }
+
+}  // namespace gui
+}  // namespace subtitler

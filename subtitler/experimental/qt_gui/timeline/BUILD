@@ -13,27 +13,6 @@ qt_cc_library(
 )
 
 qt_cc_library(
-    name = "keyline",
-    srcs = ["keyline.cpp"],
-    hdrs = ["keyline.h"],
-    deps = [
-        "@qt//:qt_core",
-        "@qt//:qt_gui",
-        "@qt//:qt_widgets",
-    ],
-)
-
-qt_cc_library(
-    name = "keypoint",
-    srcs = ["keypoint.cpp"],
-    hdrs = ["keypoint.h"],
-    deps = [
-        "@qt//:qt_core",
-        "@qt//:qt_widgets",
-    ],
-)
-
-qt_cc_library(
     name = "ruler",
     srcs = ["ruler.cpp"],
     hdrs = ["ruler.h"],

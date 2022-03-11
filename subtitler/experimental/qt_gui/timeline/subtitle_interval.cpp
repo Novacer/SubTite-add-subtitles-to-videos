@@ -10,15 +10,51 @@
 
 using namespace std::chrono_literals;
 
+SubtitleIntervalContainer::SubtitleIntervalContainer(QWidget* parent)
+    : QWidget{parent} {}
+
+void SubtitleIntervalContainer::AddInterval(SubtitleInterval* interval) {
+    if (!interval) {
+        throw std::runtime_error{"Cannot add null interval to container"};
+    }
+    intervals_.emplace_back(interval);
+    auto [ignore, ok] =
+        marker_to_interval_map.insert({interval->GetBeginMarker(), interval});
+    if (!ok) {
+        throw std::runtime_error{"Cannot insert duplicate label to container"};
+    }
+    std::tie(ignore, ok) =
+        marker_to_interval_map.insert({interval->GetEndMarker(), interval});
+    if (!ok) {
+        throw std::runtime_error{"Cannot insert duplicate label to container"};
+    }
+}
+
+void SubtitleIntervalContainer::DeleteAll() {
+    for (auto* interval : intervals_) {
+        delete interval;
+    }
+    intervals_.clear();
+    marker_to_interval_map.clear();
+}
+
+SubtitleInterval* SubtitleIntervalContainer::GetIntervalFromMarker(
+    QObject* marker) {
+    if (auto it = marker_to_interval_map.find(marker);
+        it != marker_to_interval_map.end()) {
+        return it->second;
+    }
+    return Q_NULLPTR;
+}
+
 SubtitleInterval::SubtitleInterval(const SubtitleIntervalArgs& args,
-                                   QWidget* parent)
-    : QWidget{parent} {
+                                   QWidget* parent) {
     if (parent == nullptr) {
         throw std::invalid_argument(
             "Parent of SubtitleInvterval cannot be null");
     }
 
-    begin_marker_ = new QLabel(this);
+    begin_marker_ = new QLabel(parent);
     begin_marker_->setPixmap(QPixmap(":/images/cutleft"));
     begin_marker_->setCursor(Qt::SizeHorCursor);
     begin_marker_->setFixedSize(CUT_MARKER_WIDTH, CUT_MARKER_HEIGHT);
@@ -26,7 +62,7 @@ SubtitleInterval::SubtitleInterval(const SubtitleIntervalArgs& args,
     begin_marker_->installEventFilter(parent);
     begin_marker_time_ = args.start_time;
 
-    end_marker_ = new QLabel(this);
+    end_marker_ = new QLabel(parent);
     end_marker_->setPixmap(QPixmap(":/images/cutright"));
     end_marker_->setFixedSize(CUT_MARKER_WIDTH, CUT_MARKER_HEIGHT);
     end_marker_->move(args.end_x, args.end_y);
@@ -34,7 +70,7 @@ SubtitleInterval::SubtitleInterval(const SubtitleIntervalArgs& args,
     end_marker_->installEventFilter(parent);
     end_marker_time_ = args.end_time;
 
-    rect_box_ = new QFrame(this);
+    rect_box_ = new QFrame(parent);
     rect_box_->setObjectName("cutrect");
     updateRect();
 }
@@ -57,5 +93,4 @@ void SubtitleInterval::updateRect() {
     rect_box_->setGeometry(
         begin_marker_->x() + CUT_MARKER_WIDTH, begin_marker_->y(),
         end_marker_->x() - begin_marker_->x() - CUT_MARKER_WIDTH, BODY_HEIGHT);
-    update();
 }

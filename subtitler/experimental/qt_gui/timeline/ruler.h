@@ -18,7 +18,7 @@ class Ruler : public QWidget {
   public:
     explicit Ruler(QWidget* parent, std::chrono::milliseconds duration,
                    int zoom_level = 1);
-    ~Ruler() = default;
+    ~Ruler();
 
     void setHeaderColor(const QColor& color) { header_bgrnd_ = color; }
 
@@ -29,14 +29,6 @@ class Ruler : public QWidget {
     void setBodyColor(const QColor& color) { body_bgrnd_ = color; }
 
     void setPlaying(bool playing) { playing_ = playing; }
-
-    // std::chrono::milliseconds beginTime() const {
-    //     return begin_marker_time_;
-    // }
-
-    // std::chrono::milliseconds endTime() const {
-    //     return end_marker_time_;
-    // }
 
   signals:
     void changeZoomPosition(int level);
@@ -55,7 +47,6 @@ class Ruler : public QWidget {
     virtual bool eventFilter(QObject* watched, QEvent* event) override;
     virtual void mousePressEvent(QMouseEvent* event) override;
     virtual void mouseReleaseEvent(QMouseEvent* event) override;
-    virtual void resizeEvent(QResizeEvent* event) override;
 
   private:
     void setupChildren();
@@ -69,18 +60,13 @@ class Ruler : public QWidget {
     int millisecondsToPosition(const std::chrono::milliseconds& ms);
 
     // sub controls
-    Indicator *indicator_;
-    // QLabel* begin_marker_;
-    // QLabel* end_marker_;
-    // QFrame* rect_box_;
-    SubtitleInterval *interval_;
+    Indicator* indicator_;
+    SubtitleIntervalContainer* subtitle_intervals_;
     int zoom_level_;
 
     // Scroll bar of the parent, since this may manipulate its position.
     QScrollBar* scroll_bar_;
 
-    // std::chrono::milliseconds begin_marker_time_;
-    // std::chrono::milliseconds end_marker_time_;
     std::chrono::milliseconds indicator_time_;
 
     // context menu

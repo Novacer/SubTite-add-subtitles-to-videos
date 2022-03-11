@@ -6,6 +6,24 @@
 
 QT_FORWARD_DECLARE_CLASS(QLabel)
 QT_FORWARD_DECLARE_CLASS(QFrame)
+QT_FORWARD_DECLARE_CLASS(SubtitleInterval)
+
+class SubtitleIntervalContainer : public QWidget {
+  public:
+    SubtitleIntervalContainer(QWidget* parent = Q_NULLPTR);
+    ~SubtitleIntervalContainer() = default;
+
+    void AddInterval(SubtitleInterval* interval);
+    void DeleteAll();
+
+    SubtitleInterval* GetIntervalFromMarker(QObject* marker);
+
+    std::vector<SubtitleInterval*>& intervals() { return intervals_; };
+
+  private:
+    std::vector<SubtitleInterval*> intervals_;
+    std::unordered_map<QObject*, SubtitleInterval*> marker_to_interval_map;
+};
 
 struct SubtitleIntervalArgs {
     int start_x;
@@ -16,8 +34,7 @@ struct SubtitleIntervalArgs {
     std::chrono::milliseconds end_time;
 };
 
-class SubtitleInterval : public QWidget {
-    Q_OBJECT
+class SubtitleInterval {
   public:
     SubtitleInterval(const SubtitleIntervalArgs& args, QWidget* parent);
     ~SubtitleInterval() = default;

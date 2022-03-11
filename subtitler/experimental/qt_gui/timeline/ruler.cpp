@@ -7,6 +7,9 @@
 #include <QMenu>
 #include <QPainter>
 #include <QScrollBar>
+#include <stdexcept>
+#include <unordered_map>
+#include <vector>
 
 #include "subtitler/util/duration_format.h"
 
@@ -31,6 +34,12 @@ Ruler::Ruler(QWidget* parent, std::chrono::milliseconds duration,
       duration_{duration},
       rect_width_{interval_width_ * duration_.count() / msPerInterval()},
       playing_{false} {
+    
+    subtitle_intervals_ = new SubtitleIntervalContainer(this);
+    if (!subtitle_intervals_) {
+        throw std::runtime_error{"Unable allocate subtitle container"};
+    }
+
     setAttribute(Qt::WA_OpaquePaintEvent);
 
     if (auto scroll_area = dynamic_cast<QAbstractScrollArea*>(parent)) {
@@ -47,21 +56,32 @@ Ruler::Ruler(QWidget* parent, std::chrono::milliseconds duration,
     resize(rect_width_ + START_END_PADDING, 120);
 }
 
+Ruler::~Ruler() = default;
+
 void Ruler::setupChildren() {
     indicator_ = new Indicator(this);
     indicator_->installEventFilter(this);
     indicator_time_ = 0ms;
 
-    SubtitleIntervalArgs args;
-    args.start_x = 0;
-    args.start_y = HEADER_HEIGHT;
-    args.start_time = 0ms;
+    SubtitleIntervalArgs args1;
+    args1.start_x = 0;
+    args1.start_y = HEADER_HEIGHT;
+    args1.start_time = 0ms;
 
-    args.end_x = rect_width_ + CUT_MARKER_WIDTH;
-    args.end_y = HEADER_HEIGHT;
-    args.end_time = duration_;
+    args1.end_x = millisecondsToPosition(1min);
+    args1.end_y = HEADER_HEIGHT;
+    args1.end_time = 1min;
 
-    interval_ = new SubtitleInterval(args, this);
+    auto* interval = new SubtitleInterval(args1, this);
+    subtitle_intervals_->AddInterval(interval);
+
+    args1.start_time = 2min;
+    args1.start_x = millisecondsToPosition(2min);
+    args1.end_time = 3min;
+    args1.end_x = millisecondsToPosition(3min);
+    
+    interval = new SubtitleInterval(args1, this);
+    subtitle_intervals_->AddInterval(interval);
 }
 
 int Ruler::millisecondsToPosition(const std::chrono::milliseconds& ms) {
@@ -74,8 +94,7 @@ void Ruler::resetChildren(std::chrono::milliseconds duration) {
     rect_width_ = duration_.count() * interval_width_ / msPerInterval();
     indicator_->move(0, 0);
 
-    interval_->MoveBeginMarker(0ms, millisecondsToPosition(0ms));
-    interval_->MoveEndMarker(duration_, millisecondsToPosition(duration_));
+    subtitle_intervals_->DeleteAll();
 
     resize(rect_width_ + START_END_PADDING, HEADER_HEIGHT + BODY_HEIGHT);
 }
@@ -93,10 +112,13 @@ void Ruler::onMoveIndicator(std::chrono::milliseconds frame_time) {
 void Ruler::updateChildren() {
     rect_width_ = interval_width_ * duration_.count() / msPerInterval();
 
-    auto begin_time = interval_->GetBeginTime();
-    interval_->MoveBeginMarker(begin_time, millisecondsToPosition(begin_time));
-    auto end_time = interval_->GetEndTime();
-    interval_->MoveEndMarker(end_time, millisecondsToPosition(end_time));
+    for (auto* interval : subtitle_intervals_->intervals()) {
+        auto begin_time = interval->GetBeginTime();
+        interval->MoveBeginMarker(begin_time,
+                                  millisecondsToPosition(begin_time));
+        auto end_time = interval->GetEndTime();
+        interval->MoveEndMarker(end_time, millisecondsToPosition(end_time));
+    }
     indicator_->move(
         indicator_time_.count() * interval_width_ / msPerInterval(),
         indicator_->y());
@@ -127,8 +149,8 @@ void Ruler::updateChildren() {
 }
 
 bool Ruler::eventFilter(QObject* watched, QEvent* event) {
-    if (watched == indicator_ || watched == interval_->GetBeginMarker() ||
-        watched == interval_->GetEndMarker()) {
+    if (watched == indicator_ ||
+        subtitle_intervals_->GetIntervalFromMarker(watched) != Q_NULLPTR) {
         static QPoint lastPnt;
         static bool isHover = false;
         if (event->type() == QEvent::MouseButtonPress) {
@@ -155,29 +177,34 @@ bool Ruler::eventFilter(QObject* watched, QEvent* event) {
                     emit changeIndicatorTime(indicator_time_);
                 }
             }
-            if (auto begin_marker = interval_->GetBeginMarker();
+            SubtitleInterval* interval = subtitle_intervals_->GetIntervalFromMarker(watched);
+            if (!interval) {
+                return false;
+            }
+
+            if (auto begin_marker = interval->GetBeginMarker();
                 watched == begin_marker) {
                 if (begin_marker->x() + dx + CUT_MARKER_WIDTH <= rect_width_ &&
                     begin_marker->x() + dx >= 0 &&
                     begin_marker->x() + dx + CUT_MARKER_WIDTH <=
-                        interval_->GetEndMarker()->x()) {
+                        interval->GetEndMarker()->x()) {
                     auto new_begin_marker_time = std::chrono::milliseconds{
                         (quint64)((begin_marker->x() + dx) / lengthPerMs())};
-                    interval_->MoveBeginMarker(
+                    interval->MoveBeginMarker(
                         new_begin_marker_time,
                         millisecondsToPosition(new_begin_marker_time));
                     // updateRectBox();
                 }
             }
-            if (auto end_marker = interval_->GetEndMarker();
+            if (auto end_marker = interval->GetEndMarker();
                 watched == end_marker) {
                 if (end_marker->x() + dx <= rect_width_ + CUT_MARKER_WIDTH &&
                     end_marker->x() + dx >= 0 &&
                     end_marker->x() + dx - CUT_MARKER_WIDTH >=
-                        interval_->GetBeginMarker()->x()) {
+                        interval->GetBeginMarker()->x()) {
                     auto new_end_marker_time = std::chrono::milliseconds{
                         (quint64)((end_marker->x() + dx) / lengthPerMs())};
-                    interval_->MoveEndMarker(
+                    interval->MoveEndMarker(
                         new_end_marker_time,
                         millisecondsToPosition(new_end_marker_time));
                     // updateRectBox();
@@ -330,9 +357,4 @@ void Ruler::drawScaleRuler(QPainter* painter, QRectF ruler_rect) {
                               getTickerString(x1 + interval_width_));
         }
     }
-}
-
-void Ruler::resizeEvent(QResizeEvent* event) {
-    QWidget::resizeEvent(event);
-    interval_->resize(event->size());
 }

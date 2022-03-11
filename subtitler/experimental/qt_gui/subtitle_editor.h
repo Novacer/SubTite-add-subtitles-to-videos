@@ -3,7 +3,7 @@
 
 #include <QDockWidget>
 
-QT_FORWARD_DECLARE_CLASS(QTextEdit)
+QT_FORWARD_DECLARE_CLASS(QPlainTextEdit)
 QT_FORWARD_DECLARE_CLASS(SubtitleInterval)
 
 class SubtitleEditor : public QDockWidget {
@@ -14,9 +14,11 @@ class SubtitleEditor : public QDockWidget {
   
   public slots:
     void onOpenSubtitle(SubtitleInterval* subtitle);
+    void onSubtitleTextChanged();
 
   private:
-    QTextEdit* text_edit_;
+    QPlainTextEdit* text_edit_;
+    SubtitleInterval* currently_editing_;
 };
 
 #endif

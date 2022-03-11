@@ -13,32 +13,12 @@ qt_cc_library(
 )
 
 qt_cc_library(
-    name = "keyline",
-    srcs = ["keyline.cpp"],
-    hdrs = ["keyline.h"],
-    deps = [
-        "@qt//:qt_core",
-        "@qt//:qt_gui",
-        "@qt//:qt_widgets",
-    ],
-)
-
-qt_cc_library(
-    name = "keypoint",
-    srcs = ["keypoint.cpp"],
-    hdrs = ["keypoint.h"],
-    deps = [
-        "@qt//:qt_core",
-        "@qt//:qt_widgets",
-    ],
-)
-
-qt_cc_library(
     name = "ruler",
     srcs = ["ruler.cpp"],
     hdrs = ["ruler.h"],
     deps = [
         ":indicator",
+        ":subtitle_interval",
         "//subtitler/experimental/qt_gui/timeline/resource:resources",
         "//subtitler/util:duration_format",
         "@qt//:qt_core",
@@ -90,6 +70,17 @@ qt_cc_library(
     deps = [
         ":timeline_window",
         ":timer",
+        "//subtitler/experimental/qt_gui/timeline/resource:resources",
+        "@qt//:qt_core",
+        "@qt//:qt_widgets",
+    ],
+)
+
+qt_cc_library(
+    name = "subtitle_interval",
+    srcs = ["subtitle_interval.cpp"],
+    hdrs = ["subtitle_interval.h"],
+    deps = [
         "//subtitler/experimental/qt_gui/timeline/resource:resources",
         "@qt//:qt_core",
         "@qt//:qt_widgets",

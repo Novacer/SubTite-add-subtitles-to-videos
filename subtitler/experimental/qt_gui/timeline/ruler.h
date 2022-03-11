@@ -7,6 +7,7 @@
 #include <chrono>
 
 #include "subtitler/experimental/qt_gui/timeline/indicator.h"
+#include "subtitler/experimental/qt_gui/timeline/subtitle_interval.h"
 
 QT_FORWARD_DECLARE_CLASS(QAction)
 QT_FORWARD_DECLARE_CLASS(QMenu)
@@ -17,7 +18,7 @@ class Ruler : public QWidget {
   public:
     explicit Ruler(QWidget* parent, std::chrono::milliseconds duration,
                    int zoom_level = 1);
-    ~Ruler() = default;
+    ~Ruler();
 
     void setHeaderColor(const QColor& color) { header_bgrnd_ = color; }
 
@@ -29,14 +30,6 @@ class Ruler : public QWidget {
 
     void setPlaying(bool playing) { playing_ = playing; }
 
-    std::chrono::milliseconds beginTime() const {
-        return begin_marker_time_;
-    }
-
-    std::chrono::milliseconds endTime() const {
-        return end_marker_time_;
-    }
-
   signals:
     void changeZoomPosition(int level);
     void changeIndicatorTime(std::chrono::milliseconds ms);
@@ -46,6 +39,7 @@ class Ruler : public QWidget {
     void onZoomIn(int level);
     void onZoomOut(int level);
     void onMoveIndicator(std::chrono::milliseconds frame_time);
+    void onAddSubtitleInterval();
 
   protected:
     virtual void paintEvent(QPaintEvent* event) override;
@@ -63,27 +57,21 @@ class Ruler : public QWidget {
     QString getTickerString(qreal current_pos);
     quint32 msPerInterval();
     qreal lengthPerMs();
-    void updateRectBox();
+    int millisecondsToPosition(const std::chrono::milliseconds& ms);
 
     // sub controls
     Indicator* indicator_;
-    QLabel* begin_marker_;
-    QLabel* end_marker_;
-    QFrame* rect_box_;
+    SubtitleIntervalContainer* subtitle_intervals_;
     int zoom_level_;
 
     // Scroll bar of the parent, since this may manipulate its position.
     QScrollBar* scroll_bar_;
 
-    std::chrono::milliseconds begin_marker_time_;
-    std::chrono::milliseconds end_marker_time_;
     std::chrono::milliseconds indicator_time_;
 
     // context menu
     QMenu* context_menu_;
-    QAction* clear_points_;
-    QAction* make_current_point_;
-    QAction* cut_with_current_pos_;
+    QAction* add_subtitle_interval_;
 
     // ruler members
     qreal origin_;

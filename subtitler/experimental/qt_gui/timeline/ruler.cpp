@@ -63,25 +63,25 @@ void Ruler::setupChildren() {
     indicator_->installEventFilter(this);
     indicator_time_ = 0ms;
 
-    SubtitleIntervalArgs args1;
-    args1.start_x = 0;
-    args1.start_y = HEADER_HEIGHT;
-    args1.start_time = 0ms;
+    SubtitleIntervalArgs args;
+    args.start_x = 0;
+    args.start_y = HEADER_HEIGHT;
+    args.start_time = 0ms;
 
-    args1.end_x = millisecondsToPosition(1min);
-    args1.end_y = HEADER_HEIGHT;
-    args1.end_time = 1min;
+    args.end_x = millisecondsToPosition(1min);
+    args.end_y = HEADER_HEIGHT;
+    args.end_time = 1min;
 
-    auto* interval = new SubtitleInterval(args1, this);
-    subtitle_intervals_->AddInterval(interval);
+    auto interval = std::make_unique<SubtitleInterval>(args, this);
+    subtitle_intervals_->AddInterval(std::move(interval));
 
-    args1.start_time = 2min;
-    args1.start_x = millisecondsToPosition(2min);
-    args1.end_time = 3min;
-    args1.end_x = millisecondsToPosition(3min);
+    args.start_time = 2min;
+    args.start_x = millisecondsToPosition(2min);
+    args.end_time = 3min;
+    args.end_x = millisecondsToPosition(3min);
     
-    interval = new SubtitleInterval(args1, this);
-    subtitle_intervals_->AddInterval(interval);
+    interval = std::make_unique<SubtitleInterval>(args, this);
+    subtitle_intervals_->AddInterval(std::move(interval));
 }
 
 int Ruler::millisecondsToPosition(const std::chrono::milliseconds& ms) {
@@ -112,7 +112,7 @@ void Ruler::onMoveIndicator(std::chrono::milliseconds frame_time) {
 void Ruler::updateChildren() {
     rect_width_ = interval_width_ * duration_.count() / msPerInterval();
 
-    for (auto* interval : subtitle_intervals_->intervals()) {
+    for (auto& interval : subtitle_intervals_->intervals()) {
         auto begin_time = interval->GetBeginTime();
         interval->MoveBeginMarker(begin_time,
                                   millisecondsToPosition(begin_time));

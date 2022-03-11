@@ -13,27 +13,28 @@ using namespace std::chrono_literals;
 SubtitleIntervalContainer::SubtitleIntervalContainer(QWidget* parent)
     : QWidget{parent} {}
 
-void SubtitleIntervalContainer::AddInterval(SubtitleInterval* interval) {
+SubtitleIntervalContainer::~SubtitleIntervalContainer() = default;
+
+void SubtitleIntervalContainer::AddInterval(
+    std::unique_ptr<SubtitleInterval> interval) {
     if (!interval) {
         throw std::runtime_error{"Cannot add null interval to container"};
     }
-    intervals_.emplace_back(interval);
-    auto [ignore, ok] =
-        marker_to_interval_map.insert({interval->GetBeginMarker(), interval});
+    auto* interval_raw_ptr = interval.get();
+    intervals_.push_back(std::move(interval));
+    auto [ignore, ok] = marker_to_interval_map.insert(
+        {interval_raw_ptr->GetBeginMarker(), interval_raw_ptr});
     if (!ok) {
         throw std::runtime_error{"Cannot insert duplicate label to container"};
     }
-    std::tie(ignore, ok) =
-        marker_to_interval_map.insert({interval->GetEndMarker(), interval});
+    std::tie(ignore, ok) = marker_to_interval_map.insert(
+        {interval_raw_ptr->GetEndMarker(), interval_raw_ptr});
     if (!ok) {
         throw std::runtime_error{"Cannot insert duplicate label to container"};
     }
 }
 
 void SubtitleIntervalContainer::DeleteAll() {
-    for (auto* interval : intervals_) {
-        delete interval;
-    }
     intervals_.clear();
     marker_to_interval_map.clear();
 }

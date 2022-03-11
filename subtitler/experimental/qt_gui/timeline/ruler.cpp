@@ -7,7 +7,6 @@
 #include <QMenu>
 #include <QPainter>
 #include <QScrollBar>
-#include <iostream>
 #include <stdexcept>
 #include <unordered_map>
 #include <vector>

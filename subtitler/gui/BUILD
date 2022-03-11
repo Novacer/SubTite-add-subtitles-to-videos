@@ -1,7 +1,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("@com_justbuchanan_rules_qt//:qt.bzl", "qt_cc_library")
 
-package(default_visibility = ["//subtitler/experimental:__subpackages__"])
+package(default_visibility = ["//subtitler/gui:__subpackages__"])
 
 qt_cc_library(
     name = "play_button",
@@ -22,8 +22,8 @@ qt_cc_library(
     deps = [
         ":play_button",
         ":subtitle_editor",
-        "//subtitler/experimental/qt_gui/timeline:timer",
-        "//subtitler/experimental/qt_gui/timeline:timeline_window",
+        "//subtitler/gui/timeline:timer",
+        "//subtitler/gui/timeline:timeline_window",
         "@qt//:qt_widgets",
         "@qt//:qt_multimedia",
         "@qt//:qt_multimediawidgets",
@@ -43,7 +43,7 @@ qt_cc_library(
     srcs = ["subtitle_editor.cpp"],
     hdrs = ["subtitle_editor.h"],
     deps = [
-        "//subtitler/experimental/qt_gui/timeline:subtitle_interval",
+        "//subtitler/gui/timeline:subtitle_interval",
         "@qt//:qt_widgets",
     ],
 )
@@ -58,7 +58,7 @@ cc_binary(
     }),
     deps = [
         ":player_window",
-        "//subtitler/experimental/qt_gui/timeline/resource:resources",
+        "//subtitler/gui/timeline/resource:resources",
         "@qt//:qt_core",
         "@qt//:qt_widgets",
     ] + select({

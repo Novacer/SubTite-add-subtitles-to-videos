@@ -1,4 +1,4 @@
-#include "subtitler/experimental/qt_gui/timeline/timer.h"
+#include "subtitler/gui/timeline/timer.h"
 
 #include "subtitler/util/duration_format.h"
 

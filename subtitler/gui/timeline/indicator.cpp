@@ -1,4 +1,4 @@
-#include "subtitler/experimental/qt_gui/timeline/indicator.h"
+#include "subtitler/gui/timeline/indicator.h"
 
 Indicator::Indicator(QWidget* parent /* = Q_NULLPTR */) : QLabel(parent) {
     setAttribute(Qt::WA_TranslucentBackground, true);

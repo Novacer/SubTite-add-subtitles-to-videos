@@ -1,4 +1,4 @@
-#include "subtitler/experimental/qt_gui/play_button.h"
+#include "subtitler/gui/play_button.h"
 
 const char * PLAY_MSG = "play";
 const char * PAUSE_MSG = "pause";

@@ -1,13 +1,13 @@
 load("@com_justbuchanan_rules_qt//:qt.bzl", "qt_cc_library")
 
-package(default_visibility = ["//subtitler/experimental:__subpackages__"])
+package(default_visibility = ["//subtitler/gui:__subpackages__"])
 
 qt_cc_library(
     name = "indicator",
     srcs = ["indicator.cpp"],
     hdrs = ["indicator.h"],
     deps = [
-        "//subtitler/experimental/qt_gui/timeline/resource:resources",
+        "//subtitler/gui/timeline/resource:resources",
         "@qt//:qt_widgets",
     ],
 )
@@ -19,7 +19,7 @@ qt_cc_library(
     deps = [
         ":indicator",
         ":subtitle_interval",
-        "//subtitler/experimental/qt_gui/timeline/resource:resources",
+        "//subtitler/gui/timeline/resource:resources",
         "//subtitler/util:duration_format",
         "@qt//:qt_core",
         "@qt//:qt_gui",
@@ -45,7 +45,7 @@ qt_cc_library(
     hdrs = ["zoomer.h"],
     deps = [
         ":indicator",
-        "//subtitler/experimental/qt_gui/timeline/resource:resources",
+        "//subtitler/gui/timeline/resource:resources",
         "@qt//:qt_widgets",
     ],
 )
@@ -57,20 +57,7 @@ qt_cc_library(
     deps = [
         ":ruler",
         ":zoomer",
-        "//subtitler/experimental/qt_gui/timeline/resource:resources",
-        "@qt//:qt_core",
-        "@qt//:qt_widgets",
-    ],
-)
-
-qt_cc_library(
-    name = "mainwindow",
-    srcs = ["mainwindow.cpp"],
-    hdrs = ["mainwindow.h"],
-    deps = [
-        ":timeline_window",
-        ":timer",
-        "//subtitler/experimental/qt_gui/timeline/resource:resources",
+        "//subtitler/gui/timeline/resource:resources",
         "@qt//:qt_core",
         "@qt//:qt_widgets",
     ],
@@ -81,18 +68,7 @@ qt_cc_library(
     srcs = ["subtitle_interval.cpp"],
     hdrs = ["subtitle_interval.h"],
     deps = [
-        "//subtitler/experimental/qt_gui/timeline/resource:resources",
-        "@qt//:qt_core",
-        "@qt//:qt_widgets",
-    ],
-)
-
-cc_binary(
-    name = "timeline",
-    srcs = ["main.cpp"],
-    deps = [
-        ":mainwindow",
-        "//subtitler/experimental/qt_gui/timeline/resource:resources",
+        "//subtitler/gui/timeline/resource:resources",
         "@qt//:qt_core",
         "@qt//:qt_widgets",
     ],

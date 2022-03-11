@@ -1,8 +1,8 @@
-#include "subtitler/experimental/qt_gui/subtitle_editor.h"
+#include "subtitler/gui/subtitle_editor.h"
 
 #include <QPlainTextEdit>
 
-#include "subtitler/experimental/qt_gui/timeline/subtitle_interval.h"
+#include "subtitler/gui/timeline/subtitle_interval.h"
 
 SubtitleEditor::SubtitleEditor(QWidget* parent)
     : QDockWidget{parent}, currently_editing_{Q_NULLPTR} {

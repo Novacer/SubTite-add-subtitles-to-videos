@@ -1,4 +1,4 @@
-#include "subtitler/experimental/qt_gui/timeline/ruler.h"
+#include "subtitler/gui/timeline/ruler.h"
 
 #include <QAbstractScrollArea>
 #include <QAction>

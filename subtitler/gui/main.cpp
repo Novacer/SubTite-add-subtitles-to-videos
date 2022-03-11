@@ -9,7 +9,7 @@ extern "C" {
 #include <QFile>
 #include <QByteArray>
 
-#include "subtitler/experimental/qt_gui/player_window.h"
+#include "subtitler/gui/player_window.h"
 
 int main(int argc, char *argv[]) {
     // av_log_set_level(AV_LOG_FATAL);

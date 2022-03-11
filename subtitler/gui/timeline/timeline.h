@@ -4,8 +4,8 @@
 #include <QScrollArea>
 #include <chrono>
 
-#include "subtitler/experimental/qt_gui/timeline/ruler.h"
-#include "subtitler/experimental/qt_gui/timeline/zoomer.h"
+#include "subtitler/gui/timeline/ruler.h"
+#include "subtitler/gui/timeline/zoomer.h"
 
 QT_FORWARD_DECLARE_CLASS(SubtitleInterval);
 

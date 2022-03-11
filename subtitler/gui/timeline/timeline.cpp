@@ -1,4 +1,4 @@
-#include "subtitler/experimental/qt_gui/timeline/timeline.h"
+#include "subtitler/gui/timeline/timeline.h"
 
 #include <QDebug>
 #include <QScrollBar>

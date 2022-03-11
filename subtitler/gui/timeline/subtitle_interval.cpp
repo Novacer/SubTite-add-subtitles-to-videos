@@ -1,4 +1,4 @@
-#include "subtitler/experimental/qt_gui/timeline/subtitle_interval.h"
+#include "subtitler/gui/timeline/subtitle_interval.h"
 
 #include <QFrame>
 #include <QLabel>

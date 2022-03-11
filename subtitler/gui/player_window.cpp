@@ -1,4 +1,4 @@
-#include "subtitler/experimental/qt_gui/player_window.h"
+#include "subtitler/gui/player_window.h"
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -22,10 +22,10 @@ extern "C" {
 #include <chrono>
 #include <iostream>
 
-#include "subtitler/experimental/qt_gui/play_button.h"
-#include "subtitler/experimental/qt_gui/subtitle_editor.h"
-#include "subtitler/experimental/qt_gui/timeline/timeline.h"
-#include "subtitler/experimental/qt_gui/timeline/timer.h"
+#include "subtitler/gui/play_button.h"
+#include "subtitler/gui/subtitle_editor.h"
+#include "subtitler/gui/timeline/timeline.h"
+#include "subtitler/gui/timeline/timer.h"
 
 class VideoRenderer : public QVideoRendererControl {
   public:

@@ -1,4 +1,4 @@
-#include "subtitler/experimental/qt_gui/timeline/zoomer.h"
+#include "subtitler/gui/timeline/zoomer.h"
 
 #include <QHBoxLayout>
 #include <cmath>

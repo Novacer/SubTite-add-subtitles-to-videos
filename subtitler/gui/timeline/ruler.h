@@ -6,8 +6,8 @@
 #include <QWidget>
 #include <chrono>
 
-#include "subtitler/experimental/qt_gui/timeline/indicator.h"
-#include "subtitler/experimental/qt_gui/timeline/subtitle_interval.h"
+#include "subtitler/gui/timeline/indicator.h"
+#include "subtitler/gui/timeline/subtitle_interval.h"
 
 QT_FORWARD_DECLARE_CLASS(QAction)
 QT_FORWARD_DECLARE_CLASS(QMenu)

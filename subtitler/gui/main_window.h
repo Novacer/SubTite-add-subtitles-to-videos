@@ -1,5 +1,5 @@
-#ifndef SUBTITLER_GUI_PLAYER_WINDOW_H
-#define SUBTITLER_GUI_PLAYER_WINDOW_H
+#ifndef SUBTITLER_GUI_MAIN_WINDOW_H
+#define SUBTITLER_GUI_MAIN_WINDOW_H
 
 #include <QMainWindow>
 #include <chrono>
@@ -20,11 +20,11 @@ QT_FORWARD_DECLARE_CLASS(VideoRenderer)
 namespace subtitler {
 namespace gui {
 
-class PlayerWindow : public QMainWindow {
+class MainWindow : public QMainWindow {
     Q_OBJECT
   public:
-    PlayerWindow(QWidget *parent = Q_NULLPTR);
-    ~PlayerWindow();
+    MainWindow(QWidget *parent = Q_NULLPTR);
+    ~MainWindow();
 
   signals:
     void playerChangedTime(std::chrono::milliseconds ms);

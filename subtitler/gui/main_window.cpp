@@ -1,4 +1,4 @@
-#include "subtitler/gui/player_window.h"
+#include "subtitler/gui/main_window.h"
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -88,9 +88,9 @@ class VideoWidget : public QVideoWidget {
 
 }  // namespace
 
-PlayerWindow::~PlayerWindow() = default;
+MainWindow::~MainWindow() = default;
 
-PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent) {
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     setWindowTitle("Video Player Demo");
     setMinimumSize(1280, 500);
     QWidget *placeholder = new QWidget{this};
@@ -164,16 +164,16 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent) {
     connect(timeline, &Timeline::rulerChangedTime, timer,
             &Timer::onTimerChanged);
     connect(timeline, &Timeline::userDraggedRulerChangeTime, this,
-            &PlayerWindow::onRulerChangedTime);
-    connect(this, &PlayerWindow::playerChangedTime, timeline,
+            &MainWindow::onRulerChangedTime);
+    connect(this, &MainWindow::playerChangedTime, timeline,
             &Timeline::onPlayerChangedTime);
 
     audio_output_ = std::make_unique<QAVAudioOutput>();
     // Handle decoded frames.
     connect(player_.get(), &QAVPlayer::audioFrame, this,
-            &PlayerWindow::onAudioFrameDecoded);
+            &MainWindow::onAudioFrameDecoded);
     connect(player_.get(), &QAVPlayer::videoFrame, this,
-            &PlayerWindow::onVideoFrameDecoded);
+            &MainWindow::onVideoFrameDecoded);
 
     // Handle opening/closing subtitle editor
     connect(timeline, &Timeline::openSubtitleEditor, editor,
@@ -185,18 +185,18 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent) {
     player_->pause();
 }
 
-void PlayerWindow::onRulerChangedTime(std::chrono::milliseconds ms) {
+void MainWindow::onRulerChangedTime(std::chrono::milliseconds ms) {
     user_seeked_ = true;
     player_->seek(ms.count());
 }
 
-void PlayerWindow::onAudioFrameDecoded(const QAVAudioFrame &audio_frame) {
+void MainWindow::onAudioFrameDecoded(const QAVAudioFrame &audio_frame) {
     if (player_->state() == QAVPlayer::State::PlayingState) {
         audio_output_->play(audio_frame);
     }
 }
 
-void PlayerWindow::onVideoFrameDecoded(const QAVVideoFrame &video_frame) {
+void MainWindow::onVideoFrameDecoded(const QAVVideoFrame &video_frame) {
     if (video_renderer_->m_surface == nullptr) return;
     QVideoFrame videoFrame = video_frame.convertTo(AV_PIX_FMT_RGB32);
     if (!video_renderer_->m_surface->isActive() ||

@@ -11,9 +11,9 @@ qt_cc_library(
 )
 
 qt_cc_library(
-    name = "player_window",
-    srcs = ["player_window.cpp"],
-    hdrs = ["player_window.h"],
+    name = "main_window",
+    srcs = ["main_window.cpp"],
+    hdrs = ["main_window.h"],
     copts = select({
         "@bazel_tools//src/conditions:windows": ["/DQT_BUILD_QTAVPLAYER_LIB"],
         "@bazel_tools//src/conditions:darwin": ["-DQT_BUILD_QTAVPLAYER_LIB"],
@@ -57,7 +57,7 @@ cc_binary(
         "//conditions:default": ["-DQT_BUILD_QTAVPLAYER_LIB"],
     }),
     deps = [
-        ":player_window",
+        ":main_window",
         "//subtitler/gui/resource:resources",
         "@qt//:qt_core",
         "@qt//:qt_widgets",

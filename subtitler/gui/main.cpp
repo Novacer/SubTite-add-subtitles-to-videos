@@ -9,7 +9,7 @@ extern "C" {
 #include <QFile>
 #include <QByteArray>
 
-#include "subtitler/gui/player_window.h"
+#include "subtitler/gui/main_window.h"
 
 int main(int argc, char *argv[]) {
     // av_log_set_level(AV_LOG_FATAL);
@@ -28,8 +28,8 @@ int main(int argc, char *argv[]) {
         file.close();
     }
 
-    subtitler::gui::PlayerWindow player_window;
-    player_window.show();
+    subtitler::gui::MainWindow main_window;
+    main_window.show();
 
     int res = app.exec();
     qunsetenv("QT_AVPLAYER_NO_HWDEVICE");

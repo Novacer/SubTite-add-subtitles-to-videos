@@ -7,6 +7,7 @@
 #include <chrono>
 
 #include "subtitler/experimental/qt_gui/timeline/indicator.h"
+#include "subtitler/experimental/qt_gui/timeline/subtitle_interval.h"
 
 QT_FORWARD_DECLARE_CLASS(QAction)
 QT_FORWARD_DECLARE_CLASS(QMenu)
@@ -29,13 +30,13 @@ class Ruler : public QWidget {
 
     void setPlaying(bool playing) { playing_ = playing; }
 
-    std::chrono::milliseconds beginTime() const {
-        return begin_marker_time_;
-    }
+    // std::chrono::milliseconds beginTime() const {
+    //     return begin_marker_time_;
+    // }
 
-    std::chrono::milliseconds endTime() const {
-        return end_marker_time_;
-    }
+    // std::chrono::milliseconds endTime() const {
+    //     return end_marker_time_;
+    // }
 
   signals:
     void changeZoomPosition(int level);
@@ -54,6 +55,7 @@ class Ruler : public QWidget {
     virtual bool eventFilter(QObject* watched, QEvent* event) override;
     virtual void mousePressEvent(QMouseEvent* event) override;
     virtual void mouseReleaseEvent(QMouseEvent* event) override;
+    virtual void resizeEvent(QResizeEvent* event) override;
 
   private:
     void setupChildren();
@@ -64,19 +66,21 @@ class Ruler : public QWidget {
     quint32 msPerInterval();
     qreal lengthPerMs();
     void updateRectBox();
+    int millisecondsToPosition(const std::chrono::milliseconds& ms);
 
     // sub controls
-    Indicator* indicator_;
-    QLabel* begin_marker_;
-    QLabel* end_marker_;
-    QFrame* rect_box_;
+    Indicator *indicator_;
+    // QLabel* begin_marker_;
+    // QLabel* end_marker_;
+    // QFrame* rect_box_;
+    SubtitleInterval *interval_;
     int zoom_level_;
 
     // Scroll bar of the parent, since this may manipulate its position.
     QScrollBar* scroll_bar_;
 
-    std::chrono::milliseconds begin_marker_time_;
-    std::chrono::milliseconds end_marker_time_;
+    // std::chrono::milliseconds begin_marker_time_;
+    // std::chrono::milliseconds end_marker_time_;
     std::chrono::milliseconds indicator_time_;
 
     // context menu

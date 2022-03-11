@@ -52,38 +52,31 @@ void Ruler::setupChildren() {
     indicator_->installEventFilter(this);
     indicator_time_ = 0ms;
 
-    begin_marker_ = new QLabel(this);
-    begin_marker_->setPixmap(QPixmap(":/images/cutleft"));
-    begin_marker_->setCursor(Qt::SizeHorCursor);
-    begin_marker_->setFixedSize(CUT_MARKER_WIDTH, CUT_MARKER_HEIGHT);
-    begin_marker_->move(0, HEADER_HEIGHT);
-    begin_marker_->installEventFilter(this);
-    begin_marker_time_ = 0ms;
+    SubtitleIntervalArgs args;
+    args.start_x = 0;
+    args.start_y = HEADER_HEIGHT;
+    args.start_time = 0ms;
 
-    end_marker_ = new QLabel(this);
-    end_marker_->setPixmap(QPixmap(":/images/cutright"));
-    end_marker_->setFixedSize(CUT_MARKER_WIDTH, CUT_MARKER_HEIGHT);
-    end_marker_->move(rect_width_ + CUT_MARKER_WIDTH, HEADER_HEIGHT);
-    end_marker_->setCursor(Qt::SizeHorCursor);
-    end_marker_->installEventFilter(this);
-    end_marker_time_ = duration_;
+    args.end_x = rect_width_ + CUT_MARKER_WIDTH;
+    args.end_y = HEADER_HEIGHT;
+    args.end_time = duration_;
 
-    rect_box_ = new QFrame(this);
-    rect_box_->setObjectName("cutrect");
-    rect_box_->setGeometry(begin_marker_->rect().right(), begin_marker_->y(),
-                           end_marker_->x() - begin_marker_->rect().right(),
-                           BODY_HEIGHT);
+    interval_ = new SubtitleInterval(args, this);
+}
+
+int Ruler::millisecondsToPosition(const std::chrono::milliseconds& ms) {
+    return interval_width_ * ms.count() / msPerInterval();
 }
 
 void Ruler::resetChildren(std::chrono::milliseconds duration) {
     duration_ = duration;
-    rect_width_ = interval_width_ * duration_.count() / msPerInterval();
+
+    rect_width_ = duration_.count() * interval_width_ / msPerInterval();
     indicator_->move(0, 0);
-    begin_marker_->move(0, HEADER_HEIGHT);
-    end_marker_->move(rect_width_ + CUT_MARKER_WIDTH, HEADER_HEIGHT);
-    rect_box_->setGeometry(begin_marker_->rect().right(), begin_marker_->y(),
-                           end_marker_->x() - begin_marker_->rect().right(),
-                           BODY_HEIGHT);
+
+    interval_->MoveBeginMarker(0ms, millisecondsToPosition(0ms));
+    interval_->MoveEndMarker(duration_, millisecondsToPosition(duration_));
+
     resize(rect_width_ + START_END_PADDING, HEADER_HEIGHT + BODY_HEIGHT);
 }
 
@@ -100,15 +93,10 @@ void Ruler::onMoveIndicator(std::chrono::milliseconds frame_time) {
 void Ruler::updateChildren() {
     rect_width_ = interval_width_ * duration_.count() / msPerInterval();
 
-    begin_marker_->move(
-        begin_marker_time_.count() * interval_width_ / msPerInterval(),
-        begin_marker_->y());
-    end_marker_->move(
-        end_marker_time_.count() * interval_width_ / msPerInterval(),
-        end_marker_->y());
-    rect_box_->setGeometry(
-        begin_marker_->x() + CUT_MARKER_WIDTH, begin_marker_->y(),
-        end_marker_->x() - begin_marker_->x() - CUT_MARKER_WIDTH, BODY_HEIGHT);
+    auto begin_time = interval_->GetBeginTime();
+    interval_->MoveBeginMarker(begin_time, millisecondsToPosition(begin_time));
+    auto end_time = interval_->GetEndTime();
+    interval_->MoveEndMarker(end_time, millisecondsToPosition(end_time));
     indicator_->move(
         indicator_time_.count() * interval_width_ / msPerInterval(),
         indicator_->y());
@@ -139,8 +127,8 @@ void Ruler::updateChildren() {
 }
 
 bool Ruler::eventFilter(QObject* watched, QEvent* event) {
-    if (watched == indicator_ || watched == begin_marker_ ||
-        watched == end_marker_) {
+    if (watched == indicator_ || watched == interval_->GetBeginMarker() ||
+        watched == interval_->GetEndMarker()) {
         static QPoint lastPnt;
         static bool isHover = false;
         if (event->type() == QEvent::MouseButtonPress) {
@@ -167,31 +155,32 @@ bool Ruler::eventFilter(QObject* watched, QEvent* event) {
                     emit changeIndicatorTime(indicator_time_);
                 }
             }
-            if (watched == begin_marker_) {
-                if (begin_marker_->x() + dx + CUT_MARKER_WIDTH <= rect_width_ &&
-                    begin_marker_->x() + dx >= 0 &&
-                    begin_marker_->x() + dx + CUT_MARKER_WIDTH <=
-                        end_marker_->x()) {
-                    qreal new_being_marker_time =
-                        (begin_marker_->x() + dx) / lengthPerMs();
-                    begin_marker_time_ = std::chrono::milliseconds(
-                        (quint64)new_being_marker_time);
-                    begin_marker_->move(begin_marker_->x() + dx,
-                                        begin_marker_->y());
-                    updateRectBox();
+            if (auto begin_marker = interval_->GetBeginMarker();
+                watched == begin_marker) {
+                if (begin_marker->x() + dx + CUT_MARKER_WIDTH <= rect_width_ &&
+                    begin_marker->x() + dx >= 0 &&
+                    begin_marker->x() + dx + CUT_MARKER_WIDTH <=
+                        interval_->GetEndMarker()->x()) {
+                    auto new_begin_marker_time = std::chrono::milliseconds{
+                        (quint64)((begin_marker->x() + dx) / lengthPerMs())};
+                    interval_->MoveBeginMarker(
+                        new_begin_marker_time,
+                        millisecondsToPosition(new_begin_marker_time));
+                    // updateRectBox();
                 }
             }
-            if (watched == end_marker_) {
-                if (end_marker_->x() + dx <= rect_width_ + CUT_MARKER_WIDTH &&
-                    end_marker_->x() + dx >= 0 &&
-                    end_marker_->x() + dx - CUT_MARKER_WIDTH >=
-                        begin_marker_->x()) {
-                    qreal new_end_marker_time =
-                        (end_marker_->x() + dx) / lengthPerMs();
-                    end_marker_time_ =
-                        std::chrono::milliseconds((quint64)new_end_marker_time);
-                    end_marker_->move(end_marker_->x() + dx, end_marker_->y());
-                    updateRectBox();
+            if (auto end_marker = interval_->GetEndMarker();
+                watched == end_marker) {
+                if (end_marker->x() + dx <= rect_width_ + CUT_MARKER_WIDTH &&
+                    end_marker->x() + dx >= 0 &&
+                    end_marker->x() + dx - CUT_MARKER_WIDTH >=
+                        interval_->GetBeginMarker()->x()) {
+                    auto new_end_marker_time = std::chrono::milliseconds{
+                        (quint64)((end_marker->x() + dx) / lengthPerMs())};
+                    interval_->MoveEndMarker(
+                        new_end_marker_time,
+                        millisecondsToPosition(new_end_marker_time));
+                    // updateRectBox();
                 }
             }
         } else if (event->type() == QEvent::MouseButtonRelease && isHover) {
@@ -208,9 +197,10 @@ bool Ruler::eventFilter(QObject* watched, QEvent* event) {
 }
 
 void Ruler::updateRectBox() {
-    rect_box_->setGeometry(
-        begin_marker_->x() + CUT_MARKER_WIDTH, begin_marker_->y(),
-        end_marker_->x() - begin_marker_->x() - CUT_MARKER_WIDTH, BODY_HEIGHT);
+    // rect_box_->setGeometry(
+    //     begin_marker_->x() + CUT_MARKER_WIDTH, begin_marker_->y(),
+    //     end_marker_->x() - begin_marker_->x() - CUT_MARKER_WIDTH,
+    //     BODY_HEIGHT);
 }
 
 void Ruler::contextMenuEvent(QContextMenuEvent* event) {
@@ -283,9 +273,11 @@ QString Ruler::getTickerString(qreal current_pos) {
         std::chrono::floor<std::chrono::seconds>(current_time_ms);
 
     if (interval_num % 2 == 0) {
-        auto with_milli_precision = subtitler::FormatDuration(current_time_rounded_sec);
+        auto with_milli_precision =
+            subtitler::FormatDuration(current_time_rounded_sec);
         // remove ".000" from the end
-        if (int remove_from_here = with_milli_precision.length() - 4; remove_from_here > 0) {
+        if (int remove_from_here = with_milli_precision.length() - 4;
+            remove_from_here > 0) {
             with_milli_precision.erase(remove_from_here);
         }
         return QString::fromStdString(with_milli_precision);
@@ -338,4 +330,9 @@ void Ruler::drawScaleRuler(QPainter* painter, QRectF ruler_rect) {
                               getTickerString(x1 + interval_width_));
         }
     }
+}
+
+void Ruler::resizeEvent(QResizeEvent* event) {
+    QWidget::resizeEvent(event);
+    interval_->resize(event->size());
 }

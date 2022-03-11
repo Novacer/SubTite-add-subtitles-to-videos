@@ -11,7 +11,8 @@ SubtitleEditor::SubtitleEditor(QWidget* parent)
     text_edit_->setMinimumSize(200, 100);
     text_edit_->setPlaceholderText(tr("Subtitle text here"));
 
-    connect(text_edit_, &QPlainTextEdit::textChanged, this, &SubtitleEditor::onSubtitleTextChanged);
+    connect(text_edit_, &QPlainTextEdit::textChanged, this,
+            &SubtitleEditor::onSubtitleTextChanged);
 
     setWidget(text_edit_);
 }

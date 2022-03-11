@@ -11,7 +11,7 @@ class SubtitleEditor : public QDockWidget {
   public:
     SubtitleEditor(QWidget* parent = Q_NULLPTR);
     ~SubtitleEditor() = default;
-  
+
   public slots:
     void onOpenSubtitle(SubtitleInterval* subtitle);
     void onSubtitleTextChanged();

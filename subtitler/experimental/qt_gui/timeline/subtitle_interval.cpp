@@ -32,7 +32,8 @@ void SubtitleIntervalContainer::AddInterval(
     if (!ok) {
         throw std::runtime_error{"Cannot insert duplicate label to container"};
     }
-    std::tie(ignore, ok) = rect_to_interval_map_.insert({interval_raw_ptr->GetRect(), interval_raw_ptr});
+    std::tie(ignore, ok) = rect_to_interval_map_.insert(
+        {interval_raw_ptr->GetRect(), interval_raw_ptr});
     if (!ok) {
         throw std::runtime_error{"Cannot insert duplicate rect to container"};
     }

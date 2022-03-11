@@ -20,6 +20,9 @@ QT_FORWARD_DECLARE_CLASS(VideoRenderer)
 namespace subtitler {
 namespace gui {
 
+/**
+ * Main window for the video editor gui.
+ */
 class MainWindow : public QMainWindow {
     Q_OBJECT
   public:

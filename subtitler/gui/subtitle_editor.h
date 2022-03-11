@@ -14,6 +14,10 @@ QT_FORWARD_DECLARE_CLASS(SubtitleInterval)
 namespace subtitler {
 namespace gui {
 
+/**
+ * Side docking widget containing elements used when editing
+ * the subtitle text.
+ */
 class SubtitleEditor : public QDockWidget {
     Q_OBJECT
   public:

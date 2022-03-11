@@ -6,6 +6,9 @@
 namespace subtitler {
 namespace gui {
 
+/**
+ * Vertical bar showing the current position of the video player.
+ */
 class Indicator : public QLabel {
     Q_OBJECT
   public:

@@ -16,6 +16,11 @@ QT_FORWARD_DECLARE_CLASS(QScrollBar)
 namespace subtitler {
 namespace gui {
 
+/**
+ * The ruler widget controls the current indicator position, as well
+ * as repositioning the timeline during resizing and zooming.
+ * A context menu is available when right clicking.
+ */
 class Ruler : public QWidget {
     Q_OBJECT
   public:

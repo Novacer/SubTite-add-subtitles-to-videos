@@ -6,6 +6,7 @@
 
 namespace subtitler {
 namespace gui {
+
 SubtitleEditor::SubtitleEditor(QWidget* parent)
     : QDockWidget{parent}, currently_editing_{Q_NULLPTR} {
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);

@@ -6,6 +6,9 @@
 namespace subtitler {
 namespace gui {
 
+/**
+ * Play/pause button for the video player. Part of the video controls.
+ */
 class PlayButton : public QPushButton {
     Q_OBJECT
   public:

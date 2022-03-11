@@ -20,7 +20,7 @@ Timeline::Timeline(std::chrono::milliseconds duration, QWidget* parent)
     zoomer_->setMinimumWidth(300);
     addScrollBarWidget(zoomer_, Qt::AlignLeft);
 
-    ruler_ = new Ruler(this, duration, zoomer_->max_zoom_level());
+    ruler_ = new Ruler(this, duration, zoomer_->GetMaxZoomLevel());
     setWidget(ruler_);
 
     connect(zoomer_, &Zoomer::zoomIn, ruler_, &Ruler::onZoomIn);

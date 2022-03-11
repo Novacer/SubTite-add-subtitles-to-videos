@@ -9,15 +9,16 @@
 namespace subtitler {
 namespace gui {
 
+/**
+ * Scrollbar widget to control the timeline's zoom level.
+ */
 class Zoomer : public QWidget {
     Q_OBJECT
   public:
     Zoomer(QWidget* parent, std::chrono::milliseconds duration);
     ~Zoomer() = default;
 
-    void InitializeControls(std::chrono::milliseconds duration);
-
-    int max_zoom_level() const { return max_zoom_level_; };
+    int GetMaxZoomLevel() const { return max_zoom_level_; };
 
   signals:
     void zoomIn(int level);
@@ -29,6 +30,8 @@ class Zoomer : public QWidget {
     void onSliderChanged(int value);
 
   private:
+    void initializeControls(std::chrono::milliseconds duration);
+
     QToolButton* zoom_in_;
     QToolButton* zoom_out_;
     QSlider* zoom_slider_;

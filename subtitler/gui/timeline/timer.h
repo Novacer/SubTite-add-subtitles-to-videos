@@ -7,16 +7,17 @@
 namespace subtitler {
 namespace gui {
 
+/**
+ * Label displaying a timestamp in HH:MM:SS.XXXXX format.
+ */
 class Timer : public QLabel {
     Q_OBJECT
   public:
     Timer(QWidget* parent = Q_NULLPTR);
     ~Timer() = default;
 
-  signals:
-    void timerChanged(std::chrono::milliseconds ms);
-
   public slots:
+    // Set the new time.
     void onTimerChanged(std::chrono::milliseconds ms);
 };
 

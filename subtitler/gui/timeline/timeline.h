@@ -16,6 +16,11 @@ QT_FORWARD_DECLARE_CLASS(SubtitleInterval);
 namespace subtitler {
 namespace gui {
 
+/**
+ * Widget containing the scrollable timeline controls below the video player.
+ * Includes the zoomable video timeline, current position indicator,
+ * and subtitle positions.
+ */
 class Timeline : public QScrollArea {
     Q_OBJECT
   public:

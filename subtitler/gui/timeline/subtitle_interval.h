@@ -18,7 +18,13 @@ QT_FORWARD_DECLARE_CLASS(SubtitleInterval)
 namespace subtitler {
 namespace gui {
 
-// TODO docs.
+/**
+ * Widget containing all of the subtitle intervals.
+ * Example usage:
+ * auto* container = new SubtitleIntervalContainer(this);
+ * SubtitleIntervalArgs args{ ... };
+ * container->AddInterval(std::make_unique<SubtitleInverval>(args, this));
+ */
 class SubtitleIntervalContainer : public QWidget {
     Q_OBJECT
   public:

@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <unordered_map>
 #include <vector>
+#include <iostream>
 
 #include "subtitler/util/duration_format.h"
 
@@ -17,7 +18,6 @@
 #define BODY_HEIGHT 80
 #define START_END_PADDING 60
 #define CUT_MARKER_WIDTH 10
-#define CUT_MARKER_HEIGHT 86
 #define TIME_LABEL_OFFSET 10
 
 using namespace std::chrono_literals;
@@ -34,7 +34,6 @@ Ruler::Ruler(QWidget* parent, std::chrono::milliseconds duration,
       duration_{duration},
       rect_width_{interval_width_ * duration_.count() / msPerInterval()},
       playing_{false} {
-    
     subtitle_intervals_ = new SubtitleIntervalContainer(this);
     if (!subtitle_intervals_) {
         throw std::runtime_error{"Unable allocate subtitle container"};
@@ -49,9 +48,10 @@ Ruler::Ruler(QWidget* parent, std::chrono::milliseconds duration,
     setupChildren();
 
     context_menu_ = new QMenu(this);
-    clear_points_ = new QAction(tr("Clear All Points"), this);
-    cut_with_current_pos_ = new QAction(tr("Cut With Currrent Position"), this);
-    make_current_point_ = new QAction(tr("Mark in Current Position"), this);
+    add_subtitle_interval_ = new QAction(tr("Add Subtitle at Indicator"), this);
+
+    connect(add_subtitle_interval_, &QAction::triggered, this,
+            &Ruler::onAddSubtitleInterval);
 
     resize(rect_width_ + START_END_PADDING, 120);
 }
@@ -62,26 +62,6 @@ void Ruler::setupChildren() {
     indicator_ = new Indicator(this);
     indicator_->installEventFilter(this);
     indicator_time_ = 0ms;
-
-    SubtitleIntervalArgs args;
-    args.start_x = 0;
-    args.start_y = HEADER_HEIGHT;
-    args.start_time = 0ms;
-
-    args.end_x = millisecondsToPosition(1min);
-    args.end_y = HEADER_HEIGHT;
-    args.end_time = 1min;
-
-    auto interval = std::make_unique<SubtitleInterval>(args, this);
-    subtitle_intervals_->AddInterval(std::move(interval));
-
-    args.start_time = 2min;
-    args.start_x = millisecondsToPosition(2min);
-    args.end_time = 3min;
-    args.end_x = millisecondsToPosition(3min);
-    
-    interval = std::make_unique<SubtitleInterval>(args, this);
-    subtitle_intervals_->AddInterval(std::move(interval));
 }
 
 int Ruler::millisecondsToPosition(const std::chrono::milliseconds& ms) {
@@ -177,7 +157,8 @@ bool Ruler::eventFilter(QObject* watched, QEvent* event) {
                     emit changeIndicatorTime(indicator_time_);
                 }
             }
-            SubtitleInterval* interval = subtitle_intervals_->GetIntervalFromMarker(watched);
+            SubtitleInterval* interval =
+                subtitle_intervals_->GetIntervalFromMarker(watched);
             if (!interval) {
                 return false;
             }
@@ -193,7 +174,6 @@ bool Ruler::eventFilter(QObject* watched, QEvent* event) {
                     interval->MoveBeginMarker(
                         new_begin_marker_time,
                         millisecondsToPosition(new_begin_marker_time));
-                    // updateRectBox();
                 }
             }
             if (auto end_marker = interval->GetEndMarker();
@@ -207,7 +187,6 @@ bool Ruler::eventFilter(QObject* watched, QEvent* event) {
                     interval->MoveEndMarker(
                         new_end_marker_time,
                         millisecondsToPosition(new_end_marker_time));
-                    // updateRectBox();
                 }
             }
         } else if (event->type() == QEvent::MouseButtonRelease && isHover) {
@@ -223,17 +202,8 @@ bool Ruler::eventFilter(QObject* watched, QEvent* event) {
     return false;
 }
 
-void Ruler::updateRectBox() {
-    // rect_box_->setGeometry(
-    //     begin_marker_->x() + CUT_MARKER_WIDTH, begin_marker_->y(),
-    //     end_marker_->x() - begin_marker_->x() - CUT_MARKER_WIDTH,
-    //     BODY_HEIGHT);
-}
-
 void Ruler::contextMenuEvent(QContextMenuEvent* event) {
-    context_menu_->addAction(clear_points_);
-    context_menu_->addAction(cut_with_current_pos_);
-    context_menu_->addAction(make_current_point_);
+    context_menu_->addAction(add_subtitle_interval_);
     context_menu_->exec(QCursor::pos());
     event->accept();
 }
@@ -325,6 +295,19 @@ void Ruler::onZoomOut(int level) {
     // Give user visual confirmation that they have zoomed out.
     interval_width_ -= 5;
     updateChildren();
+}
+
+void Ruler::onAddSubtitleInterval() {
+    SubtitleIntervalArgs args;
+    args.start_time = indicator_time_;
+    args.start_x = millisecondsToPosition(args.start_time);
+    args.start_y = HEADER_HEIGHT;
+
+    args.end_time = indicator_time_ + 5s;
+    args.end_x = millisecondsToPosition(args.end_time);
+    args.end_y = HEADER_HEIGHT;
+    subtitle_intervals_->AddInterval(
+        std::make_unique<SubtitleInterval>(args, this));
 }
 
 void Ruler::drawScaleRuler(QPainter* painter, QRectF ruler_rect) {

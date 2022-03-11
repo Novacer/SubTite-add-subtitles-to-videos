@@ -50,7 +50,7 @@ SubtitleInterval* SubtitleIntervalContainer::GetIntervalFromMarker(
 
 SubtitleInterval::SubtitleInterval(const SubtitleIntervalArgs& args,
                                    QWidget* parent) {
-    if (parent == nullptr) {
+    if (parent == Q_NULLPTR) {
         throw std::invalid_argument(
             "Parent of SubtitleInvterval cannot be null");
     }
@@ -61,6 +61,7 @@ SubtitleInterval::SubtitleInterval(const SubtitleIntervalArgs& args,
     begin_marker_->setFixedSize(CUT_MARKER_WIDTH, CUT_MARKER_HEIGHT);
     begin_marker_->move(args.start_x, args.start_y);
     begin_marker_->installEventFilter(parent);
+    begin_marker_->show();
     begin_marker_time_ = args.start_time;
 
     end_marker_ = new QLabel(parent);
@@ -69,12 +70,14 @@ SubtitleInterval::SubtitleInterval(const SubtitleIntervalArgs& args,
     end_marker_->move(args.end_x, args.end_y);
     end_marker_->setCursor(Qt::SizeHorCursor);
     end_marker_->installEventFilter(parent);
+    end_marker_->show();
     end_marker_time_ = args.end_time;
 
     rect_box_ = new QLabel(parent);
     rect_box_->setObjectName("cutrect");
     rect_box_->setText("hello world this is kinda cool sometimes");
     updateRect();
+    rect_box_->show();
 }
 
 void SubtitleInterval::MoveBeginMarker(

@@ -39,6 +39,7 @@ class Ruler : public QWidget {
     void onZoomIn(int level);
     void onZoomOut(int level);
     void onMoveIndicator(std::chrono::milliseconds frame_time);
+    void onAddSubtitleInterval();
 
   protected:
     virtual void paintEvent(QPaintEvent* event) override;
@@ -56,7 +57,6 @@ class Ruler : public QWidget {
     QString getTickerString(qreal current_pos);
     quint32 msPerInterval();
     qreal lengthPerMs();
-    void updateRectBox();
     int millisecondsToPosition(const std::chrono::milliseconds& ms);
 
     // sub controls
@@ -71,9 +71,7 @@ class Ruler : public QWidget {
 
     // context menu
     QMenu* context_menu_;
-    QAction* clear_points_;
-    QAction* make_current_point_;
-    QAction* cut_with_current_pos_;
+    QAction* add_subtitle_interval_;
 
     // ruler members
     qreal origin_;

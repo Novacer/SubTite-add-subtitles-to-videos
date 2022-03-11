@@ -9,6 +9,7 @@ QT_FORWARD_DECLARE_CLASS(QFrame)
 QT_FORWARD_DECLARE_CLASS(SubtitleInterval)
 
 class SubtitleIntervalContainer : public QWidget {
+    Q_OBJECT
   public:
     SubtitleIntervalContainer(QWidget* parent = Q_NULLPTR);
     ~SubtitleIntervalContainer() = default;
@@ -41,8 +42,7 @@ class SubtitleInterval {
 
     void MoveBeginMarker(const std::chrono::milliseconds& start_time,
                          int x_pos);
-    void MoveEndMarker(const std::chrono::milliseconds& end_time,
-                       int x_pos);
+    void MoveEndMarker(const std::chrono::milliseconds& end_time, int x_pos);
 
     std::chrono::milliseconds GetBeginTime() const {
         return begin_marker_time_;

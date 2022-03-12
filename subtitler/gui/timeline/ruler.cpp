@@ -176,6 +176,7 @@ bool Ruler::eventFilter(QObject* watched, QEvent* event) {
                     interval->MoveBeginMarker(
                         new_begin_marker_time,
                         millisecondsToPosition(new_begin_marker_time));
+                    emit changeSubtitleIntervalTime(interval);
                 }
             }
             if (auto end_marker = interval->GetEndMarker();
@@ -189,6 +190,7 @@ bool Ruler::eventFilter(QObject* watched, QEvent* event) {
                     interval->MoveEndMarker(
                         new_end_marker_time,
                         millisecondsToPosition(new_end_marker_time));
+                    emit changeSubtitleIntervalTime(interval);
                 }
             }
         } else if (event->type() == QEvent::MouseButtonRelease && isHover) {

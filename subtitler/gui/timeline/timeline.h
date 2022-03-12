@@ -32,6 +32,7 @@ class Timeline : public QScrollArea {
     void playerChangedTime(std::chrono::milliseconds ms);
     void userDraggedRulerChangeTime(std::chrono::milliseconds ms);
     void openSubtitleEditor(SubtitleInterval* subtitle);
+    void changeSubtitleStartEndTime(SubtitleInterval* subtitle);
 
   public slots:
     // Handles outgoing time changes from the ruler.
@@ -46,6 +47,7 @@ class Timeline : public QScrollArea {
     void onPlayerPlay();
 
     void onSubtitleIntervalClicked(SubtitleInterval* subtitle);
+    void onChangeSubtitleStartEndTime(SubtitleInterval* subtitle);
 
   private:
     Ruler* ruler_;

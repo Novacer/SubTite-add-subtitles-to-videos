@@ -43,6 +43,7 @@ class Ruler : public QWidget {
     void changeIndicatorTime(std::chrono::milliseconds ms);
     void userChangedIndicatorTime(std::chrono::milliseconds ms);
     void subtitleIntervalClicked(SubtitleInterval* interval);
+    void changeSubtitleIntervalTime(SubtitleInterval* interval);
 
   public slots:
     void onZoomIn(int level);

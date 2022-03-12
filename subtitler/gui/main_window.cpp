@@ -175,9 +175,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(player_.get(), &QAVPlayer::videoFrame, this,
             &MainWindow::onVideoFrameDecoded);
 
-    // Handle opening/closing subtitle editor
+    // Handle changes to subtitle editor state.
     connect(timeline, &Timeline::openSubtitleEditor, editor,
             &SubtitleEditor::onOpenSubtitle);
+    connect(timeline, &Timeline::changeSubtitleStartEndTime, editor,
+            &SubtitleEditor::onSubtitleChangeStartEndTime);
 
     user_seeked_ = false;
 

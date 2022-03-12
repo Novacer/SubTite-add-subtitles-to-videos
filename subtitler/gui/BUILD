@@ -44,6 +44,7 @@ qt_cc_library(
     hdrs = ["subtitle_editor.h"],
     deps = [
         "//subtitler/gui/timeline:subtitle_interval",
+        "//subtitler/util:duration_format",
         "@qt//:qt_widgets",
     ],
 )

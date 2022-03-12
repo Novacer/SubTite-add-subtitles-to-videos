@@ -35,6 +35,8 @@ Timeline::Timeline(std::chrono::milliseconds duration, QWidget* parent)
             &Timeline::onUserDraggedRulerChangeTime);
     connect(ruler_, &Ruler::subtitleIntervalClicked, this,
             &Timeline::onSubtitleIntervalClicked);
+    connect(ruler_, &Ruler::changeSubtitleIntervalTime, this,
+            &Timeline::onChangeSubtitleStartEndTime);
 }
 
 void Timeline::onRulerChangedTime(std::chrono::milliseconds ms) {
@@ -55,6 +57,10 @@ void Timeline::onPlayerPlay() { ruler_->setPlaying(true); }
 
 void Timeline::onSubtitleIntervalClicked(SubtitleInterval* subtitle) {
     emit openSubtitleEditor(subtitle);
+}
+
+void Timeline::onChangeSubtitleStartEndTime(SubtitleInterval* subtitle) {
+    emit changeSubtitleStartEndTime(subtitle);
 }
 
 }  // namespace gui

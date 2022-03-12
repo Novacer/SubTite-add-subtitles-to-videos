@@ -4,6 +4,7 @@
 #include <QDockWidget>
 
 QT_FORWARD_DECLARE_CLASS(QPlainTextEdit)
+QT_FORWARD_DECLARE_CLASS(QLabel)
 
 namespace subtitler::gui {
 
@@ -27,9 +28,11 @@ class SubtitleEditor : public QDockWidget {
   public slots:
     void onOpenSubtitle(SubtitleInterval* subtitle);
     void onSubtitleTextChanged();
+    void onSubtitleChangeStartEndTime(SubtitleInterval* subtitle);
 
   private:
     QPlainTextEdit* text_edit_;
+    QLabel* begin_end_time_;
     SubtitleInterval* currently_editing_;
 };
 

@@ -24,7 +24,8 @@ namespace gui {
 class Timeline : public QScrollArea {
     Q_OBJECT
   public:
-    Timeline(std::chrono::milliseconds duration, QWidget* parent = Q_NULLPTR);
+    Timeline(std::chrono::milliseconds duration, const QString& output_srt_file,
+             QWidget* parent = Q_NULLPTR);
     ~Timeline() = default;
 
   signals:

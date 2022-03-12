@@ -25,7 +25,7 @@ namespace subtitler {
 namespace gui {
 
 Ruler::Ruler(QWidget* parent, std::chrono::milliseconds duration,
-             int zoom_level)
+             const QString& output_srt_file, int zoom_level)
     : QWidget{parent},
       zoom_level_{zoom_level},
       scroll_bar_{Q_NULLPTR},
@@ -36,7 +36,7 @@ Ruler::Ruler(QWidget* parent, std::chrono::milliseconds duration,
       duration_{duration},
       rect_width_{interval_width_ * duration_.count() / msPerInterval()},
       playing_{false} {
-    subtitle_intervals_ = new SubtitleIntervalContainer(this);
+    subtitle_intervals_ = new SubtitleIntervalContainer(output_srt_file, this);
     if (!subtitle_intervals_) {
         throw std::runtime_error{"Unable allocate subtitle container"};
     }

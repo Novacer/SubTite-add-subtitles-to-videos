@@ -103,7 +103,7 @@ SubRipItem::SubRipItem(const std::string &payload) {
             // Line may be modified.
             ass_pos_id_ = ExtractPosIdIfExists(line);
         }
-        append_line(line);
+        AppendLine(line);
     }
 }
 
@@ -156,13 +156,16 @@ bool SubRipItem::operator<(const SubRipItem &other) const {
     return duration_ < other.duration_;
 }
 
-SubRipItem *SubRipItem::append_line(const std::string &payload) {
-    payload_ << payload << std::endl;
+SubRipItem *SubRipItem::AppendLine(const std::string &payload) {
+    payload_ << payload;
+    if (!payload.empty() && payload.back() != '\n') {
+        payload_ << std::endl;
+    }
     ++num_lines_;
     return this;
 }
 
-SubRipItem *SubRipItem::clear_payload() {
+SubRipItem *SubRipItem::ClearPayload() {
     payload_ = std::ostringstream{};
     num_lines_ = 0;
     return this;

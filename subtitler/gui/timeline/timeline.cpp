@@ -10,9 +10,10 @@ using namespace std::chrono_literals;
 namespace subtitler {
 namespace gui {
 
-Timeline::Timeline(std::chrono::milliseconds duration, QWidget* parent)
+Timeline::Timeline(std::chrono::milliseconds duration,
+                   const QString& output_srt_file, QWidget* parent)
     : QScrollArea(parent) {
-    setMinimumSize(1000, 150);
+    setMinimumSize(1280, 150);
 
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -20,7 +21,7 @@ Timeline::Timeline(std::chrono::milliseconds duration, QWidget* parent)
     zoomer_->setMinimumWidth(300);
     addScrollBarWidget(zoomer_, Qt::AlignLeft);
 
-    ruler_ = new Ruler(this, duration, zoomer_->GetMaxZoomLevel());
+    ruler_ = new Ruler(this, duration, output_srt_file, zoomer_->GetMaxZoomLevel());
     setWidget(ruler_);
 
     connect(zoomer_, &Zoomer::zoomIn, ruler_, &Ruler::onZoomIn);

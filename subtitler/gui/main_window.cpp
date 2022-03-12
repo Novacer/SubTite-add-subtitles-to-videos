@@ -113,10 +113,23 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
         /* caption= */ tr("Open Video"),
         /* directory= */ "",
         /* filter= */ tr("Video Files (*.mp4)"));
+    
+    QString output_name = QFileDialog::getSaveFileName(
+        /* parent= */ this,
+        /* caption= */ tr("Create/Open Subtitle File"),
+        /* directory= */ "",
+        /* filter= */ tr("SRT Files (*.srt)")
+    );
+
     if (file_name.isEmpty()) {
         qDebug() << "No video file selected";
         QCoreApplication::exit(1);
     }
+
+    if (output_name.isEmpty()) {
+        qDebug() << "No output file selected";
+    }
+
     video_file_ = std::make_unique<QFile>(file_name);
     if (!video_file_->open(QFile::ReadOnly)) {
         qDebug() << "Video file could not be opened";
@@ -138,7 +151,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     avformat_free_context(pFormatCtx);
 
     std::chrono::milliseconds duration{duration_us / 1000};
-    Timeline *timeline = new Timeline{duration, placeholder};
+    Timeline *timeline = new Timeline{duration, output_name, placeholder};
 
     layout->addWidget(video_widget);
     layout->addWidget(play_button);

@@ -25,7 +25,7 @@ class Ruler : public QWidget {
     Q_OBJECT
   public:
     explicit Ruler(QWidget* parent, std::chrono::milliseconds duration,
-                   int zoom_level = 1);
+                   const QString& output_srt_file, int zoom_level = 1);
     ~Ruler();
 
     void setHeaderColor(const QColor& color) { header_bgrnd_ = color; }

@@ -26,19 +26,22 @@ class SubRipItem {
     // styling and subtitles...
     void ToStream(std::size_t sequence_number, std::ostream& output) const;
 
+    std::chrono::milliseconds start() const { return start_; }
+
     SubRipItem* start(std::chrono::milliseconds start) {
         start_ = start;
         return this;
     }
+
+    std::chrono::milliseconds duration() const { return duration_; }
 
     SubRipItem* duration(std::chrono::milliseconds duration) {
         duration_ = duration;
         return this;
     }
 
-    SubRipItem* append_line(const std::string& payload);
-
-    SubRipItem* clear_payload();
+    SubRipItem* AppendLine(const std::string& payload);
+    SubRipItem* ClearPayload();
 
     // Throws out_of_range if invalid position provided.
     SubRipItem* position(const std::string& position_id) {

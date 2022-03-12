@@ -21,16 +21,16 @@ class SubRipFileTest : public ::testing::Test {
   protected:
     void SetUp() override {
         SubRipItem item;
-        item.start(1s)->duration(5s)->append_line("third");
+        item.start(1s)->duration(5s)->AppendLine("third");
         file.AddItem(item);
 
-        item.start(2s)->duration(5s)->clear_payload()->append_line("fourth");
+        item.start(2s)->duration(5s)->ClearPayload()->AppendLine("fourth");
         file.AddItem(item);
 
-        item.start(1s)->duration(4s)->clear_payload()->append_line("second");
+        item.start(1s)->duration(4s)->ClearPayload()->AppendLine("second");
         file.AddItem(item);
 
-        item.start(0s)->duration(20s)->clear_payload()->append_line("first");
+        item.start(0s)->duration(20s)->ClearPayload()->AppendLine("first");
         file.AddItem(item);
     }
 
@@ -85,7 +85,7 @@ TEST_F(SubRipFileTest, FindCollisions) {
 
 TEST_F(SubRipFileTest, AddRemoveThenReadd) {
     SubRipItem item;
-    item.start(1s)->duration(5s)->append_line("third replace");
+    item.start(1s)->duration(5s)->AppendLine("third replace");
     file.RemoveItem(3);
     file.AddItem(item);
 

@@ -13,8 +13,9 @@ using namespace std::chrono_literals;
 namespace subtitler {
 namespace gui {
 
-SubtitleIntervalContainer::SubtitleIntervalContainer(QWidget* parent)
-    : QWidget{parent} {}
+SubtitleIntervalContainer::SubtitleIntervalContainer(
+    const QString& output_srt_file, QWidget* parent)
+    : QWidget{parent}, output_srt_file_{output_srt_file} {}
 
 SubtitleIntervalContainer::~SubtitleIntervalContainer() = default;
 
@@ -80,7 +81,7 @@ SubtitleInterval::SubtitleInterval(const SubtitleIntervalArgs& args,
     begin_marker_->move(args.start_x, args.start_y);
     begin_marker_->installEventFilter(parent);
     begin_marker_->show();
-    begin_marker_time_ = args.start_time;
+    item_.start(args.start_time);
 
     end_marker_ = new QLabel(parent);
     end_marker_->setPixmap(QPixmap(":/images/cutright"));
@@ -89,7 +90,7 @@ SubtitleInterval::SubtitleInterval(const SubtitleIntervalArgs& args,
     end_marker_->setCursor(Qt::SizeHorCursor);
     end_marker_->installEventFilter(parent);
     end_marker_->show();
-    end_marker_time_ = args.end_time;
+    item_.duration(args.end_time - args.start_time);
 
     rect_box_ = new QLabel(parent);
     rect_box_->setObjectName("cutrect");
@@ -100,21 +101,27 @@ SubtitleInterval::SubtitleInterval(const SubtitleIntervalArgs& args,
 
 void SubtitleInterval::MoveBeginMarker(
     const std::chrono::milliseconds& start_time, int x_pos) {
-    begin_marker_time_ = start_time;
+    const auto previous_end_time = item_.start() + item_.duration();
+    item_.start(start_time);
+    item_.duration(previous_end_time - item_.start());
+
     begin_marker_->move(x_pos, begin_marker_->y());
     updateRect();
 }
 
 void SubtitleInterval::MoveEndMarker(const std::chrono::milliseconds& end_time,
                                      int x_pos) {
-    end_marker_time_ = end_time;
+    item_.duration(end_time - item_.start());
+
     end_marker_->move(x_pos, end_marker_->y());
     updateRect();
 }
 
 void SubtitleInterval::SetSubtitleText(const QString& subtitle) {
-    subtitle_ = subtitle;
-    rect_box_->setText(subtitle_);
+    item_.ClearPayload();
+    item_.AppendLine(subtitle.toStdString());
+    subtitle_text_ = subtitle;
+    rect_box_->setText(subtitle_text_);
 }
 
 void SubtitleInterval::CleanupWithoutParentAsking() {

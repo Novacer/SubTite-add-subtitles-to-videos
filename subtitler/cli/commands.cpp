@@ -320,7 +320,7 @@ void Commands::AddSub(const std::vector<std::string> &tokens) {
         } else if (subtitle.rfind("/cancel", 0) == 0) {
             return;
         } else {
-            item.append_line(subtitle);
+            item.AppendLine(subtitle);
         }
     }
     if (item.num_lines() > 0) {

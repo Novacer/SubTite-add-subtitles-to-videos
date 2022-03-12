@@ -129,6 +129,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
         qDebug() << "No output file selected";
     }
 
+    subtitle_file_ = output_name;
+
     video_file_ = std::make_unique<QFile>(file_name);
     if (!video_file_->open(QFile::ReadOnly)) {
         qDebug() << "Video file could not be opened";
@@ -194,6 +196,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
             &SubtitleEditor::onSubtitleChangeStartEndTime);
     connect(timeline, &Timeline::changeSubtitleStartEndTimeFinished, editor,
             &SubtitleEditor::onSave);
+    connect(editor, &SubtitleEditor::saved, this,
+            &MainWindow::onSubtitleFileChanged);
 
     user_seeked_ = false;
 
@@ -233,6 +237,11 @@ void MainWindow::onVideoFrameDecoded(const QAVVideoFrame &video_frame) {
             user_seeked_ = false;
         }
     }
+}
+
+void MainWindow::onSubtitleFileChanged() {
+    player_->setFilter("");
+    player_->setFilter("subtitles='" + subtitle_file_ + "'");
 }
 
 }  // namespace gui

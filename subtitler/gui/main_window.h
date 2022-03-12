@@ -36,6 +36,7 @@ class MainWindow : public QMainWindow {
     void onRulerChangedTime(std::chrono::milliseconds ms);
     void onAudioFrameDecoded(const QAVAudioFrame &audio_frame);
     void onVideoFrameDecoded(const QAVVideoFrame &video_frame);
+    void onSubtitleFileChanged();
 
   private:
     std::unique_ptr<QAVPlayer> player_;
@@ -45,6 +46,7 @@ class MainWindow : public QMainWindow {
     // Flag var which is set when user moves the ruler,
     // and reset once the next video frame is decoded.
     bool user_seeked_;
+    QString subtitle_file_;
 };
 
 }  // namespace gui

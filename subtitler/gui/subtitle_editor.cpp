@@ -96,6 +96,7 @@ void SubtitleEditor::onSave() {
         return;
     }
     container_->SaveSubripFile();
+    emit saved();
 }
 
 void SubtitleEditor::onVisibilityChanged(bool visible) {

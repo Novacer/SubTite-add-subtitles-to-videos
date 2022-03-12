@@ -27,7 +27,7 @@ class SubtitleEditor : public QDockWidget {
     ~SubtitleEditor() = default;
 
   signals:
-    void saveSubtitles();
+    void saved();
 
   public slots:
     void onOpenSubtitle(SubtitleIntervalContainer* container,

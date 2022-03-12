@@ -15,8 +15,8 @@ TEST(SubRipItemTest, MultiLineSubtitle) {
     SubRipItem item;
     item.start(1s + 123ms)
         ->duration(5s)
-        ->append_line("This is a subtitle!")
-        ->append_line("This is another line!");
+        ->AppendLine("This is a subtitle!\n")
+        ->AppendLine("This is another line!");
 
     std::ostringstream output;
     item.ToStream(123, output);
@@ -34,9 +34,9 @@ TEST(SubRipItemTest, ClearSubtitle) {
     SubRipItem item;
     item.start(1s + 123ms)
         ->duration(5s)
-        ->append_line("This line should not be seen!")
-        ->clear_payload()
-        ->append_line("This line should be seen!");
+        ->AppendLine("This line should not be seen!")
+        ->ClearPayload()
+        ->AppendLine("This line should be seen!");
 
     std::ostringstream output;
     item.ToStream(123, output);
@@ -51,7 +51,7 @@ TEST(SubRipItemTest, ClearSubtitle) {
 
 TEST(SubRipItemTest, SetPosition) {
     SubRipItem item;
-    item.start(1s + 123ms)->duration(5s)->append_line("Hello World!");
+    item.start(1s + 123ms)->duration(5s)->AppendLine("Hello World!");
 
     ASSERT_EQ(1, item.num_lines());
 
@@ -85,8 +85,8 @@ TEST(SubRipItemTest, SetPositionThrowsOutOfRange) {
         item.start(1s + 123ms)
             ->duration(5s)
             ->position("blahblah")
-            ->append_line("Hello World!")
-            ->append_line("Foo bar baz.");
+            ->AppendLine("Hello World!")
+            ->AppendLine("Foo bar baz.");
 
         FAIL() << "Expected std::out_of_range exception";
     } catch (const std::out_of_range &e) {
@@ -105,11 +105,11 @@ TEST(SubRipItemTest, Compare) {
 
 TEST(SubRipItemTest, CopySemantics) {
     SubRipItem a, b;
-    b.append_line("should not see");
+    b.AppendLine("should not see");
     a.start(1s)
         ->duration(2s)
         ->position("bottom-left")
-        ->append_line("hello world");
+        ->AppendLine("hello world");
     b = a;
 
     std::ostringstream output_b;
@@ -131,11 +131,11 @@ TEST(SubRipItemTest, CopySemantics) {
 
 TEST(SubRipItemTest, MoveSemantics) {
     SubRipItem a, b;
-    b.append_line("should not see");
+    b.AppendLine("should not see");
     a.start(1s)
         ->duration(2s)
         ->position("bottom-left")
-        ->append_line("hello world");
+        ->AppendLine("hello world");
     b = std::move(a);
 
     std::ostringstream output_b;

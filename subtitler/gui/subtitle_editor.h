@@ -4,10 +4,12 @@
 #include <QDockWidget>
 
 QT_FORWARD_DECLARE_CLASS(QPlainTextEdit)
+QT_FORWARD_DECLARE_CLASS(QLabel)
 
 namespace subtitler::gui {
 
 QT_FORWARD_DECLARE_CLASS(SubtitleInterval)
+QT_FORWARD_DECLARE_CLASS(SubtitleIntervalContainer)
 
 }  // namespace subtitler::gui
 
@@ -24,13 +26,23 @@ class SubtitleEditor : public QDockWidget {
     SubtitleEditor(QWidget* parent = Q_NULLPTR);
     ~SubtitleEditor() = default;
 
+  signals:
+    void saved();
+
   public slots:
-    void onOpenSubtitle(SubtitleInterval* subtitle);
+    void onOpenSubtitle(SubtitleIntervalContainer* container,
+                        SubtitleInterval* subtitle);
     void onSubtitleTextChanged();
+    void onSubtitleChangeStartEndTime(SubtitleInterval* subtitle);
+    void onSave();
+    void onVisibilityChanged(bool visible);
 
   private:
     QPlainTextEdit* text_edit_;
+    QLabel* begin_end_time_;
     SubtitleInterval* currently_editing_;
+    SubtitleIntervalContainer* container_;
+    bool prev_visibility_;
 };
 
 }  // namespace gui

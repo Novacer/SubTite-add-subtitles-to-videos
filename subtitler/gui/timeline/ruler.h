@@ -25,7 +25,7 @@ class Ruler : public QWidget {
     Q_OBJECT
   public:
     explicit Ruler(QWidget* parent, std::chrono::milliseconds duration,
-                   int zoom_level = 1);
+                   const QString& output_srt_file, int zoom_level = 1);
     ~Ruler();
 
     void setHeaderColor(const QColor& color) { header_bgrnd_ = color; }
@@ -42,7 +42,10 @@ class Ruler : public QWidget {
     void changeZoomPosition(int level);
     void changeIndicatorTime(std::chrono::milliseconds ms);
     void userChangedIndicatorTime(std::chrono::milliseconds ms);
-    void subtitleIntervalClicked(SubtitleInterval* interval);
+    void subtitleIntervalClicked(SubtitleIntervalContainer* container,
+                                 SubtitleInterval* interval);
+    void changeSubtitleIntervalTime(SubtitleInterval* interval);
+    void changeSubtitleIntervalTimeFinished(SubtitleInterval* interval);
 
   public slots:
     void onZoomIn(int level);

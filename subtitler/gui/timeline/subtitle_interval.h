@@ -5,6 +5,9 @@
 #include <QWidget>
 #include <chrono>
 #include <memory>
+#include <string>
+
+#include "subtitler/srt/subrip_item.h"
 
 QT_FORWARD_DECLARE_CLASS(QLabel)
 QT_FORWARD_DECLARE_CLASS(QFrame)
@@ -28,7 +31,8 @@ namespace gui {
 class SubtitleIntervalContainer : public QWidget {
     Q_OBJECT
   public:
-    SubtitleIntervalContainer(QWidget* parent = Q_NULLPTR);
+    SubtitleIntervalContainer(const QString& output_srt_file,
+                              QWidget* parent = Q_NULLPTR);
     ~SubtitleIntervalContainer();
 
     // Unique_ptr required to memory manage SubtitleInterval since it is
@@ -46,10 +50,14 @@ class SubtitleIntervalContainer : public QWidget {
         return intervals_;
     };
 
+  public slots:
+    void SaveSubripFile();
+
   private:
     std::vector<std::unique_ptr<SubtitleInterval>> intervals_;
     std::unordered_map<QObject*, SubtitleInterval*> marker_to_interval_map_;
     std::unordered_map<QObject*, SubtitleInterval*> rect_to_interval_map_;
+    std::string output_srt_file_;
 };
 
 /**
@@ -87,14 +95,17 @@ class SubtitleInterval {
     void MoveEndMarker(const std::chrono::milliseconds& end_time, int x_pos);
     void SetSubtitleText(const QString& subtitle);
 
-    std::chrono::milliseconds GetBeginTime() const {
-        return begin_marker_time_;
+    std::chrono::milliseconds GetBeginTime() const { return item_.start(); }
+    std::chrono::milliseconds GetEndTime() const {
+        return item_.start() + item_.duration();
     }
-    std::chrono::milliseconds GetEndTime() const { return end_marker_time_; }
+
     QLabel* GetBeginMarker() const { return begin_marker_; }
     QLabel* GetEndMarker() const { return end_marker_; }
+
     QLabel* GetRect() const { return rect_box_; }
-    QString GetSubtitleText() const { return subtitle_; }
+
+    QString GetSubtitleText() const { return subtitle_text_; }
 
     // Cleans up child widgets. Should only be used if SubtitleInterval
     // is going to be destroyed from a context where it is NOT the parent
@@ -104,16 +115,17 @@ class SubtitleInterval {
 
   private:
     QLabel* begin_marker_;
-    std::chrono::milliseconds begin_marker_time_;
-
     QLabel* end_marker_;
-    std::chrono::milliseconds end_marker_time_;
-
     QLabel* rect_box_;
 
-    QString subtitle_;
+    srt::SubRipItem item_;
+    // Payload of SubRipItem may contain  additional formatting, so we also
+    // separately store the subtitle_text before any formatting.
+    QString subtitle_text_;
 
     void updateRect();
+
+    friend class SubtitleIntervalContainer;
 };
 
 }  // namespace gui

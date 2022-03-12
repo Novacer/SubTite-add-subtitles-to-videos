@@ -25,7 +25,7 @@ namespace subtitler {
 namespace gui {
 
 Ruler::Ruler(QWidget* parent, std::chrono::milliseconds duration,
-             int zoom_level)
+             const QString& output_srt_file, int zoom_level)
     : QWidget{parent},
       zoom_level_{zoom_level},
       scroll_bar_{Q_NULLPTR},
@@ -36,7 +36,7 @@ Ruler::Ruler(QWidget* parent, std::chrono::milliseconds duration,
       duration_{duration},
       rect_width_{interval_width_ * duration_.count() / msPerInterval()},
       playing_{false} {
-    subtitle_intervals_ = new SubtitleIntervalContainer(this);
+    subtitle_intervals_ = new SubtitleIntervalContainer(output_srt_file, this);
     if (!subtitle_intervals_) {
         throw std::runtime_error{"Unable allocate subtitle container"};
     }
@@ -176,6 +176,7 @@ bool Ruler::eventFilter(QObject* watched, QEvent* event) {
                     interval->MoveBeginMarker(
                         new_begin_marker_time,
                         millisecondsToPosition(new_begin_marker_time));
+                    emit changeSubtitleIntervalTime(interval);
                 }
             }
             if (auto end_marker = interval->GetEndMarker();
@@ -189,6 +190,7 @@ bool Ruler::eventFilter(QObject* watched, QEvent* event) {
                     interval->MoveEndMarker(
                         new_end_marker_time,
                         millisecondsToPosition(new_end_marker_time));
+                    emit changeSubtitleIntervalTime(interval);
                 }
             }
         } else if (event->type() == QEvent::MouseButtonRelease && isHover) {
@@ -197,13 +199,17 @@ bool Ruler::eventFilter(QObject* watched, QEvent* event) {
                 // Only emit this when user releases mouse to prevent
                 // spamming video player with seeks and overloading the decoder.
                 emit userChangedIndicatorTime(indicator_time_);
+            } else if (auto* interval =
+                           subtitle_intervals_->GetIntervalFromMarker(watched);
+                       interval != Q_NULLPTR) {
+                emit changeSubtitleIntervalTimeFinished(interval);
             }
         }
     } else if (auto* interval =
                    subtitle_intervals_->GetIntervalFromRect(watched);
                interval != Q_NULLPTR) {
         if (event->type() == QEvent::MouseButtonRelease) {
-            emit subtitleIntervalClicked(interval);
+            emit subtitleIntervalClicked(subtitle_intervals_, interval);
         }
     }
 

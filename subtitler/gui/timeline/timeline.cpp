@@ -10,9 +10,10 @@ using namespace std::chrono_literals;
 namespace subtitler {
 namespace gui {
 
-Timeline::Timeline(std::chrono::milliseconds duration, QWidget* parent)
+Timeline::Timeline(std::chrono::milliseconds duration,
+                   const QString& output_srt_file, QWidget* parent)
     : QScrollArea(parent) {
-    setMinimumSize(1000, 150);
+    setMinimumSize(1280, 150);
 
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -20,7 +21,8 @@ Timeline::Timeline(std::chrono::milliseconds duration, QWidget* parent)
     zoomer_->setMinimumWidth(300);
     addScrollBarWidget(zoomer_, Qt::AlignLeft);
 
-    ruler_ = new Ruler(this, duration, zoomer_->GetMaxZoomLevel());
+    ruler_ =
+        new Ruler(this, duration, output_srt_file, zoomer_->GetMaxZoomLevel());
     setWidget(ruler_);
 
     connect(zoomer_, &Zoomer::zoomIn, ruler_, &Ruler::onZoomIn);
@@ -35,6 +37,10 @@ Timeline::Timeline(std::chrono::milliseconds duration, QWidget* parent)
             &Timeline::onUserDraggedRulerChangeTime);
     connect(ruler_, &Ruler::subtitleIntervalClicked, this,
             &Timeline::onSubtitleIntervalClicked);
+    connect(ruler_, &Ruler::changeSubtitleIntervalTime, this,
+            &Timeline::onChangeSubtitleStartEndTime);
+    connect(ruler_, &Ruler::changeSubtitleIntervalTimeFinished, this,
+            &Timeline::onChangeSubtitleStartEndTimeFinished);
 }
 
 void Timeline::onRulerChangedTime(std::chrono::milliseconds ms) {
@@ -53,8 +59,18 @@ void Timeline::onPlayerPause() { ruler_->setPlaying(false); }
 
 void Timeline::onPlayerPlay() { ruler_->setPlaying(true); }
 
-void Timeline::onSubtitleIntervalClicked(SubtitleInterval* subtitle) {
-    emit openSubtitleEditor(subtitle);
+void Timeline::onSubtitleIntervalClicked(SubtitleIntervalContainer* container,
+                                         SubtitleInterval* subtitle) {
+    emit openSubtitleEditor(container, subtitle);
+}
+
+void Timeline::onChangeSubtitleStartEndTime(SubtitleInterval* subtitle) {
+    emit changeSubtitleStartEndTime(subtitle);
+}
+
+void Timeline::onChangeSubtitleStartEndTimeFinished(
+    SubtitleInterval* subtitle) {
+    emit changeSubtitleStartEndTimeFinished(subtitle);
 }
 
 }  // namespace gui

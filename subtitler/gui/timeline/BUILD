@@ -69,6 +69,8 @@ qt_cc_library(
     hdrs = ["subtitle_interval.h"],
     deps = [
         "//subtitler/gui/resource:resources",
+        "//subtitler/srt:subrip_file",
+        "//subtitler/srt:subrip_item",
         "@qt//:qt_core",
         "@qt//:qt_widgets",
     ],

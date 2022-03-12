@@ -113,10 +113,24 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
         /* caption= */ tr("Open Video"),
         /* directory= */ "",
         /* filter= */ tr("Video Files (*.mp4)"));
+
+    QString output_name = QFileDialog::getSaveFileName(
+        /* parent= */ this,
+        /* caption= */ tr("Create/Open Subtitle File"),
+        /* directory= */ "",
+        /* filter= */ tr("SRT Files (*.srt)"));
+
     if (file_name.isEmpty()) {
         qDebug() << "No video file selected";
         QCoreApplication::exit(1);
     }
+
+    if (output_name.isEmpty()) {
+        qDebug() << "No output file selected";
+    }
+
+    subtitle_file_ = output_name;
+
     video_file_ = std::make_unique<QFile>(file_name);
     if (!video_file_->open(QFile::ReadOnly)) {
         qDebug() << "Video file could not be opened";
@@ -138,7 +152,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     avformat_free_context(pFormatCtx);
 
     std::chrono::milliseconds duration{duration_us / 1000};
-    Timeline *timeline = new Timeline{duration, placeholder};
+    Timeline *timeline = new Timeline{duration, output_name, placeholder};
 
     layout->addWidget(video_widget);
     layout->addWidget(play_button);
@@ -175,9 +189,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(player_.get(), &QAVPlayer::videoFrame, this,
             &MainWindow::onVideoFrameDecoded);
 
-    // Handle opening/closing subtitle editor
+    // Handle changes to subtitle editor state.
     connect(timeline, &Timeline::openSubtitleEditor, editor,
             &SubtitleEditor::onOpenSubtitle);
+    connect(timeline, &Timeline::changeSubtitleStartEndTime, editor,
+            &SubtitleEditor::onSubtitleChangeStartEndTime);
+    connect(timeline, &Timeline::changeSubtitleStartEndTimeFinished, editor,
+            &SubtitleEditor::onSave);
+    connect(editor, &SubtitleEditor::saved, this,
+            &MainWindow::onSubtitleFileChanged);
 
     user_seeked_ = false;
 
@@ -217,6 +237,13 @@ void MainWindow::onVideoFrameDecoded(const QAVVideoFrame &video_frame) {
             user_seeked_ = false;
         }
     }
+}
+
+void MainWindow::onSubtitleFileChanged() {
+    player_->setFilter("");
+    QString escaped_path = subtitle_file_;
+    escaped_path.replace(":", "\\:");
+    player_->setFilter("subtitles='" + escaped_path + "'");
 }
 
 }  // namespace gui

@@ -10,6 +10,7 @@
 namespace subtitler::gui {
 
 QT_FORWARD_DECLARE_CLASS(SubtitleInterval);
+QT_FORWARD_DECLARE_CLASS(SubtitleIntervalContainer);
 
 }  // namespace subtitler::gui
 
@@ -24,14 +25,18 @@ namespace gui {
 class Timeline : public QScrollArea {
     Q_OBJECT
   public:
-    Timeline(std::chrono::milliseconds duration, QWidget* parent = Q_NULLPTR);
+    Timeline(std::chrono::milliseconds duration, const QString& output_srt_file,
+             QWidget* parent = Q_NULLPTR);
     ~Timeline() = default;
 
   signals:
     void rulerChangedTime(std::chrono::milliseconds ms);
     void playerChangedTime(std::chrono::milliseconds ms);
     void userDraggedRulerChangeTime(std::chrono::milliseconds ms);
-    void openSubtitleEditor(SubtitleInterval* subtitle);
+    void openSubtitleEditor(SubtitleIntervalContainer* container,
+                            SubtitleInterval* subtitle);
+    void changeSubtitleStartEndTime(SubtitleInterval* subtitle);
+    void changeSubtitleStartEndTimeFinished(SubtitleInterval* subtitle);
 
   public slots:
     // Handles outgoing time changes from the ruler.
@@ -45,7 +50,10 @@ class Timeline : public QScrollArea {
     void onPlayerPause();
     void onPlayerPlay();
 
-    void onSubtitleIntervalClicked(SubtitleInterval* subtitle);
+    void onSubtitleIntervalClicked(SubtitleIntervalContainer* container,
+                                   SubtitleInterval* subtitle);
+    void onChangeSubtitleStartEndTime(SubtitleInterval* subtitle);
+    void onChangeSubtitleStartEndTimeFinished(SubtitleInterval* subtitle);
 
   private:
     Ruler* ruler_;

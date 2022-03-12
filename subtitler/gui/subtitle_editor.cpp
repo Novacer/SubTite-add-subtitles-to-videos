@@ -71,9 +71,10 @@ void SubtitleEditor::onOpenSubtitle(SubtitleIntervalContainer* container,
         return;
     }
     text_edit_->setPlainText(subtitle->GetSubtitleText());
-
     begin_end_time_->setText(FormatSubtitleStartEndString(subtitle));
     setVisible(true);
+
+    onSave();
 }
 
 void SubtitleEditor::onSubtitleTextChanged() {
@@ -99,6 +100,7 @@ void SubtitleEditor::onSave() {
     emit saved();
 }
 
+// Save when closing editor.
 void SubtitleEditor::onVisibilityChanged(bool visible) {
     if (prev_visibility_ != visible && !visible) {
         onSave();

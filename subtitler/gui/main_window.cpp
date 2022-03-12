@@ -241,7 +241,9 @@ void MainWindow::onVideoFrameDecoded(const QAVVideoFrame &video_frame) {
 
 void MainWindow::onSubtitleFileChanged() {
     player_->setFilter("");
-    player_->setFilter("subtitles='" + subtitle_file_ + "'");
+    QString escaped_path = subtitle_file_;
+    escaped_path.replace(":", "\\:");
+    player_->setFilter("subtitles='" + escaped_path + "'");
 }
 
 }  // namespace gui

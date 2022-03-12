@@ -41,7 +41,11 @@ Timeline::Timeline(std::chrono::milliseconds duration,
             &Timeline::onChangeSubtitleStartEndTime);
     connect(ruler_, &Ruler::changeSubtitleIntervalTimeFinished, this,
             &Timeline::onChangeSubtitleStartEndTimeFinished);
+    connect(ruler_, &Ruler::subtitleFileLoaded, this,
+            &Timeline::onSubtitleFileLoaded);
 }
+
+void Timeline::LoadSubtitles() { ruler_->LoadSubtitles(); }
 
 void Timeline::onRulerChangedTime(std::chrono::milliseconds ms) {
     emit rulerChangedTime(ms);
@@ -72,6 +76,8 @@ void Timeline::onChangeSubtitleStartEndTimeFinished(
     SubtitleInterval* subtitle) {
     emit changeSubtitleStartEndTimeFinished(subtitle);
 }
+
+void Timeline::onSubtitleFileLoaded() { emit subtitleFileLoaded(); }
 
 }  // namespace gui
 }  // namespace subtitler

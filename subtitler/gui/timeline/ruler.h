@@ -28,6 +28,10 @@ class Ruler : public QWidget {
                    const QString& output_srt_file, int zoom_level = 1);
     ~Ruler();
 
+    // Loads internal state from the external output_srt_file.
+    // Emits subtitleFileLoaded() signal if successful.
+    void LoadSubtitles();
+
     void setHeaderColor(const QColor& color) { header_bgrnd_ = color; }
 
     void setDuration(std::chrono::milliseconds duration) {
@@ -46,6 +50,7 @@ class Ruler : public QWidget {
                                  SubtitleInterval* interval);
     void changeSubtitleIntervalTime(SubtitleInterval* interval);
     void changeSubtitleIntervalTimeFinished(SubtitleInterval* interval);
+    void subtitleFileLoaded();
 
   public slots:
     void onZoomIn(int level);

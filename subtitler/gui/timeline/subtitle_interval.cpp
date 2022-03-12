@@ -3,7 +3,6 @@
 #include <QDebug>
 #include <QFrame>
 #include <QLabel>
-#include <filesystem>
 #include <fstream>
 #include <stdexcept>
 
@@ -14,13 +13,15 @@
 #define BODY_HEIGHT 80
 
 using namespace std::chrono_literals;
+namespace fs = std::filesystem;
 
 namespace subtitler {
 namespace gui {
 
 SubtitleIntervalContainer::SubtitleIntervalContainer(
     const QString& output_srt_file, QWidget* parent)
-    : QWidget{parent}, output_srt_file_{output_srt_file.toStdString()} {}
+    : QWidget{parent},
+      output_srt_file_{fs::u8path(output_srt_file.toStdString())} {}
 
 SubtitleIntervalContainer::~SubtitleIntervalContainer() = default;
 
@@ -73,26 +74,58 @@ SubtitleInterval* SubtitleIntervalContainer::GetIntervalFromRect(
 }
 
 void SubtitleIntervalContainer::SaveSubripFile() {
+    if (output_srt_file_.empty()) {
+        return;
+    }
+
     srt::SubRipFile srt_file;
     for (const auto& interval : intervals_) {
         srt_file.AddItem(interval->item_);
     }
 
-    namespace fs = std::filesystem;
-    auto path_wrapper = fs::u8path(output_srt_file_);
-    std::ofstream file{path_wrapper, std::ofstream::out | std::ofstream::trunc};
+    std::ofstream file{output_srt_file_,
+                       std::ofstream::out | std::ofstream::trunc};
     if (!file) {
         // TODO: maybe open dialog and warn user rather than using debug?
         qDebug() << "Could not open "
-                 << QString::fromStdString(output_srt_file_);
+                 << QString::fromStdString(output_srt_file_.string());
         return;
     }
     srt_file.ToStream(file);
     qDebug() << "Saved!";
 }
 
-SubtitleInterval::SubtitleInterval(const SubtitleIntervalArgs& args,
-                                   QWidget* parent) {
+bool SubtitleIntervalContainer::LoadSubripFile(qreal interval_width,
+                                               quint32 ms_per_interval,
+                                               int y_coord) {
+    srt::SubRipFile srt_file;
+    if (!fs::exists(output_srt_file_) || output_srt_file_.empty()) {
+        qDebug() << "No subtitle file to load";
+        return false;
+    }
+    try {
+        srt_file.LoadState(output_srt_file_.u8string());
+        if (srt_file.NumItems() == 0) {
+            qDebug() << "No subtitle items found!";
+            return false;
+        }
+        qDebug() << "Loaded subtitles!";
+        DeleteAll();
+
+        const auto& subrip_items = srt_file.GetItems();
+        for (const auto& subrip_item : subrip_items) {
+            AddInterval(std::make_unique<SubtitleInterval>(
+                subrip_item, interval_width, ms_per_interval, y_coord,
+                parentWidget()));
+        }
+    } catch (const std::exception& e) {
+        qDebug() << "Failed to load subtitle: " << e.what();
+        return false;
+    }
+    return true;
+}
+
+void SubtitleInterval::initializeChildren(QWidget* parent) {
     if (parent == Q_NULLPTR) {
         throw std::invalid_argument(
             "Parent of SubtitleInvterval cannot be null");
@@ -102,25 +135,54 @@ SubtitleInterval::SubtitleInterval(const SubtitleIntervalArgs& args,
     begin_marker_->setPixmap(QPixmap(":/images/cutleft"));
     begin_marker_->setCursor(Qt::SizeHorCursor);
     begin_marker_->setFixedSize(CUT_MARKER_WIDTH, CUT_MARKER_HEIGHT);
-    begin_marker_->move(args.start_x, args.start_y);
     begin_marker_->installEventFilter(parent);
     begin_marker_->show();
-    item_.start(args.start_time);
 
     end_marker_ = new QLabel(parent);
     end_marker_->setPixmap(QPixmap(":/images/cutright"));
     end_marker_->setFixedSize(CUT_MARKER_WIDTH, CUT_MARKER_HEIGHT);
-    end_marker_->move(args.end_x, args.end_y);
     end_marker_->setCursor(Qt::SizeHorCursor);
     end_marker_->installEventFilter(parent);
     end_marker_->show();
-    item_.duration(args.end_time - args.start_time);
 
     rect_box_ = new QLabel(parent);
     rect_box_->setObjectName("cutrect");
     rect_box_->installEventFilter(parent);
-    updateRect();
     rect_box_->show();
+}
+
+SubtitleInterval::SubtitleInterval(const SubtitleIntervalArgs& args,
+                                   QWidget* parent) {
+    initializeChildren(parent);
+
+    begin_marker_->move(args.start_x, args.start_y);
+    item_.start(args.start_time);
+
+    end_marker_->move(args.end_x, args.end_y);
+    item_.duration(args.end_time - args.start_time);
+
+    updateRect();
+}
+
+SubtitleInterval::SubtitleInterval(const srt::SubRipItem& item,
+                                   qreal interval_width,
+                                   quint32 ms_per_interval, int y_coord,
+                                   QWidget* parent)
+    : item_{item} {
+    initializeChildren(parent);
+
+    int start_x = item.start().count() * interval_width / ms_per_interval;
+    begin_marker_->move(start_x, y_coord);
+
+    int end_x = (item.start() + item.duration()).count() * interval_width /
+                ms_per_interval;
+    end_marker_->move(end_x, y_coord);
+
+    updateRect();
+
+    // Make sure subtitle text state is set properly.
+    subtitle_text_ = QString::fromStdString(item.GetPayload());
+    SetSubtitleText(subtitle_text_);
 }
 
 void SubtitleInterval::MoveBeginMarker(

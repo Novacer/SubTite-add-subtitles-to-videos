@@ -29,6 +29,9 @@ class Timeline : public QScrollArea {
              QWidget* parent = Q_NULLPTR);
     ~Timeline() = default;
 
+    // Loads internal state from the external output_srt_file.
+    void LoadSubtitles();
+
   signals:
     void rulerChangedTime(std::chrono::milliseconds ms);
     void playerChangedTime(std::chrono::milliseconds ms);
@@ -37,6 +40,7 @@ class Timeline : public QScrollArea {
                             SubtitleInterval* subtitle);
     void changeSubtitleStartEndTime(SubtitleInterval* subtitle);
     void changeSubtitleStartEndTimeFinished(SubtitleInterval* subtitle);
+    void subtitleFileLoaded();
 
   public slots:
     // Handles outgoing time changes from the ruler.
@@ -54,6 +58,7 @@ class Timeline : public QScrollArea {
                                    SubtitleInterval* subtitle);
     void onChangeSubtitleStartEndTime(SubtitleInterval* subtitle);
     void onChangeSubtitleStartEndTimeFinished(SubtitleInterval* subtitle);
+    void onSubtitleFileLoaded();
 
   private:
     Ruler* ruler_;

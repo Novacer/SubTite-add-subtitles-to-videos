@@ -196,8 +196,16 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
             &SubtitleEditor::onSubtitleChangeStartEndTime);
     connect(timeline, &Timeline::changeSubtitleStartEndTimeFinished, editor,
             &SubtitleEditor::onSave);
+
+    // Handles changes to subtitle file.
     connect(editor, &SubtitleEditor::saved, this,
             &MainWindow::onSubtitleFileChanged);
+    connect(timeline, &Timeline::subtitleFileLoaded, this,
+            &MainWindow::onSubtitleFileChanged);
+
+    if (!subtitle_file_.isEmpty()) {
+        timeline->LoadSubtitles();
+    }
 
     user_seeked_ = false;
 

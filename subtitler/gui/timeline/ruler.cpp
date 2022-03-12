@@ -81,6 +81,14 @@ void Ruler::resetChildren(std::chrono::milliseconds duration) {
     resize(rect_width_ + START_END_PADDING, HEADER_HEIGHT + BODY_HEIGHT);
 }
 
+void Ruler::LoadSubtitles() {
+    bool loaded = subtitle_intervals_->LoadSubripFile(
+        interval_width_, msPerInterval(), HEADER_HEIGHT);
+    if (loaded) {
+        emit subtitleFileLoaded();
+    }
+}
+
 void Ruler::onMoveIndicator(std::chrono::milliseconds frame_time) {
     if (frame_time > duration_) {
         return;

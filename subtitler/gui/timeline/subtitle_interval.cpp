@@ -1,8 +1,13 @@
 #include "subtitler/gui/timeline/subtitle_interval.h"
 
+#include <QDebug>
 #include <QFrame>
 #include <QLabel>
+#include <filesystem>
+#include <fstream>
 #include <stdexcept>
+
+#include "subtitler/srt/subrip_file.h"
 
 #define CUT_MARKER_WIDTH 10
 #define CUT_MARKER_HEIGHT 86
@@ -15,7 +20,7 @@ namespace gui {
 
 SubtitleIntervalContainer::SubtitleIntervalContainer(
     const QString& output_srt_file, QWidget* parent)
-    : QWidget{parent}, output_srt_file_{output_srt_file} {}
+    : QWidget{parent}, output_srt_file_{output_srt_file.toStdString()} {}
 
 SubtitleIntervalContainer::~SubtitleIntervalContainer() = default;
 
@@ -65,6 +70,25 @@ SubtitleInterval* SubtitleIntervalContainer::GetIntervalFromRect(
         return it->second;
     }
     return Q_NULLPTR;
+}
+
+void SubtitleIntervalContainer::SaveSubripFile() {
+    srt::SubRipFile srt_file;
+    for (const auto& interval : intervals_) {
+        srt_file.AddItem(interval->item_);
+    }
+
+    namespace fs = std::filesystem;
+    auto path_wrapper = fs::u8path(output_srt_file_);
+    std::ofstream file{path_wrapper, std::ofstream::out | std::ofstream::trunc};
+    if (!file) {
+        // TODO: maybe open dialog and warn user rather than using debug?
+        qDebug() << "Could not open "
+                 << QString::fromStdString(output_srt_file_);
+        return;
+    }
+    srt_file.ToStream(file);
+    qDebug() << "Saved!";
 }
 
 SubtitleInterval::SubtitleInterval(const SubtitleIntervalArgs& args,

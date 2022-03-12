@@ -199,13 +199,17 @@ bool Ruler::eventFilter(QObject* watched, QEvent* event) {
                 // Only emit this when user releases mouse to prevent
                 // spamming video player with seeks and overloading the decoder.
                 emit userChangedIndicatorTime(indicator_time_);
+            } else if (auto* interval =
+                           subtitle_intervals_->GetIntervalFromMarker(watched);
+                       interval != Q_NULLPTR) {
+                emit changeSubtitleIntervalTimeFinished(interval);
             }
         }
     } else if (auto* interval =
                    subtitle_intervals_->GetIntervalFromRect(watched);
                interval != Q_NULLPTR) {
         if (event->type() == QEvent::MouseButtonRelease) {
-            emit subtitleIntervalClicked(interval);
+            emit subtitleIntervalClicked(subtitle_intervals_, interval);
         }
     }
 

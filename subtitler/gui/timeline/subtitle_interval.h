@@ -5,8 +5,8 @@
 #include <QWidget>
 #include <chrono>
 #include <memory>
+#include <string>
 
-#include "subtitler/srt/subrip_file.h"
 #include "subtitler/srt/subrip_item.h"
 
 QT_FORWARD_DECLARE_CLASS(QLabel)
@@ -50,11 +50,14 @@ class SubtitleIntervalContainer : public QWidget {
         return intervals_;
     };
 
+  public slots:
+    void SaveSubripFile();
+
   private:
     std::vector<std::unique_ptr<SubtitleInterval>> intervals_;
     std::unordered_map<QObject*, SubtitleInterval*> marker_to_interval_map_;
     std::unordered_map<QObject*, SubtitleInterval*> rect_to_interval_map_;
-    QString output_srt_file_;
+    std::string output_srt_file_;
 };
 
 /**
@@ -121,6 +124,8 @@ class SubtitleInterval {
     QString subtitle_text_;
 
     void updateRect();
+
+    friend class SubtitleIntervalContainer;
 };
 
 }  // namespace gui

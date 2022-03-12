@@ -113,13 +113,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
         /* caption= */ tr("Open Video"),
         /* directory= */ "",
         /* filter= */ tr("Video Files (*.mp4)"));
-    
+
     QString output_name = QFileDialog::getSaveFileName(
         /* parent= */ this,
         /* caption= */ tr("Create/Open Subtitle File"),
         /* directory= */ "",
-        /* filter= */ tr("SRT Files (*.srt)")
-    );
+        /* filter= */ tr("SRT Files (*.srt)"));
 
     if (file_name.isEmpty()) {
         qDebug() << "No video file selected";
@@ -193,6 +192,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
             &SubtitleEditor::onOpenSubtitle);
     connect(timeline, &Timeline::changeSubtitleStartEndTime, editor,
             &SubtitleEditor::onSubtitleChangeStartEndTime);
+    connect(timeline, &Timeline::changeSubtitleStartEndTimeFinished, editor,
+            &SubtitleEditor::onSave);
 
     user_seeked_ = false;
 

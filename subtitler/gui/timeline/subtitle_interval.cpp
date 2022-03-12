@@ -88,7 +88,7 @@ void SubtitleIntervalContainer::SaveSubripFile() {
     if (!file) {
         // TODO: maybe open dialog and warn user rather than using debug?
         qDebug() << "Could not open "
-                 << QString::fromStdString(output_srt_file_.string());
+                 << QString::fromStdString(output_srt_file_.u8string());
         return;
     }
     srt_file.ToStream(file);

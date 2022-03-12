@@ -1,18 +1,26 @@
-#ifndef SUBTITLER_RULER_H
-#define SUBTITLER_RULER_H
+#ifndef SUBTITLER_GUI_RULER_H
+#define SUBTITLER_GUI_RULER_H
 
 #include <QTime>
 #include <QTimer>
 #include <QWidget>
 #include <chrono>
 
-#include "subtitler/experimental/qt_gui/timeline/indicator.h"
-#include "subtitler/experimental/qt_gui/timeline/subtitle_interval.h"
+#include "subtitler/gui/timeline/indicator.h"
+#include "subtitler/gui/timeline/subtitle_interval.h"
 
 QT_FORWARD_DECLARE_CLASS(QAction)
 QT_FORWARD_DECLARE_CLASS(QMenu)
 QT_FORWARD_DECLARE_CLASS(QScrollBar)
 
+namespace subtitler {
+namespace gui {
+
+/**
+ * The ruler widget controls the current indicator position, as well
+ * as repositioning the timeline during resizing and zooming.
+ * A context menu is available when right clicking.
+ */
 class Ruler : public QWidget {
     Q_OBJECT
   public:
@@ -84,5 +92,8 @@ class Ruler : public QWidget {
     qreal rect_width_;
     bool playing_;
 };
+
+}  // namespace gui
+}  // namespace subtitler
 
 #endif

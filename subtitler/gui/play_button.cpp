@@ -1,7 +1,13 @@
-#include "subtitler/experimental/qt_gui/play_button.h"
+#include "subtitler/gui/play_button.h"
 
-const char * PLAY_MSG = "play";
-const char * PAUSE_MSG = "pause";
+namespace subtitler {
+namespace gui {
+namespace {
+
+const char *PLAY_MSG = "play";
+const char *PAUSE_MSG = "pause";
+
+}  // namespace
 
 PlayButton::PlayButton(QWidget *parent)
     : QPushButton{PLAY_MSG, parent}, is_playing_{false} {
@@ -18,3 +24,6 @@ void PlayButton::onClick() {
         emit pause();
     }
 }
+
+}  // namespace gui
+}  // namespace subtitler

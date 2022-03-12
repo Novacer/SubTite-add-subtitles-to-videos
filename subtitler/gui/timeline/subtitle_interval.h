@@ -1,5 +1,5 @@
-#ifndef SUBTITLER_SUBTITLE_INTERVAL_H
-#define SUBTITLER_SUBTITLE_INTERVAL_H
+#ifndef SUBTITLER_GUI_SUBTITLE_INTERVAL_H
+#define SUBTITLER_GUI_SUBTITLE_INTERVAL_H
 
 #include <QString>
 #include <QWidget>
@@ -8,9 +8,23 @@
 
 QT_FORWARD_DECLARE_CLASS(QLabel)
 QT_FORWARD_DECLARE_CLASS(QFrame)
+
+namespace subtitler::gui {
+
 QT_FORWARD_DECLARE_CLASS(SubtitleInterval)
 
-// TODO docs.
+}  // namespace subtitler::gui
+
+namespace subtitler {
+namespace gui {
+
+/**
+ * Widget containing all of the subtitle intervals.
+ * Example usage:
+ * auto* container = new SubtitleIntervalContainer(this);
+ * SubtitleIntervalArgs args{ ... };
+ * container->AddInterval(std::make_unique<SubtitleInverval>(args, this));
+ */
 class SubtitleIntervalContainer : public QWidget {
     Q_OBJECT
   public:
@@ -101,5 +115,8 @@ class SubtitleInterval {
 
     void updateRect();
 };
+
+}  // namespace gui
+}  // namespace subtitler
 
 #endif

@@ -1,4 +1,4 @@
-#include "subtitler/experimental/qt_gui/timeline/ruler.h"
+#include "subtitler/gui/timeline/ruler.h"
 
 #include <QAbstractScrollArea>
 #include <QAction>
@@ -20,6 +20,9 @@
 #define TIME_LABEL_OFFSET 10
 
 using namespace std::chrono_literals;
+
+namespace subtitler {
+namespace gui {
 
 Ruler::Ruler(QWidget* parent, std::chrono::milliseconds duration,
              int zoom_level)
@@ -346,3 +349,6 @@ void Ruler::drawScaleRuler(QPainter* painter, QRectF ruler_rect) {
         }
     }
 }
+
+}  // namespace gui
+}  // namespace subtitler

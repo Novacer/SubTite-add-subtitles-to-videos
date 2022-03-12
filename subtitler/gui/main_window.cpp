@@ -1,4 +1,4 @@
-#include "subtitler/experimental/qt_gui/player_window.h"
+#include "subtitler/gui/main_window.h"
 
 extern "C" {
 #include <libavformat/avformat.h>
@@ -22,10 +22,13 @@ extern "C" {
 #include <chrono>
 #include <iostream>
 
-#include "subtitler/experimental/qt_gui/play_button.h"
-#include "subtitler/experimental/qt_gui/subtitle_editor.h"
-#include "subtitler/experimental/qt_gui/timeline/timeline.h"
-#include "subtitler/experimental/qt_gui/timeline/timer.h"
+#include "subtitler/gui/play_button.h"
+#include "subtitler/gui/subtitle_editor.h"
+#include "subtitler/gui/timeline/timeline.h"
+#include "subtitler/gui/timeline/timer.h"
+
+namespace subtitler {
+namespace gui {
 
 class VideoRenderer : public QVideoRendererControl {
   public:
@@ -37,6 +40,8 @@ class VideoRenderer : public QVideoRendererControl {
 
     QAbstractVideoSurface *m_surface = Q_NULLPTR;
 };
+
+namespace {
 
 class MediaService : public QMediaService {
   public:
@@ -81,9 +86,11 @@ class VideoWidget : public QVideoWidget {
     QMediaObject *media_object_ = Q_NULLPTR;
 };
 
-PlayerWindow::~PlayerWindow() = default;
+}  // namespace
 
-PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent) {
+MainWindow::~MainWindow() = default;
+
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     setWindowTitle("Video Player Demo");
     setMinimumSize(1280, 500);
     QWidget *placeholder = new QWidget{this};
@@ -157,16 +164,16 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent) {
     connect(timeline, &Timeline::rulerChangedTime, timer,
             &Timer::onTimerChanged);
     connect(timeline, &Timeline::userDraggedRulerChangeTime, this,
-            &PlayerWindow::onRulerChangedTime);
-    connect(this, &PlayerWindow::playerChangedTime, timeline,
+            &MainWindow::onRulerChangedTime);
+    connect(this, &MainWindow::playerChangedTime, timeline,
             &Timeline::onPlayerChangedTime);
 
     audio_output_ = std::make_unique<QAVAudioOutput>();
     // Handle decoded frames.
     connect(player_.get(), &QAVPlayer::audioFrame, this,
-            &PlayerWindow::onAudioFrameDecoded);
+            &MainWindow::onAudioFrameDecoded);
     connect(player_.get(), &QAVPlayer::videoFrame, this,
-            &PlayerWindow::onVideoFrameDecoded);
+            &MainWindow::onVideoFrameDecoded);
 
     // Handle opening/closing subtitle editor
     connect(timeline, &Timeline::openSubtitleEditor, editor,
@@ -178,18 +185,18 @@ PlayerWindow::PlayerWindow(QWidget *parent) : QMainWindow(parent) {
     player_->pause();
 }
 
-void PlayerWindow::onRulerChangedTime(std::chrono::milliseconds ms) {
+void MainWindow::onRulerChangedTime(std::chrono::milliseconds ms) {
     user_seeked_ = true;
     player_->seek(ms.count());
 }
 
-void PlayerWindow::onAudioFrameDecoded(const QAVAudioFrame &audio_frame) {
+void MainWindow::onAudioFrameDecoded(const QAVAudioFrame &audio_frame) {
     if (player_->state() == QAVPlayer::State::PlayingState) {
         audio_output_->play(audio_frame);
     }
 }
 
-void PlayerWindow::onVideoFrameDecoded(const QAVVideoFrame &video_frame) {
+void MainWindow::onVideoFrameDecoded(const QAVVideoFrame &video_frame) {
     if (video_renderer_->m_surface == nullptr) return;
     QVideoFrame videoFrame = video_frame.convertTo(AV_PIX_FMT_RGB32);
     if (!video_renderer_->m_surface->isActive() ||
@@ -211,3 +218,6 @@ void PlayerWindow::onVideoFrameDecoded(const QAVVideoFrame &video_frame) {
         }
     }
 }
+
+}  // namespace gui
+}  // namespace subtitler

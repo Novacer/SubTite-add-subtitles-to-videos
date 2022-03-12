@@ -1,10 +1,16 @@
-#include "subtitler/experimental/qt_gui/timeline/zoomer.h"
+#include "subtitler/gui/timeline/zoomer.h"
 
 #include <QHBoxLayout>
 #include <cmath>
 
+namespace subtitler {
+namespace gui {
 namespace {
 
+/**
+ * Given the max duration of a video, return the max zoom level.
+ * See comments in implementation for details.
+ */
 int computeZoomRange(std::chrono::milliseconds duration) {
     // The max interval size should be 10% of the total duration.
     double max_interval_size_secs = duration.count() / (10.0 * 1000);
@@ -26,7 +32,8 @@ Zoomer::Zoomer(QWidget* parent, std::chrono::milliseconds duration)
       max_zoom_level_{1} {
     setFixedWidth(150);
     setCursor(Qt::PointingHandCursor);
-    InitializeControls(duration);
+    initializeControls(duration);
+
     QHBoxLayout* main_layout = new QHBoxLayout(this);
     main_layout->setSpacing(5);
     main_layout->setContentsMargins(0, 0, 0, 0);
@@ -35,7 +42,7 @@ Zoomer::Zoomer(QWidget* parent, std::chrono::milliseconds duration)
     main_layout->addWidget(zoom_out_);
 }
 
-void Zoomer::InitializeControls(std::chrono::milliseconds duration) {
+void Zoomer::initializeControls(std::chrono::milliseconds duration) {
     zoom_slider_ = new QSlider(Qt::Horizontal, this);
     // Double the width
     min_zoom_level_ = 1;
@@ -85,3 +92,6 @@ void Zoomer::onSliderChanged(int value) {
     current_level_ = value;
     zoom_slider_->setSliderPosition(current_level_);
 }
+
+}  // namespace gui
+}  // namespace subtitler

@@ -1,4 +1,4 @@
-#include "subtitler/experimental/qt_gui/timeline/timeline.h"
+#include "subtitler/gui/timeline/timeline.h"
 
 #include <QDebug>
 #include <QScrollBar>
@@ -6,6 +6,9 @@
 #include <chrono>
 
 using namespace std::chrono_literals;
+
+namespace subtitler {
+namespace gui {
 
 Timeline::Timeline(std::chrono::milliseconds duration, QWidget* parent)
     : QScrollArea(parent) {
@@ -17,7 +20,7 @@ Timeline::Timeline(std::chrono::milliseconds duration, QWidget* parent)
     zoomer_->setMinimumWidth(300);
     addScrollBarWidget(zoomer_, Qt::AlignLeft);
 
-    ruler_ = new Ruler(this, duration, zoomer_->max_zoom_level());
+    ruler_ = new Ruler(this, duration, zoomer_->GetMaxZoomLevel());
     setWidget(ruler_);
 
     connect(zoomer_, &Zoomer::zoomIn, ruler_, &Ruler::onZoomIn);
@@ -53,3 +56,6 @@ void Timeline::onPlayerPlay() { ruler_->setPlaying(true); }
 void Timeline::onSubtitleIntervalClicked(SubtitleInterval* subtitle) {
     emit openSubtitleEditor(subtitle);
 }
+
+}  // namespace gui
+}  // namespace subtitler

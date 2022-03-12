@@ -1,4 +1,4 @@
-#include "subtitler/experimental/qt_gui/timeline/subtitle_interval.h"
+#include "subtitler/gui/timeline/subtitle_interval.h"
 
 #include <QFrame>
 #include <QLabel>
@@ -9,6 +9,9 @@
 #define BODY_HEIGHT 80
 
 using namespace std::chrono_literals;
+
+namespace subtitler {
+namespace gui {
 
 SubtitleIntervalContainer::SubtitleIntervalContainer(QWidget* parent)
     : QWidget{parent} {}
@@ -128,3 +131,6 @@ void SubtitleInterval::updateRect() {
         begin_marker_->x() + CUT_MARKER_WIDTH, begin_marker_->y(),
         end_marker_->x() - begin_marker_->x() - CUT_MARKER_WIDTH, BODY_HEIGHT);
 }
+
+}  // namespace gui
+}  // namespace subtitler

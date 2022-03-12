@@ -1,23 +1,33 @@
-#ifndef SUBTITLER_PLAYER_WINDOW_H
-#define SUBTITLER_PLAYER_WINDOW_H
+#ifndef SUBTITLER_GUI_MAIN_WINDOW_H
+#define SUBTITLER_GUI_MAIN_WINDOW_H
 
 #include <QMainWindow>
 #include <chrono>
 #include <memory>
 
-class QAVPlayer;
-class QAVAudioOutput;
-class QAVAudioFrame;
-class QAVVideoFrame;
-class VideoRenderer;
-class QFile;
+QT_FORWARD_DECLARE_CLASS(QAVPlayer)
+QT_FORWARD_DECLARE_CLASS(QAVAudioOutput)
+QT_FORWARD_DECLARE_CLASS(QAVAudioFrame)
+QT_FORWARD_DECLARE_CLASS(QAVVideoFrame)
+QT_FORWARD_DECLARE_CLASS(QFile)
 
-class PlayerWindow : public QMainWindow {
+namespace subtitler::gui {
+
+QT_FORWARD_DECLARE_CLASS(VideoRenderer)
+
+}  // namespace subtitler::gui
+
+namespace subtitler {
+namespace gui {
+
+/**
+ * Main window for the video editor gui.
+ */
+class MainWindow : public QMainWindow {
     Q_OBJECT
-
   public:
-    PlayerWindow(QWidget *parent = nullptr);
-    ~PlayerWindow();
+    MainWindow(QWidget *parent = Q_NULLPTR);
+    ~MainWindow();
 
   signals:
     void playerChangedTime(std::chrono::milliseconds ms);
@@ -36,5 +46,8 @@ class PlayerWindow : public QMainWindow {
     // and reset once the next video frame is decoded.
     bool user_seeked_;
 };
+
+}  // namespace gui
+}  // namespace subtitler
 
 #endif

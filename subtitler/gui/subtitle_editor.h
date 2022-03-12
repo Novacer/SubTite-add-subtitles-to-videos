@@ -1,11 +1,23 @@
-#ifndef SUBTITLER_SUBTITLE_EDITOR
-#define SUBTITLER_SUBTITLE_EDITOR
+#ifndef SUBTITLER_GUI_SUBTITLE_EDITOR_H
+#define SUBTITLER_GUI_SUBTITLE_EDITOR_H
 
 #include <QDockWidget>
 
 QT_FORWARD_DECLARE_CLASS(QPlainTextEdit)
+
+namespace subtitler::gui {
+
 QT_FORWARD_DECLARE_CLASS(SubtitleInterval)
 
+}  // namespace subtitler::gui
+
+namespace subtitler {
+namespace gui {
+
+/**
+ * Side docking widget containing elements used when editing
+ * the subtitle text.
+ */
 class SubtitleEditor : public QDockWidget {
     Q_OBJECT
   public:
@@ -20,5 +32,8 @@ class SubtitleEditor : public QDockWidget {
     QPlainTextEdit* text_edit_;
     SubtitleInterval* currently_editing_;
 };
+
+}  // namespace gui
+}  // namespace subtitler
 
 #endif

@@ -41,6 +41,7 @@ class SubRipItem {
     }
 
     SubRipItem* AppendLine(const std::string& payload);
+    std::string GetPayload() const { return payload_.str(); }
     SubRipItem* ClearPayload();
 
     // Throws out_of_range if invalid position provided.

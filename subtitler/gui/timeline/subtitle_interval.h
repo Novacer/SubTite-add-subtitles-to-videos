@@ -4,6 +4,7 @@
 #include <QString>
 #include <QWidget>
 #include <chrono>
+#include <filesystem>
 #include <memory>
 #include <string>
 
@@ -50,6 +51,11 @@ class SubtitleIntervalContainer : public QWidget {
         return intervals_;
     };
 
+    // Params needed to calculate position of the intervals.
+    // Reference examples in ruler.cpp to see how the fields are set.
+    bool LoadSubripFile(qreal interval_width, quint32 ms_per_interval,
+                        int y_coord);
+
   public slots:
     void SaveSubripFile();
 
@@ -57,7 +63,7 @@ class SubtitleIntervalContainer : public QWidget {
     std::vector<std::unique_ptr<SubtitleInterval>> intervals_;
     std::unordered_map<QObject*, SubtitleInterval*> marker_to_interval_map_;
     std::unordered_map<QObject*, SubtitleInterval*> rect_to_interval_map_;
-    std::string output_srt_file_;
+    std::filesystem::path output_srt_file_;
 };
 
 /**
@@ -87,6 +93,8 @@ struct SubtitleIntervalArgs {
 class SubtitleInterval {
   public:
     SubtitleInterval(const SubtitleIntervalArgs& args, QWidget* parent);
+    SubtitleInterval(const srt::SubRipItem& item, qreal interval_width,
+                     quint32 ms_per_interval, int y_coord, QWidget* parent);
     // TODO: if parent is null, should this cleanup the children?
     ~SubtitleInterval() = default;
 
@@ -124,6 +132,7 @@ class SubtitleInterval {
     QString subtitle_text_;
 
     void updateRect();
+    void initializeChildren(QWidget* parent);
 
     friend class SubtitleIntervalContainer;
 };

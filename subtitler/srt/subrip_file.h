@@ -35,6 +35,8 @@ class SubRipFile {
     // Return the number of SubRipItems.
     std::size_t NumItems() const;
 
+    const std::vector<SubRipItem>& GetItems() const { return items_; }
+
     // Returns the SubRipItems which have start and ends intersecting with the
     // given interval. SubRipItems are keyed by sequence number. Worst case this
     // is a linear search.

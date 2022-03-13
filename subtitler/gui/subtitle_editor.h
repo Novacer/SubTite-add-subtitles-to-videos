@@ -26,6 +26,8 @@ class SubtitleEditor : public QDockWidget {
     SubtitleEditor(QWidget* parent = Q_NULLPTR);
     ~SubtitleEditor() = default;
 
+    std::size_t GetNumSubtitles() const;
+
   signals:
     void saved();
 

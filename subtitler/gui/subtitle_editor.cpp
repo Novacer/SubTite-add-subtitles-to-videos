@@ -63,6 +63,13 @@ SubtitleEditor::SubtitleEditor(QWidget* parent)
             &SubtitleEditor::onVisibilityChanged);
 }
 
+std::size_t SubtitleEditor::GetNumSubtitles() const {
+    if (!container_) {
+        return 0;
+    }
+    return container_->intervals().size();
+}
+
 void SubtitleEditor::onOpenSubtitle(SubtitleIntervalContainer* container,
                                     SubtitleInterval* subtitle) {
     currently_editing_ = subtitle;

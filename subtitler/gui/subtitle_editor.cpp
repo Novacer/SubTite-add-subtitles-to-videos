@@ -57,6 +57,8 @@ SubtitleEditor::SubtitleEditor(QWidget* parent)
     connect(text_edit_, &QPlainTextEdit::textChanged, this,
             &SubtitleEditor::onSubtitleTextChanged);
     connect(save_button, &QPushButton::clicked, this, &SubtitleEditor::onSave);
+    connect(delete_button, &QPushButton::clicked, this,
+            &SubtitleEditor::onDelete);
     connect(this, &SubtitleEditor::visibilityChanged, this,
             &SubtitleEditor::onVisibilityChanged);
 }
@@ -98,6 +100,17 @@ void SubtitleEditor::onSave() {
     }
     container_->SaveSubripFile();
     emit saved();
+}
+
+void SubtitleEditor::onDelete() {
+    if (!container_ || !currently_editing_) {
+        return;
+    }
+    SubtitleInterval* backup = currently_editing_;
+    currently_editing_ = Q_NULLPTR;
+    container_->RemoveInterval(backup);
+    // Closing editor should also save the file?
+    setVisible(false);
 }
 
 // Save when closing editor.

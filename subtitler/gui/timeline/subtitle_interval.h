@@ -40,7 +40,7 @@ class SubtitleIntervalContainer : public QWidget {
     // not a widget. See documentation below on why that is.
     void AddInterval(std::unique_ptr<SubtitleInterval> interval);
 
-    // TODO: RemoveInterval(). This should also call CleanupWithoutParentAsking.
+    void RemoveInterval(SubtitleInterval* interval);
 
     void DeleteAll();
 

@@ -35,6 +35,7 @@ class SubtitleEditor : public QDockWidget {
     void onSubtitleTextChanged();
     void onSubtitleChangeStartEndTime(SubtitleInterval* subtitle);
     void onSave();
+    void onDelete();
     void onVisibilityChanged(bool visible);
 
   private:

@@ -109,7 +109,7 @@ void SubtitleEditor::onDelete() {
     SubtitleInterval* backup = currently_editing_;
     currently_editing_ = Q_NULLPTR;
     container_->RemoveInterval(backup);
-    // Closing editor should also save the file?
+    // Closing editor should also save the file.
     setVisible(false);
 }
 

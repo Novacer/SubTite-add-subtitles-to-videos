@@ -5,9 +5,9 @@ extern "C" {
 }
 
 #include <QApplication>
+#include <QByteArray>
 #include <QDir>
 #include <QFile>
-#include <QByteArray>
 
 #include "subtitler/gui/main_window.h"
 

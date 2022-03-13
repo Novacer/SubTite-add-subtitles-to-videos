@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <functional>
+#include <memory>
 #include <sstream>
 #include <unordered_map>
 #include <vector>
@@ -35,7 +36,9 @@ class SubRipFile {
     // Return the number of SubRipItems.
     std::size_t NumItems() const;
 
-    const std::vector<SubRipItem>& GetItems() const { return items_; }
+    const std::vector<std::shared_ptr<SubRipItem>> &GetItems() const {
+        return items_;
+    }
 
     // Returns the SubRipItems which have start and ends intersecting with the
     // given interval. SubRipItems are keyed by sequence number. Worst case this
@@ -46,12 +49,15 @@ class SubRipFile {
 
     // Add a SubRipItem. Maintains sorted order by start time.
     // Overlapping intervals are allowed.
+    void AddItem(const std::shared_ptr<SubRipItem> &item);
+
+    // Makes a copy of the subripitem and adds it.
     void AddItem(const SubRipItem &item);
 
     // Remove the SubRipItem with sequence number and returns the removed one.
     // Throws std::out_of_range if invalid sequence is provided.
     // Note that indices start at 1, as per SRT file format spec.
-    SubRipItem RemoveItem(std::size_t sequence_number);
+    std::shared_ptr<SubRipItem> RemoveItem(std::size_t sequence_number);
 
     // Edits the positioning of an existing SubRipItem.
     // Reference SubRipItem::pos_to_id for valid positions.
@@ -62,13 +68,14 @@ class SubRipFile {
   private:
     // SRT items should be ordered by start time to allow for overlapping
     // subtitles.
-    std::vector<SubRipItem> items_;
+    std::vector<std::shared_ptr<SubRipItem>> items_;
 
     // Find all intervals with non-empty intersection with [start, start +
     // duration] For each item found, call on_find(index_of_item, item).
     void ForEachOverlappingItem(
         std::chrono::milliseconds start, std::chrono::milliseconds duration,
-        std::function<void(std::size_t, const SubRipItem &)> on_find) const;
+        std::function<void(std::size_t, const std::shared_ptr<SubRipItem> &)>
+            on_find) const;
 };
 
 }  // namespace srt

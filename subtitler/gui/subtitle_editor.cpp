@@ -106,7 +106,7 @@ void SubtitleEditor::onSave() {
         return;
     }
     container_->SaveSubripFile();
-    emit saved();
+    emit saved(container_->intervals().size());
 }
 
 void SubtitleEditor::onDelete() {

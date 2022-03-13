@@ -82,10 +82,10 @@ void Ruler::resetChildren(std::chrono::milliseconds duration) {
 }
 
 void Ruler::LoadSubtitles() {
-    bool loaded = subtitle_intervals_->LoadSubripFile(
+    const auto [loaded, num_loaded] = subtitle_intervals_->LoadSubripFile(
         interval_width_, msPerInterval(), HEADER_HEIGHT);
     if (loaded) {
-        emit subtitleFileLoaded();
+        emit subtitleFileLoaded(num_loaded);
     }
 }
 

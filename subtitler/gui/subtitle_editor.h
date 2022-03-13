@@ -29,7 +29,7 @@ class SubtitleEditor : public QDockWidget {
     std::size_t GetNumSubtitles() const;
 
   signals:
-    void saved();
+    void saved(std::size_t num_subtitles);
 
   public slots:
     void onOpenSubtitle(SubtitleIntervalContainer* container,

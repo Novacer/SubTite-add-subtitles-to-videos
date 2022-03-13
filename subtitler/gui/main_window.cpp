@@ -161,10 +161,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     setCentralWidget(placeholder);
 
-    SubtitleEditor *editor = new SubtitleEditor{this};
-    editor->setWindowTitle(tr("Subtitle Editor"));
-    editor->setVisible(false);
-    addDockWidget(Qt::RightDockWidgetArea, editor);
+    editor_ = new SubtitleEditor{this};
+    editor_->setWindowTitle(tr("Subtitle Editor"));
+    editor_->setVisible(false);
+    addDockWidget(Qt::RightDockWidgetArea, editor_);
 
     // Play/Pause connections
     connect(play_button, &PlayButton::play, player_.get(), &QAVPlayer::play);
@@ -190,15 +190,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
             &MainWindow::onVideoFrameDecoded);
 
     // Handle changes to subtitle editor state.
-    connect(timeline, &Timeline::openSubtitleEditor, editor,
+    connect(timeline, &Timeline::openSubtitleEditor, editor_,
             &SubtitleEditor::onOpenSubtitle);
-    connect(timeline, &Timeline::changeSubtitleStartEndTime, editor,
+    connect(timeline, &Timeline::changeSubtitleStartEndTime, editor_,
             &SubtitleEditor::onSubtitleChangeStartEndTime);
-    connect(timeline, &Timeline::changeSubtitleStartEndTimeFinished, editor,
+    connect(timeline, &Timeline::changeSubtitleStartEndTimeFinished, editor_,
             &SubtitleEditor::onSave);
 
     // Handles changes to subtitle file.
-    connect(editor, &SubtitleEditor::saved, this,
+    connect(editor_, &SubtitleEditor::saved, this,
             &MainWindow::onSubtitleFileChanged);
     connect(timeline, &Timeline::subtitleFileLoaded, this,
             &MainWindow::onSubtitleFileChanged);
@@ -249,6 +249,9 @@ void MainWindow::onVideoFrameDecoded(const QAVVideoFrame &video_frame) {
 
 void MainWindow::onSubtitleFileChanged() {
     player_->setFilter("");
+    if (editor_->GetNumSubtitles() == 0) {
+        return;
+    }
     QString escaped_path = subtitle_file_;
     escaped_path.replace(":", "\\:");
     player_->setFilter("subtitles='" + escaped_path + "'");

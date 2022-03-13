@@ -26,6 +26,8 @@ class SubtitleEditor : public QDockWidget {
     SubtitleEditor(QWidget* parent = Q_NULLPTR);
     ~SubtitleEditor() = default;
 
+    std::size_t GetNumSubtitles() const;
+
   signals:
     void saved();
 
@@ -35,6 +37,7 @@ class SubtitleEditor : public QDockWidget {
     void onSubtitleTextChanged();
     void onSubtitleChangeStartEndTime(SubtitleInterval* subtitle);
     void onSave();
+    void onDelete();
     void onVisibilityChanged(bool visible);
 
   private:

@@ -5,14 +5,14 @@ extern "C" {
 }
 
 #include <QApplication>
+#include <QByteArray>
 #include <QDir>
 #include <QFile>
-#include <QByteArray>
 
 #include "subtitler/gui/main_window.h"
 
 int main(int argc, char *argv[]) {
-    // av_log_set_level(AV_LOG_FATAL);
+    av_log_set_level(AV_LOG_FATAL);
     QApplication app(argc, argv);
 
     // Force software decoding for now, until I can figure out

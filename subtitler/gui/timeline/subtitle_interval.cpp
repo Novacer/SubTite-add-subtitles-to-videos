@@ -49,6 +49,26 @@ void SubtitleIntervalContainer::AddInterval(
     }
 }
 
+void SubtitleIntervalContainer::RemoveInterval(SubtitleInterval* interval) {
+    if (!interval || intervals_.size() == 0) {
+        return;
+    }
+    // Remove from maps first.
+    marker_to_interval_map_.erase(interval->GetBeginMarker());
+    marker_to_interval_map_.erase(interval->GetEndMarker());
+    rect_to_interval_map_.erase(interval->GetRect());
+
+    // Search for the interval in the vector and delete it.
+    for (auto it = intervals_.begin(); it != intervals_.end(); ++it) {
+        if (it->get() == interval) {
+            it->get()->CleanupWithoutParentAsking();
+            intervals_.erase(it);
+            interval = Q_NULLPTR;
+            return;
+        }
+    }
+}
+
 void SubtitleIntervalContainer::DeleteAll() {
     intervals_.clear();
     marker_to_interval_map_.clear();

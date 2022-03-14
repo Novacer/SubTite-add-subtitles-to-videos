@@ -126,16 +126,16 @@ SubRipItem &SubRipItem::operator=(const SubRipItem &other) {
     return *this;
 }
 
-void SubRipItem::ToStream(std::size_t sequence_number,
-                          std::ostream &output) const {
+void SubRipItem::ToStream(std::size_t sequence_number, std::ostream &output,
+                          bool flush) const {
     // Refer to https://docs.fileformat.com/video/srt/
     // Line 1: the subtitle sequence id.
-    output << sequence_number << std::endl;
+    output << sequence_number << '\n';
 
     // Line 2: The timestamp.
     output << ToSubRipDuration(start_);
     output << " --> ";
-    output << ToSubRipDuration(start_ + duration_) << std::endl;
+    output << ToSubRipDuration(start_ + duration_) << '\n';
 
     // TODO: extended SRT format for specifying location of subtitle
 
@@ -146,6 +146,9 @@ void SubRipItem::ToStream(std::size_t sequence_number,
             output << "{\\an" << *ass_pos_id_ << "}";
         }
         output << payload;
+    }
+    if (flush) {
+        output << std::flush;
     }
 }
 
@@ -159,7 +162,7 @@ bool SubRipItem::operator<(const SubRipItem &other) const {
 SubRipItem *SubRipItem::AppendLine(const std::string &payload) {
     payload_ << payload;
     if (!payload.empty() && payload.back() != '\n') {
-        payload_ << std::endl;
+        payload_ << '\n';
     }
     ++num_lines_;
     return this;

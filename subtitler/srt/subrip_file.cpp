@@ -31,9 +31,10 @@ void InsertSortedItem(std::vector<std::shared_ptr<SubRipItem>> &container,
 
 void SubRipFile::ToStream(std::ostream &output) const {
     for (std::size_t i = 0; i < items_.size(); ++i) {
-        items_.at(i)->ToStream(i + 1, output);
-        output << std::endl;
+        items_.at(i)->ToStream(i + 1, output, /* flush= */ false);
+        output << '\n';
     }
+    output << std::flush;
 }
 
 void SubRipFile::LoadState(const std::string &file_name) {

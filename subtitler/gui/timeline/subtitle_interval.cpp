@@ -115,19 +115,18 @@ void SubtitleIntervalContainer::SaveSubripFile() {
     qDebug() << "Saved!";
 }
 
-bool SubtitleIntervalContainer::LoadSubripFile(qreal interval_width,
-                                               quint32 ms_per_interval,
-                                               int y_coord) {
+std::pair<bool, std::size_t> SubtitleIntervalContainer::LoadSubripFile(
+    qreal interval_width, quint32 ms_per_interval, int y_coord) {
     srt::SubRipFile srt_file;
     if (!fs::exists(output_srt_file_) || output_srt_file_.empty()) {
         qDebug() << "No subtitle file to load";
-        return false;
+        return std::make_pair(false, 0);
     }
     try {
         srt_file.LoadState(output_srt_file_.u8string());
         if (srt_file.NumItems() == 0) {
             qDebug() << "No subtitle items found!";
-            return false;
+            return std::make_pair(false, 0);
         }
         qDebug() << "Loaded subtitles!";
         DeleteAll();
@@ -140,9 +139,9 @@ bool SubtitleIntervalContainer::LoadSubripFile(qreal interval_width,
         }
     } catch (const std::exception& e) {
         qDebug() << "Failed to load subtitle: " << e.what();
-        return false;
+        return std::make_pair(false, 0);
     }
-    return true;
+    return std::make_pair(true, srt_file.NumItems());
 }
 
 void SubtitleInterval::initializeChildren(QWidget* parent) {
@@ -173,43 +172,53 @@ void SubtitleInterval::initializeChildren(QWidget* parent) {
 
 SubtitleInterval::SubtitleInterval(const SubtitleIntervalArgs& args,
                                    QWidget* parent) {
+    item_ = std::make_shared<srt::SubRipItem>();
+    if (!item_) {
+        throw std::runtime_error{"Could not create SubRipItem"};
+    }
+
     initializeChildren(parent);
 
     begin_marker_->move(args.start_x, args.start_y);
-    item_.start(args.start_time);
+    item_->start(args.start_time);
 
     end_marker_->move(args.end_x, args.end_y);
-    item_.duration(args.end_time - args.start_time);
+    item_->duration(args.end_time - args.start_time);
 
     updateRect();
 }
 
-SubtitleInterval::SubtitleInterval(const srt::SubRipItem& item,
+SubtitleInterval::SubtitleInterval(const std::shared_ptr<srt::SubRipItem>& item,
                                    qreal interval_width,
                                    quint32 ms_per_interval, int y_coord,
                                    QWidget* parent)
     : item_{item} {
+    if (!item_) {
+        throw std::runtime_error{
+            "Cannot create SubtitleInterval with null item"};
+    }
+
     initializeChildren(parent);
 
-    int start_x = item.start().count() * interval_width / ms_per_interval;
+    int start_x = item_->start().count() * interval_width / ms_per_interval;
     begin_marker_->move(start_x, y_coord);
 
-    int end_x = (item.start() + item.duration()).count() * interval_width /
+    int end_x = (item_->start() + item_->duration()).count() * interval_width /
                 ms_per_interval;
     end_marker_->move(end_x, y_coord);
 
     updateRect();
 
     // Make sure subtitle text state is set properly.
-    subtitle_text_ = QString::fromStdString(item.GetPayload());
+    subtitle_text_ = QString::fromStdString(item->GetPayload());
     SetSubtitleText(subtitle_text_);
 }
 
 void SubtitleInterval::MoveBeginMarker(
     const std::chrono::milliseconds& start_time, int x_pos) {
-    const auto previous_end_time = item_.start() + item_.duration();
-    item_.start(start_time);
-    item_.duration(previous_end_time - item_.start());
+    const auto previous_end_time = item_->start() + item_->duration();
+    item_->start(start_time);
+    item_->duration(previous_end_time - item_->start());
 
     begin_marker_->move(x_pos, begin_marker_->y());
     updateRect();
@@ -217,15 +226,15 @@ void SubtitleInterval::MoveBeginMarker(
 
 void SubtitleInterval::MoveEndMarker(const std::chrono::milliseconds& end_time,
                                      int x_pos) {
-    item_.duration(end_time - item_.start());
+    item_->duration(end_time - item_->start());
 
     end_marker_->move(x_pos, end_marker_->y());
     updateRect();
 }
 
 void SubtitleInterval::SetSubtitleText(const QString& subtitle) {
-    item_.ClearPayload();
-    item_.AppendLine(subtitle.toStdString());
+    item_->ClearPayload();
+    item_->AppendLine(subtitle.toStdString());
     subtitle_text_ = subtitle;
     rect_box_->setText(subtitle_text_);
 }

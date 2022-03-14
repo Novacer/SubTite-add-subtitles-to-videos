@@ -77,7 +77,9 @@ void Timeline::onChangeSubtitleStartEndTimeFinished(
     emit changeSubtitleStartEndTimeFinished(subtitle);
 }
 
-void Timeline::onSubtitleFileLoaded() { emit subtitleFileLoaded(); }
+void Timeline::onSubtitleFileLoaded(std::size_t num_loaded) {
+    emit subtitleFileLoaded(num_loaded);
+}
 
 }  // namespace gui
 }  // namespace subtitler

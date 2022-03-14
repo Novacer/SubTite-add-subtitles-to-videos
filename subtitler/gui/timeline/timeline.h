@@ -40,7 +40,7 @@ class Timeline : public QScrollArea {
                             SubtitleInterval* subtitle);
     void changeSubtitleStartEndTime(SubtitleInterval* subtitle);
     void changeSubtitleStartEndTimeFinished(SubtitleInterval* subtitle);
-    void subtitleFileLoaded();
+    void subtitleFileLoaded(std::size_t num_loaded);
 
   public slots:
     // Handles outgoing time changes from the ruler.
@@ -58,7 +58,7 @@ class Timeline : public QScrollArea {
                                    SubtitleInterval* subtitle);
     void onChangeSubtitleStartEndTime(SubtitleInterval* subtitle);
     void onChangeSubtitleStartEndTimeFinished(SubtitleInterval* subtitle);
-    void onSubtitleFileLoaded();
+    void onSubtitleFileLoaded(std::size_t num_loaded);
 
   private:
     Ruler* ruler_;

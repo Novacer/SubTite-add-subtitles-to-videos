@@ -29,7 +29,7 @@ class SubtitleEditor : public QDockWidget {
     std::size_t GetNumSubtitles() const;
 
   signals:
-    void saved();
+    void saved(std::size_t num_subtitles);
 
   public slots:
     void onOpenSubtitle(SubtitleIntervalContainer* container,
@@ -39,6 +39,9 @@ class SubtitleEditor : public QDockWidget {
     void onSave();
     void onDelete();
     void onVisibilityChanged(bool visible);
+
+  protected:
+    virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
   private:
     QPlainTextEdit* text_edit_;

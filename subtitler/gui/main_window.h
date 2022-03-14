@@ -37,7 +37,7 @@ class MainWindow : public QMainWindow {
     void onRulerChangedTime(std::chrono::milliseconds ms);
     void onAudioFrameDecoded(const QAVAudioFrame &audio_frame);
     void onVideoFrameDecoded(const QAVVideoFrame &video_frame);
-    void onSubtitleFileChanged();
+    void onSubtitleFileChanged(std::size_t num_loaded);
 
   private:
     std::unique_ptr<QAVPlayer> player_;

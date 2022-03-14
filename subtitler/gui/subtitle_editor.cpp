@@ -1,5 +1,7 @@
 #include "subtitler/gui/subtitle_editor.h"
 
+#include <QDebug>
+#include <QFocusEvent>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPlainTextEdit>
@@ -34,6 +36,7 @@ SubtitleEditor::SubtitleEditor(QWidget* parent)
     QWidget* main_placeholder = new QWidget(this);
     text_edit_ = new QPlainTextEdit(main_placeholder);
     text_edit_->setPlaceholderText(tr("Subtitle text here"));
+    text_edit_->installEventFilter(this);
 
     begin_end_time_ = new QLabel(main_placeholder);
 
@@ -82,8 +85,6 @@ void SubtitleEditor::onOpenSubtitle(SubtitleIntervalContainer* container,
     text_edit_->setPlainText(subtitle->GetSubtitleText());
     begin_end_time_->setText(FormatSubtitleStartEndString(subtitle));
     setVisible(true);
-
-    onSave();
 }
 
 void SubtitleEditor::onSubtitleTextChanged() {
@@ -106,7 +107,7 @@ void SubtitleEditor::onSave() {
         return;
     }
     container_->SaveSubripFile();
-    emit saved();
+    emit saved(container_->intervals().size());
 }
 
 void SubtitleEditor::onDelete() {
@@ -126,6 +127,13 @@ void SubtitleEditor::onVisibilityChanged(bool visible) {
         onSave();
     }
     prev_visibility_ = visible;
+}
+
+bool SubtitleEditor::eventFilter(QObject* watched, QEvent* event) {
+    if (watched == text_edit_ && event->type() == QEvent::FocusOut) {
+        onSave();
+    }
+    return false;
 }
 
 }  // namespace gui

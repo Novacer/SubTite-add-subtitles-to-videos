@@ -50,7 +50,7 @@ class Ruler : public QWidget {
                                  SubtitleInterval* interval);
     void changeSubtitleIntervalTime(SubtitleInterval* interval);
     void changeSubtitleIntervalTimeFinished(SubtitleInterval* interval);
-    void subtitleFileLoaded();
+    void subtitleFileLoaded(std::size_t num_subtitles);
 
   public slots:
     void onZoomIn(int level);

@@ -268,8 +268,8 @@ void Commands::PrintSubs() {
 
 void Commands::AddSub(const std::vector<std::string> &tokens) {
     std::size_t i = 0;
-    srt::SubRipItem item;
-    item.start(start_)->duration(duration_);
+    auto item = std::make_shared<srt::SubRipItem>();
+    item->start(start_)->duration(duration_);
 
     while (i < tokens.size()) {
         if (tokens.at(i) == "position" || tokens.at(i) == "p") {
@@ -281,7 +281,7 @@ void Commands::AddSub(const std::vector<std::string> &tokens) {
                 return;
             }
             try {
-                item.position(tokens.at(i + 1));
+                item->position(tokens.at(i + 1));
             } catch (const std::out_of_range &e) {
                 output_ << "Position " << tokens.at(i + 1)
                         << " not recognized. Valid positions are: "
@@ -320,10 +320,10 @@ void Commands::AddSub(const std::vector<std::string> &tokens) {
         } else if (subtitle.rfind("/cancel", 0) == 0) {
             return;
         } else {
-            item.AppendLine(subtitle);
+            item->AppendLine(subtitle);
         }
     }
-    if (item.num_lines() > 0) {
+    if (item->num_lines() > 0) {
         srt_file_.AddItem(std::move(item));
         srt_file_has_changed_ = true;
     }
@@ -372,7 +372,7 @@ void Commands::DeleteSub(const std::vector<std::string> &tokens) {
     try {
         auto deleted_item = srt_file_.RemoveItem(sequence_num);
         output_ << "Deleted: ";
-        deleted_item.ToStream(sequence_num, output_);
+        deleted_item->ToStream(sequence_num, output_);
         output_ << std::endl;
     } catch (const std::out_of_range &e) {
         output_ << "Error while deleting sequence num: " << sequence_num;

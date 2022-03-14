@@ -247,9 +247,9 @@ void MainWindow::onVideoFrameDecoded(const QAVVideoFrame &video_frame) {
     }
 }
 
-void MainWindow::onSubtitleFileChanged() {
+void MainWindow::onSubtitleFileChanged(std::size_t num_loaded) {
     player_->setFilter("");
-    if (editor_->GetNumSubtitles() == 0) {
+    if (num_loaded == 0) {
         return;
     }
     QString escaped_path = subtitle_file_;

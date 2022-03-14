@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <memory>
 #include <string>
+#include <utility>
 
 #include "subtitler/srt/subrip_item.h"
 
@@ -53,8 +54,9 @@ class SubtitleIntervalContainer : public QWidget {
 
     // Params needed to calculate position of the intervals.
     // Reference examples in ruler.cpp to see how the fields are set.
-    bool LoadSubripFile(qreal interval_width, quint32 ms_per_interval,
-                        int y_coord);
+    std::pair<bool, std::size_t> LoadSubripFile(qreal interval_width,
+                                                quint32 ms_per_interval,
+                                                int y_coord);
 
   public slots:
     void SaveSubripFile();
@@ -93,8 +95,9 @@ struct SubtitleIntervalArgs {
 class SubtitleInterval {
   public:
     SubtitleInterval(const SubtitleIntervalArgs& args, QWidget* parent);
-    SubtitleInterval(const srt::SubRipItem& item, qreal interval_width,
-                     quint32 ms_per_interval, int y_coord, QWidget* parent);
+    SubtitleInterval(const std::shared_ptr<srt::SubRipItem>& item,
+                     qreal interval_width, quint32 ms_per_interval, int y_coord,
+                     QWidget* parent);
     // TODO: if parent is null, should this cleanup the children?
     ~SubtitleInterval() = default;
 
@@ -103,9 +106,9 @@ class SubtitleInterval {
     void MoveEndMarker(const std::chrono::milliseconds& end_time, int x_pos);
     void SetSubtitleText(const QString& subtitle);
 
-    std::chrono::milliseconds GetBeginTime() const { return item_.start(); }
+    std::chrono::milliseconds GetBeginTime() const { return item_->start(); }
     std::chrono::milliseconds GetEndTime() const {
-        return item_.start() + item_.duration();
+        return item_->start() + item_->duration();
     }
 
     QLabel* GetBeginMarker() const { return begin_marker_; }
@@ -126,7 +129,7 @@ class SubtitleInterval {
     QLabel* end_marker_;
     QLabel* rect_box_;
 
-    srt::SubRipItem item_;
+    std::shared_ptr<srt::SubRipItem> item_;
     // Payload of SubRipItem may contain  additional formatting, so we also
     // separately store the subtitle_text before any formatting.
     QString subtitle_text_;

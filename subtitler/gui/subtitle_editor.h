@@ -40,6 +40,9 @@ class SubtitleEditor : public QDockWidget {
     void onDelete();
     void onVisibilityChanged(bool visible);
 
+  protected:
+    virtual bool eventFilter(QObject* watched, QEvent* event) override;
+
   private:
     QPlainTextEdit* text_edit_;
     QLabel* begin_end_time_;

@@ -70,11 +70,12 @@ void SubRipFile::ToStream(std::ostream &output, std::chrono::milliseconds start,
         // To produce a valid SRT file, the first subtitle must begin with
         // sequence one. Hence we provide our own sequential counter while
         // ignoring the index.
-        item->ToStream(sequence_number, output);
-        output << std::endl;
+        item->ToStream(sequence_number, output, /* flush= */ false);
+        output << '\n';
         ++sequence_number;
     };
     this->ForEachOverlappingItem(start, duration, print_item);
+    output << std::flush;
 }
 
 std::size_t SubRipFile::NumItems() const { return items_.size(); }

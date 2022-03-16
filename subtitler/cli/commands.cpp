@@ -261,7 +261,7 @@ void Commands::Play(const std::vector<std::string> &tokens) {
 void Commands::PrintSubs() {
     auto collisions = srt_file_.GetCollisions(start_, duration_);
     for (const auto &[seq_num, item] : collisions) {
-        item->ToStream(seq_num, output_);
+        item->ToStream(seq_num, output_, /* flush= */ false);
         output_ << std::endl;
     }
 }
@@ -372,7 +372,7 @@ void Commands::DeleteSub(const std::vector<std::string> &tokens) {
     try {
         auto deleted_item = srt_file_.RemoveItem(sequence_num);
         output_ << "Deleted: ";
-        deleted_item->ToStream(sequence_num, output_);
+        deleted_item->ToStream(sequence_num, output_, /* flush= */ false);
         output_ << std::endl;
     } catch (const std::out_of_range &e) {
         output_ << "Error while deleting sequence num: " << sequence_num;

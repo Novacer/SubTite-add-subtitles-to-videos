@@ -104,7 +104,14 @@ class SubtitleInterval {
     void MoveBeginMarker(const std::chrono::milliseconds& start_time,
                          int x_pos);
     void MoveEndMarker(const std::chrono::milliseconds& end_time, int x_pos);
+
+    QString GetSubtitleText() const { return subtitle_text_; }
     void SetSubtitleText(const QString& subtitle);
+
+    int GetSubtitlePosition() const {
+        return item_->substation_alpha_position();
+    }
+    void SetSubtitlePosition(const std::string& position_id);
 
     std::chrono::milliseconds GetBeginTime() const { return item_->start(); }
     std::chrono::milliseconds GetEndTime() const {
@@ -115,8 +122,6 @@ class SubtitleInterval {
     QLabel* GetEndMarker() const { return end_marker_; }
 
     QLabel* GetRect() const { return rect_box_; }
-
-    QString GetSubtitleText() const { return subtitle_text_; }
 
     // Cleans up child widgets. Should only be used if SubtitleInterval
     // is going to be destroyed from a context where it is NOT the parent

@@ -46,6 +46,13 @@ class SubRipItem {
     std::string GetPayload() const { return payload_.str(); }
     SubRipItem* ClearPayload();
 
+    int substation_alpha_position() const {
+        if (ass_pos_id_) {
+            return *ass_pos_id_;
+        }
+        return pos_to_id.at("bottom-center");
+    }
+
     // Throws out_of_range if invalid position provided.
     SubRipItem* position(const std::string& position_id) {
         ass_pos_id_ = pos_to_id.at(position_id);

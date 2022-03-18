@@ -239,6 +239,10 @@ void SubtitleInterval::SetSubtitleText(const QString& subtitle) {
     rect_box_->setText(subtitle_text_);
 }
 
+void SubtitleInterval::SetSubtitlePosition(const std::string& position_id) {
+    item_->position(position_id);
+}
+
 void SubtitleInterval::CleanupWithoutParentAsking() {
     delete begin_marker_;
     begin_marker_ = Q_NULLPTR;

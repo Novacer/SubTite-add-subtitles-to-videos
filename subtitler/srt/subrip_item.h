@@ -24,7 +24,9 @@ class SubRipItem {
     // position
     // start_ --> start + duration
     // styling and subtitles...
-    void ToStream(std::size_t sequence_number, std::ostream& output) const;
+    // Set flush to true if ostream should be flushed after outputting.
+    void ToStream(std::size_t sequence_number, std::ostream& output,
+                  bool flush = true) const;
 
     std::chrono::milliseconds start() const { return start_; }
 

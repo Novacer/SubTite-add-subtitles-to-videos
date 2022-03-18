@@ -21,7 +21,7 @@ qt_cc_library(
     }),
     deps = [
         ":play_button",
-        ":subtitle_editor",
+        "//subtitler/gui/subtitle_editor:subtitle_editor",
         "//subtitler/gui/timeline:timer",
         "//subtitler/gui/timeline:timeline_window",
         "@qt//:qt_widgets",
@@ -36,17 +36,6 @@ qt_cc_library(
         "@bazel_tools//src/conditions:darwin": ["@ffmpeg_linux//:ffmpeg_libavformat"],
         "//conditions:default": ["@ffmpeg_linux//:ffmpeg_libavformat"],
     }),
-)
-
-qt_cc_library(
-    name = "subtitle_editor",
-    srcs = ["subtitle_editor.cpp"],
-    hdrs = ["subtitle_editor.h"],
-    deps = [
-        "//subtitler/gui/timeline:subtitle_interval",
-        "//subtitler/util:duration_format",
-        "@qt//:qt_widgets",
-    ],
 )
 
 cc_binary(

@@ -49,6 +49,20 @@ TEST(SubRipItemTest, ClearSubtitle) {
         output.str());
 }
 
+TEST(SubRipItemTest, GetPosition) {
+    SubRipItem item;
+
+    // default case.
+    ASSERT_EQ(item.substation_alpha_position(),
+              item.pos_to_id.at("bottom-center"));
+
+    item.position("top-right");
+    ASSERT_EQ(item.substation_alpha_position(), item.pos_to_id.at("top-right"));
+
+    item.position("bl");
+    ASSERT_EQ(item.substation_alpha_position(), item.pos_to_id.at("bl"));
+}
+
 TEST(SubRipItemTest, SetPosition) {
     SubRipItem item;
     item.start(1s + 123ms)->duration(5s)->AppendLine("Hello World!");

@@ -23,7 +23,7 @@ extern "C" {
 #include <iostream>
 
 #include "subtitler/gui/play_button.h"
-#include "subtitler/gui/subtitle_editor.h"
+#include "subtitler/gui/subtitle_editor/subtitle_editor.h"
 #include "subtitler/gui/timeline/timeline.h"
 #include "subtitler/gui/timeline/timer.h"
 

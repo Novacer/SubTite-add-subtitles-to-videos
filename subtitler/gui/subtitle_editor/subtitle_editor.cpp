@@ -1,4 +1,4 @@
-#include "subtitler/gui/subtitle_editor.h"
+#include "subtitler/gui/subtitle_editor/subtitle_editor.h"
 
 #include <QDebug>
 #include <QFocusEvent>
@@ -9,6 +9,7 @@
 #include <QVBoxLayout>
 #include <sstream>
 
+#include "subtitler/gui/subtitle_editor/position_buttons.h"
 #include "subtitler/gui/timeline/subtitle_interval.h"
 #include "subtitler/util/duration_format.h"
 
@@ -34,11 +35,14 @@ SubtitleEditor::SubtitleEditor(QWidget* parent)
     setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
     QWidget* main_placeholder = new QWidget(this);
+
+    begin_end_time_ = new QLabel(main_placeholder);
+
     text_edit_ = new QPlainTextEdit(main_placeholder);
     text_edit_->setPlaceholderText(tr("Subtitle text here"));
     text_edit_->installEventFilter(this);
 
-    begin_end_time_ = new QLabel(main_placeholder);
+    position_buttons_ = new PositionButtons{main_placeholder};
 
     QWidget* delete_save_placeholder = new QWidget(main_placeholder);
     QPushButton* save_button = new QPushButton(delete_save_placeholder);
@@ -53,6 +57,7 @@ SubtitleEditor::SubtitleEditor(QWidget* parent)
     QVBoxLayout* layout = new QVBoxLayout(main_placeholder);
     layout->addWidget(begin_end_time_);
     layout->addWidget(text_edit_);
+    layout->addWidget(position_buttons_);
     layout->addWidget(delete_save_placeholder);
 
     setWidget(main_placeholder);
@@ -64,6 +69,8 @@ SubtitleEditor::SubtitleEditor(QWidget* parent)
             &SubtitleEditor::onDelete);
     connect(this, &SubtitleEditor::visibilityChanged, this,
             &SubtitleEditor::onVisibilityChanged);
+    connect(position_buttons_, &PositionButtons::positionIdSelected, this,
+            &SubtitleEditor::onPositionSelected);
 }
 
 std::size_t SubtitleEditor::GetNumSubtitles() const {
@@ -84,6 +91,7 @@ void SubtitleEditor::onOpenSubtitle(SubtitleIntervalContainer* container,
     }
     text_edit_->setPlainText(subtitle->GetSubtitleText());
     begin_end_time_->setText(FormatSubtitleStartEndString(subtitle));
+    position_buttons_->onPositionChanged(subtitle->GetSubtitlePosition());
     setVisible(true);
 }
 
@@ -134,6 +142,14 @@ bool SubtitleEditor::eventFilter(QObject* watched, QEvent* event) {
         onSave();
     }
     return false;
+}
+
+void SubtitleEditor::onPositionSelected(const std::string& position_id) {
+    if (!currently_editing_) {
+        return;
+    }
+    currently_editing_->SetSubtitlePosition(position_id);
+    onSave();
 }
 
 }  // namespace gui

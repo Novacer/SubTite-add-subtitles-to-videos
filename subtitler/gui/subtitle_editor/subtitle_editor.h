@@ -1,7 +1,8 @@
-#ifndef SUBTITLER_GUI_SUBTITLE_EDITOR_H
-#define SUBTITLER_GUI_SUBTITLE_EDITOR_H
+#ifndef SUBTITLER_GUI_SUBTITLE_EDITOR_SUBTITLE_EDITOR_H
+#define SUBTITLER_GUI_SUBTITLE_EDITOR_SUBTITLE_EDITOR_H
 
 #include <QDockWidget>
+#include <string>
 
 QT_FORWARD_DECLARE_CLASS(QPlainTextEdit)
 QT_FORWARD_DECLARE_CLASS(QLabel)
@@ -10,6 +11,7 @@ namespace subtitler::gui {
 
 QT_FORWARD_DECLARE_CLASS(SubtitleInterval)
 QT_FORWARD_DECLARE_CLASS(SubtitleIntervalContainer)
+QT_FORWARD_DECLARE_CLASS(PositionButtons)
 
 }  // namespace subtitler::gui
 
@@ -39,13 +41,16 @@ class SubtitleEditor : public QDockWidget {
     void onSave();
     void onDelete();
     void onVisibilityChanged(bool visible);
+    void onPositionSelected(const std::string& position_id);
 
   protected:
     virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
   private:
-    QPlainTextEdit* text_edit_;
     QLabel* begin_end_time_;
+    QPlainTextEdit* text_edit_;
+    PositionButtons* position_buttons_;
+
     SubtitleInterval* currently_editing_;
     SubtitleIntervalContainer* container_;
     bool prev_visibility_;

@@ -58,7 +58,6 @@ SubtitleEditor::SubtitleEditor(QWidget* parent)
     layout->addWidget(begin_end_time_);
     layout->addWidget(text_edit_);
     layout->addWidget(position_buttons_);
-    position_buttons_->show();
     layout->addWidget(delete_save_placeholder);
 
     setWidget(main_placeholder);

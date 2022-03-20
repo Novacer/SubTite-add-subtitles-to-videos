@@ -154,7 +154,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     player_controls_layout->addWidget(play_button);
     player_controls_layout->addWidget(step_forwards);
 
-    Timer *timer = new Timer{placeholder};
+    timeline::Timer *timer = new timeline::Timer{placeholder};
 
     // Get video duration
     // TODO: make util class?
@@ -167,7 +167,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     avformat_free_context(pFormatCtx);
 
     std::chrono::milliseconds duration{duration_us / 1000};
-    Timeline *timeline = new Timeline{duration, output_name, placeholder};
+    timeline::Timeline *timeline =
+        new timeline::Timeline{duration, output_name, placeholder};
 
     layout->addWidget(video_widget);
     layout->addWidget(player_controls_placeholder);
@@ -185,21 +186,21 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(play_button, &PlayButton::play, player_.get(), &QAVPlayer::play);
     connect(play_button, &PlayButton::pause, player_.get(), &QAVPlayer::pause);
     connect(player_.get(), &QAVPlayer::played, timeline,
-            &Timeline::onPlayerPlay);
+            &timeline::Timeline::onPlayerPlay);
     connect(player_.get(), &QAVPlayer::paused, timeline,
-            &Timeline::onPlayerPause);
+            &timeline::Timeline::onPlayerPause);
     connect(step_backwards, &StepBackwardsButton::stepDelta, timeline,
-            &Timeline::onUserStepChangedTime);
+            &timeline::Timeline::onUserStepChangedTime);
     connect(step_forwards, &StepForwardsButton::stepDelta, timeline,
-            &Timeline::onUserStepChangedTime);
+            &timeline::Timeline::onUserStepChangedTime);
 
     // Connections to synchronize time between ruler, player, and timer.
-    connect(timeline, &Timeline::rulerChangedTime, timer,
-            &Timer::onTimerChanged);
-    connect(timeline, &Timeline::userDraggedRulerChangeTime, this,
+    connect(timeline, &timeline::Timeline::rulerChangedTime, timer,
+            &timeline::Timer::onTimerChanged);
+    connect(timeline, &timeline::Timeline::userDraggedRulerChangeTime, this,
             &MainWindow::onRulerChangedTime);
     connect(this, &MainWindow::playerChangedTime, timeline,
-            &Timeline::onPlayerChangedTime);
+            &timeline::Timeline::onPlayerChangedTime);
 
     audio_output_ = std::make_unique<QAVAudioOutput>();
     // Handle decoded frames.
@@ -209,17 +210,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
             &MainWindow::onVideoFrameDecoded);
 
     // Handle changes to subtitle editor state.
-    connect(timeline, &Timeline::openSubtitleEditor, editor_,
+    connect(timeline, &timeline::Timeline::openSubtitleEditor, editor_,
             &SubtitleEditor::onOpenSubtitle);
-    connect(timeline, &Timeline::changeSubtitleStartEndTime, editor_,
+    connect(timeline, &timeline::Timeline::changeSubtitleStartEndTime, editor_,
             &SubtitleEditor::onSubtitleChangeStartEndTime);
-    connect(timeline, &Timeline::changeSubtitleStartEndTimeFinished, editor_,
-            &SubtitleEditor::onSave);
+    connect(timeline, &timeline::Timeline::changeSubtitleStartEndTimeFinished,
+            editor_, &SubtitleEditor::onSave);
 
     // Handles changes to subtitle file.
     connect(editor_, &SubtitleEditor::saved, this,
             &MainWindow::onSubtitleFileChanged);
-    connect(timeline, &Timeline::subtitleFileLoaded, this,
+    connect(timeline, &timeline::Timeline::subtitleFileLoaded, this,
             &MainWindow::onSubtitleFileChanged);
 
     if (!subtitle_file_.isEmpty()) {

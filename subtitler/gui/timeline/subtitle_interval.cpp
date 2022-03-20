@@ -17,6 +17,7 @@ namespace fs = std::filesystem;
 
 namespace subtitler {
 namespace gui {
+namespace timeline {
 
 SubtitleIntervalContainer::SubtitleIntervalContainer(
     const QString& output_srt_file, QWidget* parent)
@@ -258,5 +259,6 @@ void SubtitleInterval::updateRect() {
         end_marker_->x() - begin_marker_->x() - CUT_MARKER_WIDTH, BODY_HEIGHT);
 }
 
+}  // namespace timeline
 }  // namespace gui
 }  // namespace subtitler

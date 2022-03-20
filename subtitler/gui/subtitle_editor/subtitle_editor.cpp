@@ -18,7 +18,7 @@ namespace gui {
 
 namespace {
 
-QString FormatSubtitleStartEndString(const SubtitleInterval* subtitle) {
+QString FormatSubtitleStartEndString(const timeline::SubtitleInterval* subtitle) {
     std::ostringstream builder;
     builder << subtitler::ToSubRipDuration(subtitle->GetBeginTime()) << " --> "
             << subtitler::ToSubRipDuration(subtitle->GetEndTime());
@@ -80,8 +80,8 @@ std::size_t SubtitleEditor::GetNumSubtitles() const {
     return container_->intervals().size();
 }
 
-void SubtitleEditor::onOpenSubtitle(SubtitleIntervalContainer* container,
-                                    SubtitleInterval* subtitle) {
+void SubtitleEditor::onOpenSubtitle(timeline::SubtitleIntervalContainer* container,
+                                    timeline::SubtitleInterval* subtitle) {
     currently_editing_ = subtitle;
     container_ = container;
     if (!subtitle) {
@@ -102,7 +102,7 @@ void SubtitleEditor::onSubtitleTextChanged() {
     currently_editing_->SetSubtitleText(text_edit_->toPlainText());
 }
 
-void SubtitleEditor::onSubtitleChangeStartEndTime(SubtitleInterval* subtitle) {
+void SubtitleEditor::onSubtitleChangeStartEndTime(timeline::SubtitleInterval* subtitle) {
     if (subtitle != currently_editing_) {
         // irrelevant event, skip.
         return;
@@ -122,7 +122,7 @@ void SubtitleEditor::onDelete() {
     if (!container_ || !currently_editing_) {
         return;
     }
-    SubtitleInterval* backup = currently_editing_;
+    timeline::SubtitleInterval* backup = currently_editing_;
     currently_editing_ = Q_NULLPTR;
     container_->RemoveInterval(backup);
     // Closing editor should also save the file.

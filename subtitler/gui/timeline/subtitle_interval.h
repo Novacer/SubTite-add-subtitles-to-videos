@@ -1,5 +1,5 @@
-#ifndef SUBTITLER_GUI_SUBTITLE_INTERVAL_H
-#define SUBTITLER_GUI_SUBTITLE_INTERVAL_H
+#ifndef SUBTITLER_GUI_TIMELINE_SUBTITLE_INTERVAL_H
+#define SUBTITLER_GUI_TIMELINE_SUBTITLE_INTERVAL_H
 
 #include <QString>
 #include <QWidget>
@@ -14,14 +14,15 @@
 QT_FORWARD_DECLARE_CLASS(QLabel)
 QT_FORWARD_DECLARE_CLASS(QFrame)
 
-namespace subtitler::gui {
+namespace subtitler::gui::timeline {
 
 QT_FORWARD_DECLARE_CLASS(SubtitleInterval)
 
-}  // namespace subtitler::gui
+}  // namespace subtitler::gui::timeline
 
 namespace subtitler {
 namespace gui {
+namespace timeline {
 
 /**
  * Widget containing all of the subtitle intervals.
@@ -145,6 +146,7 @@ class SubtitleInterval {
     friend class SubtitleIntervalContainer;
 };
 
+}  // namespace timeline
 }  // namespace gui
 }  // namespace subtitler
 

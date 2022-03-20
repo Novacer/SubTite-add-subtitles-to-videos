@@ -5,6 +5,7 @@
 
 namespace subtitler {
 namespace gui {
+namespace timeline {
 namespace {
 
 /**
@@ -93,5 +94,6 @@ void Zoomer::onSliderChanged(int value) {
     zoom_slider_->setSliderPosition(current_level_);
 }
 
+}  // namespace timeline
 }  // namespace gui
 }  // namespace subtitler

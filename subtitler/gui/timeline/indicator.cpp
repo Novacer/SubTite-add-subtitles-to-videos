@@ -2,6 +2,7 @@
 
 namespace subtitler {
 namespace gui {
+namespace timeline {
 
 Indicator::Indicator(QWidget* parent /* = Q_NULLPTR */) : QLabel(parent) {
     setAttribute(Qt::WA_TranslucentBackground, true);
@@ -11,5 +12,6 @@ Indicator::Indicator(QWidget* parent /* = Q_NULLPTR */) : QLabel(parent) {
     move(0, 0);
 }
 
+}  // namespace timeline
 }  // namespace gui
 }  // namespace subtitler

@@ -9,6 +9,7 @@ using namespace std::chrono_literals;
 
 namespace subtitler {
 namespace gui {
+namespace timeline {
 
 Timeline::Timeline(std::chrono::milliseconds duration,
                    const QString& output_srt_file, QWidget* parent)
@@ -85,5 +86,6 @@ void Timeline::onSubtitleFileLoaded(std::size_t num_loaded) {
     emit subtitleFileLoaded(num_loaded);
 }
 
+}  // namespace timeline
 }  // namespace gui
 }  // namespace subtitler

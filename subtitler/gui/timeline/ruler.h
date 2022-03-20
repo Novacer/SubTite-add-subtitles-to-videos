@@ -56,6 +56,7 @@ class Ruler : public QWidget {
     void onZoomIn(int level);
     void onZoomOut(int level);
     void onMoveIndicator(std::chrono::milliseconds frame_time);
+    void onStepIndicator(std::chrono::milliseconds delta);
     void onAddSubtitleInterval();
 
   protected:

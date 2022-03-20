@@ -149,7 +149,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     PlayButton *play_button = new PlayButton(player_controls_placeholder);
     StepForwardsButton *step_forwards =
         new StepForwardsButton{player_controls_placeholder};
-    
+
     player_controls_layout->addWidget(step_backwards);
     player_controls_layout->addWidget(play_button);
     player_controls_layout->addWidget(step_forwards);
@@ -181,13 +181,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     editor_->setVisible(false);
     addDockWidget(Qt::RightDockWidgetArea, editor_);
 
-    // Play/Pause connections
+    // Play/Pause/Step connections
     connect(play_button, &PlayButton::play, player_.get(), &QAVPlayer::play);
     connect(play_button, &PlayButton::pause, player_.get(), &QAVPlayer::pause);
     connect(player_.get(), &QAVPlayer::played, timeline,
             &Timeline::onPlayerPlay);
     connect(player_.get(), &QAVPlayer::paused, timeline,
             &Timeline::onPlayerPause);
+    connect(step_backwards, &StepBackwardsButton::stepDelta, timeline,
+            &Timeline::onUserStepChangedTime);
+    connect(step_forwards, &StepForwardsButton::stepDelta, timeline,
+            &Timeline::onUserStepChangedTime);
 
     // Connections to synchronize time between ruler, player, and timer.
     connect(timeline, &Timeline::rulerChangedTime, timer,

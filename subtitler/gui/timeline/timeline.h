@@ -50,6 +50,8 @@ class Timeline : public QScrollArea {
     void onUserDraggedRulerChangeTime(std::chrono::milliseconds ms);
     // Handles incoming time changes from the player.
     void onPlayerChangedTime(std::chrono::milliseconds ms);
+    // Handles incoming time changes when user steps forwards/backwards.
+    void onUserStepChangedTime(std::chrono::milliseconds delta);
 
     void onPlayerPause();
     void onPlayerPlay();

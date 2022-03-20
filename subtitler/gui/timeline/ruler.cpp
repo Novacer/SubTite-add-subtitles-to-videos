@@ -90,12 +90,18 @@ void Ruler::LoadSubtitles() {
 }
 
 void Ruler::onMoveIndicator(std::chrono::milliseconds frame_time) {
-    if (frame_time > duration_) {
+    if (frame_time < 0ms || frame_time > duration_) {
         return;
     }
     indicator_->move(frame_time.count() * lengthPerMs(), indicator_->y());
     indicator_time_ = frame_time;
     emit changeIndicatorTime(indicator_time_);
+}
+
+void Ruler::onStepIndicator(std::chrono::milliseconds delta) {
+    std::chrono::milliseconds new_frame_time = indicator_time_ + delta;
+    onMoveIndicator(new_frame_time);
+    emit userChangedIndicatorTime(indicator_time_);
 }
 
 // update children when the ruler scaled up or down

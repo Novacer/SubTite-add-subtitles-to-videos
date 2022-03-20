@@ -13,6 +13,7 @@ extern "C" {
 #include <QDebug>
 #include <QFile>
 #include <QFileDialog>
+#include <QHBoxLayout>
 #include <QMediaObject>
 #include <QMediaService>
 #include <QVBoxLayout>
@@ -22,7 +23,8 @@ extern "C" {
 #include <chrono>
 #include <iostream>
 
-#include "subtitler/gui/play_button.h"
+#include "subtitler/gui/player_controls/play_button.h"
+#include "subtitler/gui/player_controls/step_button.h"
 #include "subtitler/gui/subtitle_editor/subtitle_editor.h"
 #include "subtitler/gui/timeline/timeline.h"
 #include "subtitler/gui/timeline/timer.h"
@@ -91,7 +93,7 @@ class VideoWidget : public QVideoWidget {
 MainWindow::~MainWindow() = default;
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
-    setWindowTitle("Video Player Demo");
+    setWindowTitle("SubTite");
     setMinimumSize(1280, 500);
     QWidget *placeholder = new QWidget{this};
     QVBoxLayout *layout = new QVBoxLayout(placeholder);
@@ -138,7 +140,20 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     }
     player_->setSource(file_name, video_file_.get());
 
-    PlayButton *play_button = new PlayButton(placeholder);
+    QWidget *player_controls_placeholder = new QWidget{this};
+    QHBoxLayout *player_controls_layout =
+        new QHBoxLayout{player_controls_placeholder};
+
+    StepBackwardsButton *step_backwards =
+        new StepBackwardsButton{player_controls_placeholder};
+    PlayButton *play_button = new PlayButton(player_controls_placeholder);
+    StepForwardsButton *step_forwards =
+        new StepForwardsButton{player_controls_placeholder};
+
+    player_controls_layout->addWidget(step_backwards);
+    player_controls_layout->addWidget(play_button);
+    player_controls_layout->addWidget(step_forwards);
+
     Timer *timer = new Timer{placeholder};
 
     // Get video duration
@@ -155,7 +170,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     Timeline *timeline = new Timeline{duration, output_name, placeholder};
 
     layout->addWidget(video_widget);
-    layout->addWidget(play_button);
+    layout->addWidget(player_controls_placeholder);
     layout->addWidget(timer);
     layout->addWidget(timeline);
 
@@ -166,13 +181,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     editor_->setVisible(false);
     addDockWidget(Qt::RightDockWidgetArea, editor_);
 
-    // Play/Pause connections
+    // Play/Pause/Step connections
     connect(play_button, &PlayButton::play, player_.get(), &QAVPlayer::play);
     connect(play_button, &PlayButton::pause, player_.get(), &QAVPlayer::pause);
     connect(player_.get(), &QAVPlayer::played, timeline,
             &Timeline::onPlayerPlay);
     connect(player_.get(), &QAVPlayer::paused, timeline,
             &Timeline::onPlayerPause);
+    connect(step_backwards, &StepBackwardsButton::stepDelta, timeline,
+            &Timeline::onUserStepChangedTime);
+    connect(step_forwards, &StepForwardsButton::stepDelta, timeline,
+            &Timeline::onUserStepChangedTime);
 
     // Connections to synchronize time between ruler, player, and timer.
     connect(timeline, &Timeline::rulerChangedTime, timer,

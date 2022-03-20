@@ -51,12 +51,16 @@ void Timeline::onRulerChangedTime(std::chrono::milliseconds ms) {
     emit rulerChangedTime(ms);
 }
 
+void Timeline::onUserDraggedRulerChangeTime(std::chrono::milliseconds ms) {
+    emit userDraggedRulerChangeTime(ms);
+}
+
 void Timeline::onPlayerChangedTime(std::chrono::milliseconds ms) {
     emit playerChangedTime(ms);
 }
 
-void Timeline::onUserDraggedRulerChangeTime(std::chrono::milliseconds ms) {
-    emit userDraggedRulerChangeTime(ms);
+void Timeline::onUserStepChangedTime(std::chrono::milliseconds delta) {
+    ruler_->onStepIndicator(delta);
 }
 
 void Timeline::onPlayerPause() { ruler_->setPlaying(false); }

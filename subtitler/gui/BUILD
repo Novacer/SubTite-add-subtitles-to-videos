@@ -4,13 +4,6 @@ load("@com_justbuchanan_rules_qt//:qt.bzl", "qt_cc_library")
 package(default_visibility = ["//subtitler/gui:__subpackages__"])
 
 qt_cc_library(
-    name = "play_button",
-    srcs = ["play_button.cpp"],
-    hdrs = ["play_button.h"],
-    deps = ["@qt//:qt_widgets"],
-)
-
-qt_cc_library(
     name = "main_window",
     srcs = ["main_window.cpp"],
     hdrs = ["main_window.h"],
@@ -20,7 +13,8 @@ qt_cc_library(
         "//conditions:default": ["-DQT_BUILD_QTAVPLAYER_LIB"],
     }),
     deps = [
-        ":play_button",
+        "//subtitler/gui/player_controls:play_button",
+        "//subtitler/gui/player_controls:step_button",
         "//subtitler/gui/subtitle_editor:subtitle_editor",
         "//subtitler/gui/timeline:timer",
         "//subtitler/gui/timeline:timeline_window",

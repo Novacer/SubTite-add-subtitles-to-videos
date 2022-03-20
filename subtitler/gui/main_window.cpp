@@ -13,6 +13,7 @@ extern "C" {
 #include <QDebug>
 #include <QFile>
 #include <QFileDialog>
+#include <QHBoxLayout>
 #include <QMediaObject>
 #include <QMediaService>
 #include <QVBoxLayout>
@@ -22,7 +23,8 @@ extern "C" {
 #include <chrono>
 #include <iostream>
 
-#include "subtitler/gui/play_button.h"
+#include "subtitler/gui/player_controls/play_button.h"
+#include "subtitler/gui/player_controls/step_button.h"
 #include "subtitler/gui/subtitle_editor/subtitle_editor.h"
 #include "subtitler/gui/timeline/timeline.h"
 #include "subtitler/gui/timeline/timer.h"
@@ -91,7 +93,7 @@ class VideoWidget : public QVideoWidget {
 MainWindow::~MainWindow() = default;
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
-    setWindowTitle("Video Player Demo");
+    setWindowTitle("SubTite");
     setMinimumSize(1280, 500);
     QWidget *placeholder = new QWidget{this};
     QVBoxLayout *layout = new QVBoxLayout(placeholder);
@@ -138,7 +140,20 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     }
     player_->setSource(file_name, video_file_.get());
 
-    PlayButton *play_button = new PlayButton(placeholder);
+    QWidget *player_controls_placeholder = new QWidget{this};
+    QHBoxLayout *player_controls_layout =
+        new QHBoxLayout{player_controls_placeholder};
+
+    StepBackwardsButton *step_backwards =
+        new StepBackwardsButton{player_controls_placeholder};
+    PlayButton *play_button = new PlayButton(player_controls_placeholder);
+    StepForwardsButton *step_forwards =
+        new StepForwardsButton{player_controls_placeholder};
+    
+    player_controls_layout->addWidget(step_backwards);
+    player_controls_layout->addWidget(play_button);
+    player_controls_layout->addWidget(step_forwards);
+
     Timer *timer = new Timer{placeholder};
 
     // Get video duration
@@ -155,7 +170,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     Timeline *timeline = new Timeline{duration, output_name, placeholder};
 
     layout->addWidget(video_widget);
-    layout->addWidget(play_button);
+    layout->addWidget(player_controls_placeholder);
     layout->addWidget(timer);
     layout->addWidget(timeline);
 

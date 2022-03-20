@@ -10,6 +10,10 @@
         <file alias="sliderhandle">images/sliderDrag.png</file>
         <file alias="zoomin">images/sliderIcon.png</file>
         <file alias="zoomout">images/sliderIcon0.png</file>
+        <file alias="play">images/play.png</file>
+        <file alias="pause">images/pause.png</file>
+        <file alias="stepForward">images/stepForward.png</file>
+        <file alias="stepBackward">images/stepBackward.png</file>
     </qresource>
     <qresource prefix="/style">
         <file alias="app">app.qss</file>

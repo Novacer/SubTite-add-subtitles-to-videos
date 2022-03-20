@@ -23,6 +23,7 @@ using namespace std::chrono_literals;
 
 namespace subtitler {
 namespace gui {
+namespace timeline {
 
 Ruler::Ruler(QWidget* parent, std::chrono::milliseconds duration,
              const QString& output_srt_file, int zoom_level)
@@ -370,5 +371,6 @@ void Ruler::drawScaleRuler(QPainter* painter, QRectF ruler_rect) {
     }
 }
 
+}  // namespace timeline
 }  // namespace gui
 }  // namespace subtitler

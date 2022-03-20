@@ -6,6 +6,7 @@
 
 namespace subtitler {
 namespace gui {
+namespace player_controls {
 
 /**
  * Generalized interface for a button moving player forwards/backwards.
@@ -48,6 +49,7 @@ class StepBackwardsButton : public StepButton {
     ~StepBackwardsButton() = default;
 };
 
+}  // namespace player_controls
 }  // namespace gui
 }  // namespace subtitler
 

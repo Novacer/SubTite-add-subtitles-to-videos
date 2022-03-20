@@ -2,6 +2,7 @@
 
 namespace subtitler {
 namespace gui {
+namespace player_controls {
 
 PlayButton::PlayButton(QWidget *parent)
     : QPushButton{parent}, is_playing_{false} {
@@ -20,5 +21,6 @@ void PlayButton::onClick() {
     }
 }
 
+}  // namespace player_controls
 }  // namespace gui
 }  // namespace subtitler

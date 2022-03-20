@@ -1,10 +1,11 @@
-#ifndef SUBTITLER_GUI_INDICATOR_H
-#define SUBTITLER_GUI_INDICATOR_H
+#ifndef SUBTITLER_GUI_TIMELINE_INDICATOR_H
+#define SUBTITLER_GUI_TIMELINE_INDICATOR_H
 
 #include <QLabel>
 
 namespace subtitler {
 namespace gui {
+namespace timeline {
 
 /**
  * Vertical bar showing the current position of the video player.
@@ -16,6 +17,7 @@ class Indicator : public QLabel {
     ~Indicator() = default;
 };
 
+}  // namespace timeline
 }  // namespace gui
 }  // namespace subtitler
 

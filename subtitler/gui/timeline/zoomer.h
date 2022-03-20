@@ -1,5 +1,5 @@
-#ifndef SUBTITLER_GUI_ZOOMER_H
-#define SUBTITLER_GUI_ZOOMER_H
+#ifndef SUBTITLER_GUI_TIMELINE_ZOOMER_H
+#define SUBTITLER_GUI_TIMELINE_ZOOMER_H
 
 #include <QSlider>
 #include <QToolButton>
@@ -8,6 +8,7 @@
 
 namespace subtitler {
 namespace gui {
+namespace timeline {
 
 /**
  * Scrollbar widget to control the timeline's zoom level.
@@ -40,6 +41,7 @@ class Zoomer : public QWidget {
     int max_zoom_level_;
 };
 
+}  // namespace timeline
 }  // namespace gui
 }  // namespace subtitler
 

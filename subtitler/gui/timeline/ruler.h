@@ -1,5 +1,5 @@
-#ifndef SUBTITLER_GUI_RULER_H
-#define SUBTITLER_GUI_RULER_H
+#ifndef SUBTITLER_GUI_TIMELINE_RULER_H
+#define SUBTITLER_GUI_TIMELINE_RULER_H
 
 #include <QTime>
 #include <QTimer>
@@ -15,6 +15,7 @@ QT_FORWARD_DECLARE_CLASS(QScrollBar)
 
 namespace subtitler {
 namespace gui {
+namespace timeline {
 
 /**
  * The ruler widget controls the current indicator position, as well
@@ -102,6 +103,7 @@ class Ruler : public QWidget {
     bool playing_;
 };
 
+}  // namespace timeline
 }  // namespace gui
 }  // namespace subtitler
 

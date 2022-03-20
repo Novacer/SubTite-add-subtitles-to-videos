@@ -7,6 +7,7 @@
 
 namespace subtitler {
 namespace gui {
+namespace subtitle_editor {
 
 PositionButtons::PositionButtons(QWidget* parent) : QWidget{parent} {
     radio_top_left_ = new QRadioButton{tr("Top Left"), this};
@@ -86,5 +87,6 @@ void PositionButtons::onPositionChanged(int substation_alpha_id) {
     }
 }
 
+}  // namespace subtitle_editor
 }  // namespace gui
 }  // namespace subtitler

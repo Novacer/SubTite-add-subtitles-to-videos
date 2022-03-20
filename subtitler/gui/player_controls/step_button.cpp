@@ -4,6 +4,7 @@ using namespace std::chrono_literals;
 
 namespace subtitler {
 namespace gui {
+namespace player_controls {
 
 StepButton::StepButton(const std::chrono::milliseconds& step_amount,
                        QWidget* parent)
@@ -23,5 +24,6 @@ StepBackwardsButton::StepBackwardsButton(QWidget* parent)
     setIcon(QIcon(":/images/stepBackward"));
 }
 
+}  // namespace player_controls
 }  // namespace gui
 }  // namespace subtitler

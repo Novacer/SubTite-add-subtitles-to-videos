@@ -15,10 +15,12 @@
 
 namespace subtitler {
 namespace gui {
+namespace subtitle_editor {
 
 namespace {
 
-QString FormatSubtitleStartEndString(const timeline::SubtitleInterval* subtitle) {
+QString FormatSubtitleStartEndString(
+    const timeline::SubtitleInterval* subtitle) {
     std::ostringstream builder;
     builder << subtitler::ToSubRipDuration(subtitle->GetBeginTime()) << " --> "
             << subtitler::ToSubRipDuration(subtitle->GetEndTime());
@@ -80,8 +82,9 @@ std::size_t SubtitleEditor::GetNumSubtitles() const {
     return container_->intervals().size();
 }
 
-void SubtitleEditor::onOpenSubtitle(timeline::SubtitleIntervalContainer* container,
-                                    timeline::SubtitleInterval* subtitle) {
+void SubtitleEditor::onOpenSubtitle(
+    timeline::SubtitleIntervalContainer* container,
+    timeline::SubtitleInterval* subtitle) {
     currently_editing_ = subtitle;
     container_ = container;
     if (!subtitle) {
@@ -102,7 +105,8 @@ void SubtitleEditor::onSubtitleTextChanged() {
     currently_editing_->SetSubtitleText(text_edit_->toPlainText());
 }
 
-void SubtitleEditor::onSubtitleChangeStartEndTime(timeline::SubtitleInterval* subtitle) {
+void SubtitleEditor::onSubtitleChangeStartEndTime(
+    timeline::SubtitleInterval* subtitle) {
     if (subtitle != currently_editing_) {
         // irrelevant event, skip.
         return;
@@ -152,5 +156,6 @@ void SubtitleEditor::onPositionSelected(const std::string& position_id) {
     onSave();
 }
 
+}  // namespace subtitle_editor
 }  // namespace gui
 }  // namespace subtitler

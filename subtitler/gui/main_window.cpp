@@ -177,7 +177,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     setCentralWidget(placeholder);
 
-    editor_ = new SubtitleEditor{this};
+    editor_ = new subtitle_editor::SubtitleEditor{this};
     editor_->setWindowTitle(tr("Subtitle Editor"));
     editor_->setVisible(false);
     addDockWidget(Qt::RightDockWidgetArea, editor_);
@@ -211,14 +211,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Handle changes to subtitle editor state.
     connect(timeline, &timeline::Timeline::openSubtitleEditor, editor_,
-            &SubtitleEditor::onOpenSubtitle);
+            &subtitle_editor::SubtitleEditor::onOpenSubtitle);
     connect(timeline, &timeline::Timeline::changeSubtitleStartEndTime, editor_,
-            &SubtitleEditor::onSubtitleChangeStartEndTime);
+            &subtitle_editor::SubtitleEditor::onSubtitleChangeStartEndTime);
     connect(timeline, &timeline::Timeline::changeSubtitleStartEndTimeFinished,
-            editor_, &SubtitleEditor::onSave);
+            editor_, &subtitle_editor::SubtitleEditor::onSave);
 
     // Handles changes to subtitle file.
-    connect(editor_, &SubtitleEditor::saved, this,
+    connect(editor_, &subtitle_editor::SubtitleEditor::saved, this,
             &MainWindow::onSubtitleFileChanged);
     connect(timeline, &timeline::Timeline::subtitleFileLoaded, this,
             &MainWindow::onSubtitleFileChanged);

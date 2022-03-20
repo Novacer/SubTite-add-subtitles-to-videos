@@ -8,6 +8,7 @@ QT_FORWARD_DECLARE_CLASS(QRadioButton)
 
 namespace subtitler {
 namespace gui {
+namespace subtitle_editor {
 
 /**
  * A 3x3 grid of radio buttons which are used to select the position where
@@ -46,6 +47,7 @@ class PositionButtons : public QWidget {
     QRadioButton* radio_bottom_right_;
 };
 
+}  // namespace subtitle_editor
 }  // namespace gui
 }  // namespace subtitler
 

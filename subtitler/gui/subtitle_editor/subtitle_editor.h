@@ -15,12 +15,17 @@ QT_FORWARD_DECLARE_CLASS(SubtitleIntervalContainer)
 
 }  // namespace timeline
 
+namespace subtitle_editor {
+
 QT_FORWARD_DECLARE_CLASS(PositionButtons)
+
+}  // namespace subtitle_editor
 
 }  // namespace subtitler::gui
 
 namespace subtitler {
 namespace gui {
+namespace subtitle_editor {
 
 /**
  * Side docking widget containing elements used when editing
@@ -60,6 +65,7 @@ class SubtitleEditor : public QDockWidget {
     bool prev_visibility_;
 };
 
+}  // namespace subtitle_editor
 }  // namespace gui
 }  // namespace subtitler
 

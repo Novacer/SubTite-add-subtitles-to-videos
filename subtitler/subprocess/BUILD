@@ -6,7 +6,6 @@ cc_library(
     name = "subprocess_executor",
     srcs = select({
         "@bazel_tools//src/conditions:windows": ["subprocess_executor_msvc.cpp"],
-        "@bazel_tools//src/conditions:linux": ["subprocess_executor_gcc.cpp"],
         "//conditions:default": ["subprocess_executor_gcc.cpp"],
     }),
     hdrs = ["subprocess_executor.h"],
@@ -20,7 +19,6 @@ cc_test(
     timeout = "short",
     srcs = select({
         "@bazel_tools//src/conditions:windows": ["subprocess_executor_msvc_test.cpp"],
-        "@bazel_tools//src/conditions:linux": ["subprocess_executor_gcc_test.cpp"],
         "//conditions:default": ["subprocess_executor_gcc_test.cpp"],
     }),
     deps = [

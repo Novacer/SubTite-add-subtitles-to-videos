@@ -4,7 +4,6 @@ cc_binary(
     name = "cli",
     srcs = select({
         "@bazel_tools//src/conditions:windows": ["main_msvc.cpp"],
-        "@bazel_tools//src/conditions:linux": ["main_gcc.cpp"],
         "//conditions:default": ["main_gcc.cpp"],
     }),
     deps = [

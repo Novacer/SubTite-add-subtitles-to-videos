@@ -6,7 +6,6 @@ cc_library(
     name = "input",
     srcs = select({
         "@bazel_tools//src/conditions:windows": ["input_msvc.cpp"],
-        "@bazel_tools//src/conditions:linux": ["input_gcc.cpp"],
         "//conditions:default": ["input_gcc.cpp"],
     }),
     hdrs = ["input.h"],

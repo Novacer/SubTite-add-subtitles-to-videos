@@ -1,8 +1,9 @@
 /* class selector */
 * {
-	background: rgb(35, 35, 35);
-	color: rgb(91, 91, 91);
-	font-family: "Microsoft Yahei";
+    background: rgb(35, 35, 35);
+    color: rgb(145, 145, 145);
+    font-family: "Microsoft Yahei";
+    font-size: larger;
 }
 
 /* QSlider styles */ 
@@ -11,8 +12,8 @@ QSlider::groove:horizontal {
     border: 1px solid #bbb;
     background: white;
     height: 3px; 
-	left: 12px;
-	right: 12px;
+    left: 12px;
+    right: 12px;
 }
 
 QSlider::sub-page:horizontal { 
@@ -23,14 +24,14 @@ QSlider::sub-page:horizontal {
 QSlider::add-page:horizontal {
     background: #fff;
     border: 1px solid #777;
-    height: 3px; 
+    height: 3px;
 }
 
 QSlider::handle:horizontal { 
     border: 1px solid #777;
     width: 13px;
-	border-image: url(:/images/sliderhandle);
-    margin: -7px; 
+    border-image: url(:/images/sliderhandle);
+    margin: -7px;
 }
 
 QSlider::handle:horizontal:hover { 
@@ -49,43 +50,43 @@ QSlider::add-page:horizontal:disabled {
 
 QSlider::handle:horizontal:disabled {
     background: #eee;
-    border: 1px solid #aaa; 
+    border: 1px solid #aaa;
 }
 
 /* QScrollBar styles */
 QScrollBar:horizontal {
-	background: transparent; 
+    background: transparent;
 }
 
 QScrollBar::handle:horizontal {
-	background: rgb(115,115,115); 
+    background: rgb(115,115,115); 
 }
 
 QScrollBar::add-line:horizontal {
-	border: nonde;
-	background: transparent;
+    border: none;
+    background: transparent;
 }
 
 QScrollBar::sub-line:horizontal {
-	border: none;
-	background: transparent;
+    border: none;
+    background: transparent;
 } 
 
 QScrollBar::add-page:horizontal{
-	border: none;
-	background: transparent;
+    border: none;
+    background: transparent;
 }
 
 QScrollBar::sub-page:horizontal{
-	border: none;
-	background: transparent;
+    border: none;
+    background: transparent;
 }
 
 /* QToolButton */
  
 QToolButton {
-	border: none;
-	background: transparent;
+    border: none;
+    background: transparent;
 }
 
 /* ID selectors */

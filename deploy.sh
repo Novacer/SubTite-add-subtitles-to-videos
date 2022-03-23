@@ -22,13 +22,27 @@ case "${unameOut}" in
     *)          machine="UNKNOWN:${unameOut}"
 esac
 
-echo ${machine}
+# Instead of directly using the path, use a folder within the path so when
+# we do the delete step we aren't wiping any important files by accident.
+SUBTITE_RELEASE_PATH=${SUBTITE_RELEASE_PATH}/subtite-release
 
 set -e
 
 if [[ ${machine} == "MinGw" || ${machine} == "CYGWIN" ]]; then
     echo "Using OS: Windows"
     bazel build --config=vs2019-prod //subtitler/gui:main
+
+    [ -d ${SUBTITE_RELEASE_PATH} ] && rm -r ${SUBTITE_RELEASE_PATH}
+
+    mkdir -p ${SUBTITE_RELEASE_PATH}
+    cp bazel-bin/subtitler/gui/*.dll ${SUBTITE_RELEASE_PATH}/
+    cp bazel-bin/subtitler/gui/main.exe ${SUBTITE_RELEASE_PATH}/subtite.exe
+    mkdir -p ${SUBTITE_RELEASE_PATH}/plugins
+    cp -r ${QT5_INSTALL_PATH}/plugins/audio ${SUBTITE_RELEASE_PATH}/plugins/audio
+    cp -r ${QT5_INSTALL_PATH}/plugins/platforms ${SUBTITE_RELEASE_PATH}/plugins/platforms
+
+echo "Deployed to ${SUBTITE_RELEASE_PATH}"
+
 elif [[ ${machine} == "Linux" ]]; then
     echo "Using OS: Linux"
     bazel build --config=gcc-prod //subtitler/gui:main
@@ -36,18 +50,3 @@ else
     echo "Unsupported OS: ${machine}"
     exit 1
 fi
-
-# Instead of directly using the path, use a folder within the path so when
-# we do the delete step we aren't wiping any important files by accident.
-SUBTITE_RELEASE_PATH=${SUBTITE_RELEASE_PATH}/subtite-release
-
-[ -d ${SUBTITE_RELEASE_PATH} ] && rm -r ${SUBTITE_RELEASE_PATH}
-
-mkdir -p ${SUBTITE_RELEASE_PATH}
-cp bazel-bin/subtitler/gui/*.dll ${SUBTITE_RELEASE_PATH}/
-cp bazel-bin/subtitler/gui/main.exe ${SUBTITE_RELEASE_PATH}/subtite.exe
-mkdir -p ${SUBTITE_RELEASE_PATH}/plugins
-cp -r ${QT5_INSTALL_PATH}/plugins/audio ${SUBTITE_RELEASE_PATH}/plugins/audio
-cp -r ${QT5_INSTALL_PATH}/plugins/platforms ${SUBTITE_RELEASE_PATH}/plugins/platforms
-
-echo "Deployed to ${SUBTITE_RELEASE_PATH}"

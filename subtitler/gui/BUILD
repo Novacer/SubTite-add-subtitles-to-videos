@@ -9,7 +9,7 @@ qt_cc_library(
     hdrs = ["main_window.h"],
     copts = select({
         "@bazel_tools//src/conditions:windows": ["/DQT_BUILD_QTAVPLAYER_LIB"],
-        "@bazel_tools//src/conditions:darwin": ["-DQT_BUILD_QTAVPLAYER_LIB"],
+        "@bazel_tools//src/conditions:linux": ["-DQT_BUILD_QTAVPLAYER_LIB"],
         "//conditions:default": ["-DQT_BUILD_QTAVPLAYER_LIB"],
     }),
     deps = [
@@ -23,11 +23,11 @@ qt_cc_library(
         "@qt//:qt_multimediawidgets",
     ] + select({
         "@bazel_tools//src/conditions:windows": ["@qt_av_player_windows//:qt_av_player"],
-        "@bazel_tools//src/conditions:darwin": ["@qt_av_player_linux//:qt_av_player"],
+        "@bazel_tools//src/conditions:linux": ["@qt_av_player_linux//:qt_av_player"],
         "//conditions:default": ["@qt_av_player_linux//:qt_av_player"],
     }) + select({
         "@bazel_tools//src/conditions:windows": ["@ffmpeg_windows//:ffmpeg_libavformat"],
-        "@bazel_tools//src/conditions:darwin": ["@ffmpeg_linux//:ffmpeg_libavformat"],
+        "@bazel_tools//src/conditions:linux": ["@ffmpeg_linux//:ffmpeg_libavformat"],
         "//conditions:default": ["@ffmpeg_linux//:ffmpeg_libavformat"],
     }),
 )
@@ -37,7 +37,7 @@ cc_binary(
     srcs = ["main.cpp"],
     copts = select({
         "@bazel_tools//src/conditions:windows": ["/DQT_BUILD_QTAVPLAYER_LIB"],
-        "@bazel_tools//src/conditions:darwin": ["-DQT_BUILD_QTAVPLAYER_LIB"],
+        "@bazel_tools//src/conditions:linux": ["-DQT_BUILD_QTAVPLAYER_LIB"],
         "//conditions:default": ["-DQT_BUILD_QTAVPLAYER_LIB"],
     }),
     deps = [
@@ -47,7 +47,7 @@ cc_binary(
         "@qt//:qt_widgets",
     ] + select({
         "@bazel_tools//src/conditions:windows": ["@ffmpeg_windows//:ffmpeg_libavutil"],
-        "@bazel_tools//src/conditions:darwin": ["@ffmpeg_linux//:ffmpeg_libavutil"],
+        "@bazel_tools//src/conditions:linux": ["@ffmpeg_linux//:ffmpeg_libavutil"],
         "//conditions:default": ["@ffmpeg_linux//:ffmpeg_libavutil"],
     }),
 )

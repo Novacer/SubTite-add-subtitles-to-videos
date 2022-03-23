@@ -41,8 +41,6 @@ if [[ ${machine} == "MinGw" || ${machine} == "CYGWIN" ]]; then
     cp -r ${QT5_INSTALL_PATH}/plugins/audio ${SUBTITE_RELEASE_PATH}/plugins/audio
     cp -r ${QT5_INSTALL_PATH}/plugins/platforms ${SUBTITE_RELEASE_PATH}/plugins/platforms
 
-echo "Deployed to ${SUBTITE_RELEASE_PATH}"
-
 elif [[ ${machine} == "Linux" ]]; then
     echo "Using OS: Linux"
     bazel build --config=gcc-prod //subtitler/gui:main
@@ -50,3 +48,5 @@ else
     echo "Unsupported OS: ${machine}"
     exit 1
 fi
+
+echo "Deployed to ${SUBTITE_RELEASE_PATH}"

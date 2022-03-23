@@ -14,6 +14,7 @@ extern "C" {
 int main(int argc, char *argv[]) {
     av_log_set_level(AV_LOG_FATAL);
     QApplication app(argc, argv);
+    app.setWindowIcon(QIcon(":/images/logo"));
 
     // Force software decoding for now, until I can figure out
     // how to make hw decoding work...

@@ -4,7 +4,7 @@ if [[ -z ${SUBTITE_RELEASE_PATH} ]]; then
     echo "Please set SUBTITE_RELEASE_PATH env variable to be the directory to copy release binary"
     exit 1
 else
-    echo "Using QT5 Path: ${SUBTITE_RELEASE_PATH}"
+    echo "Using SUBTITE_RELEASE_PATH: ${SUBTITE_RELEASE_PATH}"
 fi
 
 unameOut="$(uname -s)"

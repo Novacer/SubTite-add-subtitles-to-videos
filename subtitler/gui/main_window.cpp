@@ -16,7 +16,7 @@ extern "C" {
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <chrono>
-#include <iostream>
+#include <stdexcept>
 
 #include "subtitler/gui/player_controls/play_button.h"
 #include "subtitler/gui/player_controls/step_button.h"
@@ -24,6 +24,7 @@ extern "C" {
 #include "subtitler/gui/timeline/timeline.h"
 #include "subtitler/gui/timeline/timer.h"
 #include "subtitler/gui/video_renderer/opengl_renderer.h"
+#include "subtitler/gui/settings_window.h"
 
 namespace subtitler {
 namespace gui {
@@ -36,39 +37,29 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     QWidget *placeholder = new QWidget{this};
     QVBoxLayout *layout = new QVBoxLayout(placeholder);
 
-    QString file_name = QFileDialog::getOpenFileName(
-        /* parent= */ this,
-        /* caption= */ tr("Open Video"),
-        /* directory= */ "",
-        /* filter= */ tr("Video Files (*.mp4)"));
+    Settings settings = GetSettings(Settings{});
 
-    QString output_name = QFileDialog::getSaveFileName(
-        /* parent= */ this,
-        /* caption= */ tr("Create/Open Subtitle File"),
-        /* directory= */ "",
-        /* filter= */ tr("SRT Files (*.srt)"));
-
-    video_renderer_ = new video_renderer::OpenGLRenderer(placeholder);
-
-    player_ = std::make_unique<QAVPlayer>();
-
-    if (file_name.isEmpty()) {
+    if (settings.video_file.isEmpty()) {
         qDebug() << "No video file selected";
         QCoreApplication::exit(1);
     }
 
-    if (output_name.isEmpty()) {
+    if (settings.subtitle_file.isEmpty()) {
         qDebug() << "No output file selected";
     }
 
-    subtitle_file_ = output_name;
+    subtitle_file_ = settings.subtitle_file;
 
-    video_file_ = std::make_unique<QFile>(file_name);
+    video_file_ = std::make_unique<QFile>(settings.video_file);
     if (!video_file_->open(QFile::ReadOnly)) {
         qDebug() << "Video file could not be opened";
-        QCoreApplication::exit(1);
+        throw std::runtime_error{"Invalid video file path"};
     }
-    player_->setSource(file_name, video_file_.get());
+
+    video_renderer_ = new video_renderer::OpenGLRenderer(placeholder);
+
+    player_ = std::make_unique<QAVPlayer>();
+    player_->setSource(video_file_->fileName(), video_file_.get());
 
     QWidget *player_controls_placeholder = new QWidget{this};
     QHBoxLayout *player_controls_layout =
@@ -90,7 +81,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     // Get video duration
     // TODO: make util class?
     AVFormatContext *pFormatCtx = avformat_alloc_context();
-    auto file_stdstr = file_name.toStdString();
+    auto file_stdstr = settings.video_file.toStdString();
     avformat_open_input(&pFormatCtx, file_stdstr.c_str(), NULL, NULL);
     avformat_find_stream_info(pFormatCtx, NULL);
     auto duration_us = pFormatCtx->duration;
@@ -99,7 +90,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     std::chrono::milliseconds duration{duration_us / 1000};
     timeline::Timeline *timeline =
-        new timeline::Timeline{duration, output_name, placeholder};
+        new timeline::Timeline{duration, settings.subtitle_file, placeholder};
 
     layout->addWidget(video_renderer_, 60);
     layout->addWidget(player_controls_placeholder);

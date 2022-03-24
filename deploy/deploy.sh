@@ -54,17 +54,18 @@ elif [[ ${machine} == "Linux" ]]; then
     [ -d ${SUBTITE_RELEASE_PATH} ] && rm -r ${SUBTITE_RELEASE_PATH}
 
     mkdir -p ${SUBTITE_RELEASE_PATH}
-
+    cp LICENSE.md ${SUBTITE_RELEASE_PATH}/
     cp -r deploy/linux/usr ${SUBTITE_RELEASE_PATH}
     mkdir -p ${SUBTITE_RELEASE_PATH}/usr/bin
     cp bazel-bin/subtitler/gui/main ${SUBTITE_RELEASE_PATH}/usr/bin/subtite
     mkdir -p ${SUBTITE_RELEASE_PATH}/usr/lib
-    cp LICENSE.md ${SUBTITE_RELEASE_PATH}/
+
     cd ${SUBTITE_RELEASE_PATH}
     linuxdeployqt \
 	${SUBTITE_RELEASE_PATH}/usr/share/applications/subtite.desktop \
 	-appimage
     mv Subtite-x86_64.AppImage Subtite-linux_x86_64.AppImage
+    zip Subtite-linux_x86_64.zip Subtite-linux_x86_64.AppImage LICENSE.md
 
 else
     echo "Unsupported OS: ${machine}"

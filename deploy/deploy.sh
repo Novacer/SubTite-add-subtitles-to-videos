@@ -15,10 +15,6 @@ case "${unameOut}" in
     *)          machine="UNKNOWN:${unameOut}"
 esac
 
-# Instead of directly using the path, use a folder within the path so when
-# we do the delete step we aren't wiping any important files by accident.
-SUBTITE_RELEASE_PATH=${SUBTITE_RELEASE_PATH}/subtite-release
-
 set -e
 
 if [[ ${machine} == "MinGw" || ${machine} == "CYGWIN" ]]; then
@@ -32,6 +28,7 @@ if [[ ${machine} == "MinGw" || ${machine} == "CYGWIN" ]]; then
 
     bazel build --config=vs2019-prod //subtitler/gui:main
 
+    SUBTITE_RELEASE_PATH=${SUBTITE_RELEASE_PATH}/Subtite-win_x86_64
     [ -d ${SUBTITE_RELEASE_PATH} ] && rm -r ${SUBTITE_RELEASE_PATH}
 
     mkdir -p ${SUBTITE_RELEASE_PATH}
@@ -46,12 +43,13 @@ if [[ ${machine} == "MinGw" || ${machine} == "CYGWIN" ]]; then
         -action addskip \
         -res subtitler/gui/resource/images/logo.ico \
         -mask ICONGROUP,MAINICON,
-    mv ${SUBTITE_RELEASE_PATH}/subtite-icon.exe ${SUBTITE_RELEASE_PATH}/subtite.exe
+    mv -f ${SUBTITE_RELEASE_PATH}/subtite-icon.exe ${SUBTITE_RELEASE_PATH}/subtite.exe
 
 elif [[ ${machine} == "Linux" ]]; then
     echo "Using OS: Linux"
     bazel build --config=gcc-prod //subtitler/gui:main
 
+    SUBTITE_RELEASE_PATH=${SUBTITE_RELEASE_PATH}/Subtite-linux_x86_64
     [ -d ${SUBTITE_RELEASE_PATH} ] && rm -r ${SUBTITE_RELEASE_PATH}
 
     mkdir -p ${SUBTITE_RELEASE_PATH}

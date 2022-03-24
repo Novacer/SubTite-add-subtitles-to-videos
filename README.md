@@ -254,6 +254,7 @@ SubTite is available under [The Prosperity Public License 3.0.0](https://prosper
 * [nlohmann json](https://github.com/nlohmann/json/blob/develop/LICENSE.MIT)
 * [howard hinnant date](https://github.com/HowardHinnant/date/blob/master/LICENSE.txt)
 * [QT AV Player](https://github.com/Novacer/QtAVPlayer/blob/master/LICENSE)
+* [csuft video timeline](https://github.com/csuft/VideoTimeline/blob/68df754ce0385e8f6d1f67cd8ee2dd0f9fcf67df/readme.md)
 
 ### BSD 3
 * [gflags](https://github.com/gflags/gflags/blob/master/COPYING.txt)

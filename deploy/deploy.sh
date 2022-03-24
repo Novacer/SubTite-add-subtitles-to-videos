@@ -44,6 +44,7 @@ if [[ ${machine} == "MinGw" || ${machine} == "CYGWIN" ]]; then
         -res subtitler/gui/resource/images/logo.ico \
         -mask ICONGROUP,MAINICON,
     mv -f ${SUBTITE_RELEASE_PATH}/subtite-icon.exe ${SUBTITE_RELEASE_PATH}/subtite.exe
+    cp LICENSE.md ${SUBTITE_RELEASE_PATH}/
 
 elif [[ ${machine} == "Linux" ]]; then
     echo "Using OS: Linux"
@@ -58,6 +59,7 @@ elif [[ ${machine} == "Linux" ]]; then
     mkdir -p ${SUBTITE_RELEASE_PATH}/usr/bin
     cp bazel-bin/subtitler/gui/main ${SUBTITE_RELEASE_PATH}/usr/bin/subtite
     mkdir -p ${SUBTITE_RELEASE_PATH}/usr/lib
+    cp LICENSE.md ${SUBTITE_RELEASE_PATH}/
     cd ${SUBTITE_RELEASE_PATH}
     linuxdeployqt \
 	${SUBTITE_RELEASE_PATH}/usr/share/applications/subtite.desktop \

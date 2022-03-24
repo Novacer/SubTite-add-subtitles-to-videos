@@ -188,6 +188,8 @@ sudo apt-get install -y qt5-default qttools5-dev-tools qtmultimedia5-dev libva-d
 #### Important for Windows Audio!
 The binaries and dynamic libraries are contained in `bazel-bin/subtitler/gui/`. In order to have audio played in the integrated player on windows, you need to copy the QT audio plugins into this folder. In particular, you need to create the folder `bazel-bin/subtitler/gui/plugins`. Then, copy the audio folder from `C:\Qt\5.15.2\msvc2019_64\plugins\` into `bazel-bin/subtitler/gui/plugins`.
 
+You can reference the [deployment section](#deploying---packaging-subtite-with-its-dependencies) for further tips on making sure the dependencies are in the right place.
+
 ## Build configs
 
 The following build options are configured in [.bazelrc](https://github.com/Novacer/SubTite-add-subtitles-to-videos/blob/master/.bazelrc) of this project:

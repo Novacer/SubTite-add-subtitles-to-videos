@@ -13,14 +13,8 @@ extern "C" {
 #include <QDebug>
 #include <QFile>
 #include <QFileDialog>
-#include <QGLWidget>
 #include <QHBoxLayout>
-#include <QMediaObject>
-#include <QMediaService>
 #include <QVBoxLayout>
-#include <QVideoRendererControl>
-#include <QVideoSurfaceFormat>
-#include <QVideoWidget>
 #include <chrono>
 #include <iostream>
 
@@ -29,63 +23,10 @@ extern "C" {
 #include "subtitler/gui/subtitle_editor/subtitle_editor.h"
 #include "subtitler/gui/timeline/timeline.h"
 #include "subtitler/gui/timeline/timer.h"
+#include "subtitler/gui/video_renderer/opengl_renderer.h"
 
 namespace subtitler {
 namespace gui {
-
-class QGLCanvas : public QGLWidget {
-  public:
-    QGLCanvas(QWidget *parent = NULL);
-    void setImage(const QImage &image);
-
-  protected:
-    void paintEvent(QPaintEvent *) override;
-    QRect centeredViewport(int width, int height);
-
-  private:
-    QImage img_;
-    bool set_;
-};
-
-QGLCanvas::QGLCanvas(QWidget *parent) : QGLWidget(parent), set_{false} {
-    QSizePolicy sp = this->sizePolicy();
-    sp.setHorizontalPolicy(QSizePolicy::Preferred);
-    sp.setVerticalPolicy(QSizePolicy::Preferred);
-    sp.setHeightForWidth(true);
-    this->setSizePolicy(sp);
-}
-
-void QGLCanvas::setImage(const QImage &image) {
-    img_ = image;
-    set_ = true;
-}
-
-QRect QGLCanvas::centeredViewport(int width, int height) {
-    double aspectRatio = 1.0;
-    if (set_) {
-        aspectRatio = (double) img_.width() / (double) img_.height();
-    }
-    int heightFromWidth = (int)(width / aspectRatio);
-    int widthFromHeight = (int)(height * aspectRatio);
-
-    if (heightFromWidth <= height) {
-        return QRect(0, (height - heightFromWidth) / 2, width, heightFromWidth);
-    } else {
-        return QRect((width - widthFromHeight) / 2.0, 0, widthFromHeight,
-                     height);
-    }
-}
-
-void QGLCanvas::paintEvent(QPaintEvent *) {
-    QPainter p(this);
-    p.setViewport(centeredViewport(width(), height()));
-    // Set the painter to use a smooth scaling algorithm.
-    p.setRenderHint(QPainter::SmoothPixmapTransform, 1);
-
-    p.drawImage(QRect(QPoint(0,0), size()), img_);
-}
-
-namespace {}  // namespace
 
 MainWindow::~MainWindow() = default;
 
@@ -94,10 +35,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     setMinimumSize(1280, 500);
     QWidget *placeholder = new QWidget{this};
     QVBoxLayout *layout = new QVBoxLayout(placeholder);
-
-    video_canvas_ = new QGLCanvas(placeholder);
-
-    player_ = std::make_unique<QAVPlayer>();
 
     QString file_name = QFileDialog::getOpenFileName(
         /* parent= */ this,
@@ -110,6 +47,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
         /* caption= */ tr("Create/Open Subtitle File"),
         /* directory= */ "",
         /* filter= */ tr("SRT Files (*.srt)"));
+
+    video_renderer_ = new video_renderer::OpenGLRenderer(placeholder);
+
+    player_ = std::make_unique<QAVPlayer>();
 
     if (file_name.isEmpty()) {
         qDebug() << "No video file selected";
@@ -160,7 +101,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     timeline::Timeline *timeline =
         new timeline::Timeline{duration, output_name, placeholder};
 
-    layout->addWidget(video_canvas_, 60);
+    layout->addWidget(video_renderer_, 60);
     layout->addWidget(player_controls_placeholder);
     layout->addWidget(timer);
     layout->addWidget(timeline);
@@ -237,17 +178,12 @@ void MainWindow::onAudioFrameDecoded(const QAVAudioFrame &audio_frame) {
 }
 
 void MainWindow::onVideoFrameDecoded(const QAVVideoFrame &video_frame) {
-    if (video_canvas_ == nullptr) return;
+    if (video_renderer_ == nullptr) {
+        return;
+    }
     QVideoFrame videoFrame = video_frame.convertTo(AV_PIX_FMT_RGB32);
-    // if (!video_renderer_->m_surface->isActive() ||
-    //     video_renderer_->m_surface->surfaceFormat().frameSize() !=
-    //         videoFrame.size()) {
-    //     QVideoSurfaceFormat f(videoFrame.size(), videoFrame.pixelFormat(),
-    //                           videoFrame.handleType());
-    //     video_renderer_->m_surface->start(f);
-    // }
-    video_canvas_->setImage(videoFrame.image());
-    video_canvas_->update();
+    video_renderer_->presentImage(videoFrame.image());
+
     std::chrono::milliseconds ms{(quint64)(video_frame.pts() * 1000)};
     if (!user_seeked_) {
         // Only emit if the user did not seek.

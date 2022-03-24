@@ -4,7 +4,6 @@ cc_binary(
     name = "trimmer",
     srcs = select({
         "@bazel_tools//src/conditions:windows": ["trimmer_msvc.cpp"],
-        "@bazel_tools//src/conditions:darwin": ["trimmer_gcc.cpp"],
         "//conditions:default": ["trimmer_gcc.cpp"],
     }),
     deps = [

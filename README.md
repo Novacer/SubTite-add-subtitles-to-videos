@@ -1,19 +1,27 @@
 # SubTite: Easy way to create and add subtitles for your videos
-**TLDR:** SubTite allows you to add subtitles and preview it immediately in the video player. The subtitles will be output as a separate SRT file. Existing SRT files can be imported and edited effortlessly. The subtitles can be positioned in 9 different locations along the video. Support for adding images and trimming video coming soon!
+**TLDR:** SubTite allows you to add subtitles and preview it immediately in the video player. The subtitles will be output as a separate SRT file. Existing SRT files can be imported and edited effortlessly. The subtitles can be positioned in 9 different locations along the video. Support for trimming video, adding images, and other video editing features coming soon!
 
-![demo](https://user-images.githubusercontent.com/29148427/151613092-e7dcf2c3-80dd-4f72-a3c9-8bdd220594b8.gif)
+## GUI Demo
+![gui demo](https://i.imgur.com/ty0G3uF.gif)
 
+## CLI Demo
+![cli demo](https://user-images.githubusercontent.com/29148427/151613092-e7dcf2c3-80dd-4f72-a3c9-8bdd220594b8.gif)
 
-## Feature Overview (Current v0.1)
+## Feature Overview (Current v0.9)
 * Supports Windows and Linux
+* GUI for adding subtitles
 * CLI for adding subtitles
 * Intuitive interface to make subtitling as fast and pain-free as possible
 * Full UTF-8 Unicode support on Windows and Linux
 * Subtitles can be positioned in 9 different locations: top right, middle center, bottom left etc.
 * Added subtitles can immediately be previewed in a video player on the fly
-* Existing subtitles can be loaded and easily edited
+* Existing subtitles (.srt) can be loaded and easily edited
 
 ## Installation
+
+### To use the GUI
+Download the appropriate binaries from the [releases section](https://github.com/Novacer/SubTite-add-subtitles-to-videos/releases)
+
 ### To use the CLI
 The CLI edition of SubTite is the Keep-It-Simple solution to quickly add subtitles without being bogged down by UI elements.
 
@@ -33,6 +41,18 @@ The CLI edition of SubTite is the Keep-It-Simple solution to quickly add subtitl
 3. Obtain SubTite cli binary from releases section or build the code yourself (see building section below)
 
 ## Usage
+
+### GUI
+1. Select the video from the file dialog.
+2. Select the subtitle file from the next file dialog. You can create a new subtitle file to start from scratch, or use an existing (.srt) file.
+3. Position the yellow indicator at the subtitle's start position.
+4. Right-click and select "Add interval at position".
+5. Enter the subtitle text on the pane to the right.
+6. (Optional) Select the subtitle position from one of the 9 positions.
+7. Use mouse to adjust the subtitle's start and end time. Any changes are saved automatically.
+
+
+### CLI
 The following are usage instructions for the CLI. Let `subtite` be the name of the binary.
 
 ### Paths setup
@@ -139,6 +159,39 @@ $ bazel build --config=vs2019-prod //subtitler/cli:cli # Build CLI in release mo
 $ bazel build --config=gcc-prod //subttiler/cli:cli    # Build CLI in release mode using GCC
 ```
 
+Building the GUI requires QT 5 to be installed on your machine. On windows specifically, we expect the path to be somewhat similar to
+```
+C:\Qt\5.15.2\msvc2019_64\... etc
+```
+
+and on linux,
+```
+/usr/include/x86_64-linux-gnu/qt5
+or
+/usr/include/qt
+```
+
+Then SubTite can be built all from one command:
+
+```bash
+$ bazel build --config=vs2019-prod //subtitler/gui:main # Build GUI in release mode using MSVC2019
+$ bazel build --config=gcc-prod //subttiler/gui:main    # Build GUI in release mode using GCC
+```
+All other dependencies like FFMPEG etc. are downloaded for you automatically
+during the build process.
+
+On linux, some additional packages may be needed.
+```
+sudo apt-get install -y qt5-default qttools5-dev-tools qtmultimedia5-dev libva-dev
+```
+
+#### Important for Windows Audio!
+The binaries and dynamic libraries are contained in `bazel-bin/subtitler/gui/`. In order to have audio played in the integrated player on windows, you need to copy the QT audio plugins into this folder. In particular, you need to create the folder `bazel-bin/subtitler/gui/plugins`. Then, copy the audio folder from `C:\Qt\5.15.2\msvc2019_64\plugins\` into `bazel-bin/subtitler/gui/plugins`.
+
+You can reference the [deployment section](#deploying---packaging-subtite-with-its-dependencies) for further tips on making sure the dependencies are in the right place.
+
+## Build configs
+
 The following build options are configured in [.bazelrc](https://github.com/Novacer/SubTite-add-subtitles-to-videos/blob/master/.bazelrc) of this project:
 1. `--config=vs2019-prod`. MSVC release mode
 2. `--config=vs2019-asan`. MSVC debug mode, with address sanitizer
@@ -151,6 +204,11 @@ Unit tests can be run using
 $ bazel test --config=vs2019 ... # used for running on windows
 $ bazel test --config=gcc ...    # used for running on linux
 ```
+
+## Deploying - Packaging Subtite with it's dependencies.
+Since Subtite uses Dynamic Linking with QT and FFMPEG (so it can remain LGPL compliant with those projects), there is a need to package the dependencies of Subtite when deploying. A deploy script can be run `./deploy/deploy.sh` (IMPORTANT: script has to be run from the project root) which will package the dependecies automatically.
+
+In addition to the dependencies required to build Subtite, deploying also requires [Resource Hacker](http://www.angusj.com/resourcehacker/) on Windows, and [linuxdeployqt](https://github.com/probonopd/linuxdeployqt) on Linux.
 
 ## Experimental
 Some experimental binaries are also placed in the `subtitler/experimental` folder.
@@ -176,11 +234,32 @@ $ bazel build --config=vs2019 //subtitler/experimental:trimmer
 This functionality will eventually be integrated in the SubTite binary. See planned features below.
 
 ## Planned Features
-### V0.2-0.9
-* Support for various fonts and colours
+### V1.0-2.0
+* Support for subtitles of various fonts and colours
 * Subtitles can be baked directly into the video
 * Support simple video editing, such as cropping/trimming
 * Support adding static images on top of the video between certain timestamps.
 
-### V1.0
-* Full graphical user interface with integrated video player, interval selector etc.
+# Licensing
+SubTite is available under [The Prosperity Public License 3.0.0](https://prosperitylicense.com/versions/3.0.0)
+* If you use SubTite in a non-commercial manner, then you have permission to do so for free.
+* If you use SubTite in any commercial manner, then you are subject to a 30-day free trial. After which, you must initiate contact directly to discuss a commercial licensing agreement.
+
+## Attribution - SubTite uses the following projects:
+### LGPL
+* [FFMPEG](https://www.ffmpeg.org/legal.htmlhttps://www.ffmpeg.org/legal.html). Pre-built shared libraries are obtained from https://github.com/BtbN/FFmpeg-Builds/releases
+* [Qt](https://doc.qt.io/qt-5/lgpl.html) 
+
+### MIT
+* [nlohmann json](https://github.com/nlohmann/json/blob/develop/LICENSE.MIT)
+* [howard hinnant date](https://github.com/HowardHinnant/date/blob/master/LICENSE.txt)
+* [QT AV Player](https://github.com/Novacer/QtAVPlayer/blob/master/LICENSE)
+* [csuft video timeline](https://github.com/csuft/VideoTimeline/blob/68df754ce0385e8f6d1f67cd8ee2dd0f9fcf67df/readme.md)
+
+### BSD 3
+* [gflags](https://github.com/gflags/gflags/blob/master/COPYING.txt)
+* [googletest](https://github.com/google/googletest/blob/main/LICENSE)
+
+### Other
+* [glog](https://github.com/google/glog/blob/master/COPYING)
+* [bazel rules qt](https://github.com/Novacer/bazel_rules_qt/blob/master/LICENSE)

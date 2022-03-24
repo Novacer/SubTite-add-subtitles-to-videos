@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Subtite
+Comment=A simple subtitle adding video editor
+# Need to copy binary into usr/bin/subtite
+Exec=subtite
+Icon=logo
+Categories=Office;

@@ -51,10 +51,14 @@ Ruler::Ruler(QWidget* parent, std::chrono::milliseconds duration,
     setupChildren();
 
     context_menu_ = new QMenu(this);
-    add_subtitle_interval_ = new QAction(tr("Add Subtitle at Indicator"), this);
+    add_subtitle_after_ = new QAction(tr("Add Subtitle After Indicator"), this);
+    add_subtitle_before_ =
+        new QAction(tr("Add Subtitle Before Indicator"), this);
 
-    connect(add_subtitle_interval_, &QAction::triggered, this,
-            &Ruler::onAddSubtitleInterval);
+    connect(add_subtitle_after_, &QAction::triggered, this,
+            &Ruler::onAddSubtitleIntervalAfter);
+    connect(add_subtitle_before_, &QAction::triggered, this,
+            &Ruler::onAddSubtitleIntervalBefore);
 
     resize(rect_width_ + START_END_PADDING, 120);
 }
@@ -232,7 +236,8 @@ bool Ruler::eventFilter(QObject* watched, QEvent* event) {
 }
 
 void Ruler::contextMenuEvent(QContextMenuEvent* event) {
-    context_menu_->addAction(add_subtitle_interval_);
+    context_menu_->addAction(add_subtitle_after_);
+    context_menu_->addAction(add_subtitle_before_);
     context_menu_->exec(QCursor::pos());
     event->accept();
 }
@@ -326,7 +331,7 @@ void Ruler::onZoomOut(int level) {
     updateChildren();
 }
 
-void Ruler::onAddSubtitleInterval() {
+void Ruler::onAddSubtitleIntervalAfter() {
     SubtitleIntervalArgs args;
     args.start_time = indicator_time_;
     args.start_x = millisecondsToPosition(args.start_time);
@@ -335,6 +340,44 @@ void Ruler::onAddSubtitleInterval() {
     args.end_time = indicator_time_ + 5s;
     args.end_x = millisecondsToPosition(args.end_time);
     args.end_y = HEADER_HEIGHT;
+    subtitle_intervals_->AddInterval(
+        std::make_unique<SubtitleInterval>(args, this));
+}
+
+/**
+ * Search the intervals for the nearest ending before the indicator.
+ * Place start time = nearest end, end time = indicator.
+ * If the gap between the nearest interval >30s, then assume the user probably
+ * didn't want to connect to that interval. In that case, just make the interval
+ * 5s long.
+ */
+void Ruler::onAddSubtitleIntervalBefore() {
+    auto& intervals = subtitle_intervals_->intervals();
+    auto nearest_interval = intervals.end();
+    for (auto it = intervals.begin(); it != intervals.end(); ++it) {
+        auto end_time = (*it)->GetEndTime();
+        if (end_time < indicator_time_) {
+            if (nearest_interval == intervals.end() ||
+                (*nearest_interval)->GetEndTime() < end_time) {
+                nearest_interval = it;
+            }
+        }
+    }
+    SubtitleIntervalArgs args;
+    if (nearest_interval == intervals.end() ||
+        indicator_time_ - (*nearest_interval)->GetEndTime() > 30s) {
+        args.start_time = std::max(indicator_time_ - 5s, 0ms);
+        args.end_time = indicator_time_;
+    } else {
+        args.start_time = (*nearest_interval)->GetEndTime();
+        args.end_time = indicator_time_;
+    }
+
+    args.start_x = millisecondsToPosition(args.start_time);
+    args.start_y = HEADER_HEIGHT;
+    args.end_x = millisecondsToPosition(args.end_time);
+    args.end_y = HEADER_HEIGHT;
+
     subtitle_intervals_->AddInterval(
         std::make_unique<SubtitleInterval>(args, this));
 }

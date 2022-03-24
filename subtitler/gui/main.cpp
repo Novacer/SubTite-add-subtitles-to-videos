@@ -8,7 +8,6 @@ extern "C" {
 #include <QByteArray>
 #include <QDir>
 #include <QFile>
-#include <iostream>
 
 #include "subtitler/gui/main_window.h"
 

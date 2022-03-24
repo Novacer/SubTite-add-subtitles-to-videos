@@ -20,7 +20,7 @@
 ## Installation
 
 ### To use the GUI
-Download the appropriate binaries from the releases section (TODO)
+Download the appropriate binaries from the [releases section](https://github.com/Novacer/SubTite-add-subtitles-to-videos/releases)
 
 ### To use the CLI
 The CLI edition of SubTite is the Keep-It-Simple solution to quickly add subtitles without being bogged down by UI elements.
@@ -159,7 +159,7 @@ $ bazel build --config=vs2019-prod //subtitler/cli:cli # Build CLI in release mo
 $ bazel build --config=gcc-prod //subttiler/cli:cli    # Build CLI in release mode using GCC
 ```
 
-Building the GUI requires QT5 to be installed on your machine. On windows specifically, we expect the path to be similar to
+Building the GUI requires QT 5 to be installed on your machine. On windows specifically, we expect the path to be somewhat similar to
 ```
 C:\Qt\5.15.2\msvc2019_64\... etc
 ```
@@ -180,6 +180,11 @@ $ bazel build --config=gcc-prod //subttiler/gui:main    # Build GUI in release m
 All other dependencies like FFMPEG etc. are downloaded for you automatically
 during the build process.
 
+On linux, some additional packages may be needed.
+```
+sudo apt-get install -y qt5-default qttools5-dev-tools qtmultimedia5-dev libva-dev
+```
+
 #### Important for Windows Audio!
 The binaries and dynamic libraries are contained in `bazel-bin/subtitler/gui/`. In order to have audio played in the integrated player on windows, you need to copy the QT audio plugins into this folder. In particular, you need to create the folder `bazel-bin/subtitler/gui/plugins`. Then, copy the audio folder from `C:\Qt\5.15.2\msvc2019_64\plugins\` into `bazel-bin/subtitler/gui/plugins`.
 
@@ -197,6 +202,11 @@ Unit tests can be run using
 $ bazel test --config=vs2019 ... # used for running on windows
 $ bazel test --config=gcc ...    # used for running on linux
 ```
+
+## Deploying - Packaging Subtite with it's dependencies.
+Since Subtite uses Dynamic Linking with QT and FFMPEG (so it can remain LGPL compliant with those projects), there is a need to package the dependencies of Subtite when deploying. A deploy script can be run `./deploy/deploy.sh` (IMPORTANT: script has to be run from the project root) which will package the dependecies automatically.
+
+In addition to the dependencies required to build Subtite, deploying also requires [Resource Hacker](http://www.angusj.com/resourcehacker/) on Windows, and [linuxdeployqt](https://github.com/probonopd/linuxdeployqt) on Linux.
 
 ## Experimental
 Some experimental binaries are also placed in the `subtitler/experimental` folder.
@@ -222,7 +232,7 @@ $ bazel build --config=vs2019 //subtitler/experimental:trimmer
 This functionality will eventually be integrated in the SubTite binary. See planned features below.
 
 ## Planned Features
-### V1.0
+### V1.0-2.0
 * Support for subtitles of various fonts and colours
 * Subtitles can be baked directly into the video
 * Support simple video editing, such as cropping/trimming

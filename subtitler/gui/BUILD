@@ -17,6 +17,7 @@ qt_cc_library(
         "//subtitler/gui/subtitle_editor:subtitle_editor",
         "//subtitler/gui/timeline:timer",
         "//subtitler/gui/timeline:timeline_window",
+        "//subtitler/gui/video_renderer:opengl_renderer",
         "@qt//:qt_widgets",
         "@qt//:qt_multimedia",
         "@qt//:qt_multimediawidgets",

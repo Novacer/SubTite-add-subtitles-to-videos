@@ -18,8 +18,11 @@ QT_FORWARD_DECLARE_CLASS(SubtitleEditor)
 
 }  // namespace subtitle_editor
 
-QT_FORWARD_DECLARE_CLASS(VideoRenderer)
+namespace video_renderer {
 
+QT_FORWARD_DECLARE_CLASS(OpenGLRenderer)
+
+}  // namespace video_renderer
 }  // namespace subtitler::gui
 
 namespace subtitler {
@@ -47,7 +50,7 @@ class MainWindow : public QMainWindow {
     std::unique_ptr<QAVPlayer> player_;
     std::unique_ptr<QAVAudioOutput> audio_output_;
     std::unique_ptr<QFile> video_file_;
-    VideoRenderer *video_renderer_;
+    video_renderer::OpenGLRenderer *video_renderer_;
     subtitle_editor::SubtitleEditor *editor_;
     // Flag var which is set when user moves the ruler,
     // and reset once the next video frame is decoded.

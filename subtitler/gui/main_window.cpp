@@ -14,12 +14,7 @@ extern "C" {
 #include <QFile>
 #include <QFileDialog>
 #include <QHBoxLayout>
-#include <QMediaObject>
-#include <QMediaService>
 #include <QVBoxLayout>
-#include <QVideoRendererControl>
-#include <QVideoSurfaceFormat>
-#include <QVideoWidget>
 #include <chrono>
 #include <iostream>
 
@@ -28,67 +23,10 @@ extern "C" {
 #include "subtitler/gui/subtitle_editor/subtitle_editor.h"
 #include "subtitler/gui/timeline/timeline.h"
 #include "subtitler/gui/timeline/timer.h"
+#include "subtitler/gui/video_renderer/opengl_renderer.h"
 
 namespace subtitler {
 namespace gui {
-
-class VideoRenderer : public QVideoRendererControl {
-  public:
-    QAbstractVideoSurface *surface() const override { return m_surface; }
-
-    void setSurface(QAbstractVideoSurface *surface) override {
-        m_surface = surface;
-    }
-
-    QAbstractVideoSurface *m_surface = Q_NULLPTR;
-};
-
-namespace {
-
-class MediaService : public QMediaService {
-  public:
-    MediaService(std::unique_ptr<VideoRenderer> vr, QObject *parent = Q_NULLPTR)
-        : QMediaService(parent), renderer_(std::move(vr)) {}
-
-    QMediaControl *requestControl(const char *name) override {
-        if (qstrcmp(name, QVideoRendererControl_iid) == 0)
-            return renderer_.get();
-
-        return Q_NULLPTR;
-    }
-
-    void releaseControl(QMediaControl *) override {}
-
-  private:
-    std::unique_ptr<VideoRenderer> renderer_ = Q_NULLPTR;
-};
-
-class MediaObject : public QMediaObject {
-  public:
-    MediaObject(std::unique_ptr<MediaService> media_service,
-                QObject *parent = Q_NULLPTR)
-        : QMediaObject(parent, media_service.get()),
-          media_service_{std::move(media_service)} {}
-
-  private:
-    std::unique_ptr<MediaService> media_service_;
-};
-
-class VideoWidget : public QVideoWidget {
-  public:
-    explicit VideoWidget(QWidget *parent = Q_NULLPTR) : QVideoWidget(parent) {}
-    ~VideoWidget() { delete media_object_; }
-    bool setMediaObject(QMediaObject *object) override {
-        delete media_object_;
-        media_object_ = object;
-        return QVideoWidget::setMediaObject(object);
-    }
-
-  private:
-    QMediaObject *media_object_ = Q_NULLPTR;
-};
-
-}  // namespace
 
 MainWindow::~MainWindow() = default;
 
@@ -97,18 +35,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     setMinimumSize(1280, 500);
     QWidget *placeholder = new QWidget{this};
     QVBoxLayout *layout = new QVBoxLayout(placeholder);
-
-    auto video_renderer = std::make_unique<VideoRenderer>();
-    video_renderer_ = video_renderer.get();
-
-    VideoWidget *video_widget = new VideoWidget{placeholder};
-
-    MediaObject *media_object = new MediaObject(
-        std::make_unique<MediaService>(std::move(video_renderer)),
-        video_widget);
-    video_widget->setMediaObject(media_object);
-
-    player_ = std::make_unique<QAVPlayer>();
 
     QString file_name = QFileDialog::getOpenFileName(
         /* parent= */ this,
@@ -121,6 +47,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
         /* caption= */ tr("Create/Open Subtitle File"),
         /* directory= */ "",
         /* filter= */ tr("SRT Files (*.srt)"));
+
+    video_renderer_ = new video_renderer::OpenGLRenderer(placeholder);
+
+    player_ = std::make_unique<QAVPlayer>();
 
     if (file_name.isEmpty()) {
         qDebug() << "No video file selected";
@@ -171,7 +101,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     timeline::Timeline *timeline =
         new timeline::Timeline{duration, output_name, placeholder};
 
-    layout->addWidget(video_widget);
+    layout->addWidget(video_renderer_, 60);
     layout->addWidget(player_controls_placeholder);
     layout->addWidget(timer);
     layout->addWidget(timeline);
@@ -248,25 +178,19 @@ void MainWindow::onAudioFrameDecoded(const QAVAudioFrame &audio_frame) {
 }
 
 void MainWindow::onVideoFrameDecoded(const QAVVideoFrame &video_frame) {
-    if (video_renderer_->m_surface == nullptr) return;
-    QVideoFrame videoFrame = video_frame.convertTo(AV_PIX_FMT_RGB32);
-    if (!video_renderer_->m_surface->isActive() ||
-        video_renderer_->m_surface->surfaceFormat().frameSize() !=
-            videoFrame.size()) {
-        QVideoSurfaceFormat f(videoFrame.size(), videoFrame.pixelFormat(),
-                              videoFrame.handleType());
-        video_renderer_->m_surface->start(f);
+    if (video_renderer_ == nullptr) {
+        return;
     }
-    if (video_renderer_->m_surface->isActive()) {
-        video_renderer_->m_surface->present(videoFrame);
-        std::chrono::milliseconds ms{(quint64)(video_frame.pts() * 1000)};
-        if (!user_seeked_) {
-            // Only emit if the user did not seek.
-            // If user seeked, then the player is not changing the time!
-            emit this->playerChangedTime(ms);
-        } else {
-            user_seeked_ = false;
-        }
+    QVideoFrame videoFrame = video_frame.convertTo(AV_PIX_FMT_RGB32);
+    video_renderer_->displayFrame(videoFrame);
+
+    std::chrono::milliseconds ms{(quint64)(video_frame.pts() * 1000)};
+    if (!user_seeked_) {
+        // Only emit if the user did not seek.
+        // If user seeked, then the player is not changing the time!
+        emit this->playerChangedTime(ms);
+    } else {
+        user_seeked_ = false;
     }
 }
 

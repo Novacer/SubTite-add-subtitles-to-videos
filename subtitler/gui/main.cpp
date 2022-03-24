@@ -29,10 +29,16 @@ int main(int argc, char *argv[]) {
         file.close();
     }
 
-    subtitler::gui::MainWindow main_window;
-    main_window.show();
+    int res = 0;
 
-    int res = app.exec();
+    try {
+        subtitler::gui::MainWindow main_window;
+        main_window.show();
+        res = app.exec();
+    } catch (const std::exception &e) {
+        // Silence
+    }
+
     qunsetenv("QT_AVPLAYER_NO_HWDEVICE");
     return res;
 }

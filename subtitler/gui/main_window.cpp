@@ -20,11 +20,11 @@ extern "C" {
 
 #include "subtitler/gui/player_controls/play_button.h"
 #include "subtitler/gui/player_controls/step_button.h"
+#include "subtitler/gui/settings_window.h"
 #include "subtitler/gui/subtitle_editor/subtitle_editor.h"
 #include "subtitler/gui/timeline/timeline.h"
 #include "subtitler/gui/timeline/timer.h"
 #include "subtitler/gui/video_renderer/opengl_renderer.h"
-#include "subtitler/gui/settings_window.h"
 
 namespace subtitler {
 namespace gui {

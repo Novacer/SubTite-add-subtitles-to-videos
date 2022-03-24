@@ -21,7 +21,7 @@ class SettingsWindow : public QDialog {
     ~SettingsWindow() = default;
 
   private:
-    Settings& settings_;
+    Settings &settings_;
 };
 
 }  // namespace gui

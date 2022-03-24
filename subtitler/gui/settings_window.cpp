@@ -1,10 +1,10 @@
 #include "subtitler/gui/settings_window.h"
 
+#include <QDebug>
 #include <QFileDialog>
 #include <QGridLayout>
 #include <QLabel>
 #include <QPushButton>
-#include <QDebug>
 
 namespace subtitler {
 namespace gui {
@@ -48,18 +48,17 @@ SettingsWindow::SettingsWindow(Settings &settings, QWidget *parent)
         video_choice->setText(settings_.video_file);
     });
 
-    connect(choose_subtitle, &QPushButton::clicked, this, [this, subtitle_choice]() {
-        settings_.subtitle_file = QFileDialog::getSaveFileName(
-            /* parent= */ this,
-            /* caption= */ tr("Create/Open Subtitle File"),
-            /* directory= */ "",
-            /* filter= */ tr("SRT Files (*.srt)"));
-        subtitle_choice->setText(settings_.subtitle_file);
-    });
+    connect(choose_subtitle, &QPushButton::clicked, this,
+            [this, subtitle_choice]() {
+                settings_.subtitle_file = QFileDialog::getSaveFileName(
+                    /* parent= */ this,
+                    /* caption= */ tr("Create/Open Subtitle File"),
+                    /* directory= */ "",
+                    /* filter= */ tr("SRT Files (*.srt)"));
+                subtitle_choice->setText(settings_.subtitle_file);
+            });
 
-    connect(close, &QPushButton::clicked, this, [this]() {
-        this->done(0);
-    });
+    connect(close, &QPushButton::clicked, this, [this]() { this->done(0); });
 }
 
 }  // namespace gui

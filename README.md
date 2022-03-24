@@ -239,3 +239,21 @@ This functionality will eventually be integrated in the SubTite binary. See plan
 * Subtitles can be baked directly into the video
 * Support simple video editing, such as cropping/trimming
 * Support adding static images on top of the video between certain timestamps.
+
+## Attribution - SubTite uses the following projects:
+### LGPL
+* [FFMPEG](https://www.ffmpeg.org/legal.htmlhttps://www.ffmpeg.org/legal.html). Pre-built shared libraries are obtained from https://github.com/BtbN/FFmpeg-Builds/releases
+* [Qt](https://doc.qt.io/qt-5/lgpl.html) 
+
+### MIT
+* [nlohmann json](https://github.com/nlohmann/json/blob/develop/LICENSE.MIT)
+* [howard hinnant date](https://github.com/HowardHinnant/date/blob/master/LICENSE.txt)
+* [QT AV Player](https://github.com/Novacer/QtAVPlayer/blob/master/LICENSE)
+
+### BSD 3
+* [gflags](https://github.com/gflags/gflags/blob/master/COPYING.txt)
+* [googletest](https://github.com/google/googletest/blob/main/LICENSE)
+
+### Other
+* [glog](https://github.com/google/glog/blob/master/COPYING)
+* [bazel rules qt](https://github.com/Novacer/bazel_rules_qt/blob/master/LICENSE)

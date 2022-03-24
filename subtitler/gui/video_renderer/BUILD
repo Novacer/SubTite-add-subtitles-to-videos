@@ -7,7 +7,7 @@ qt_cc_library(
     srcs = ["opengl_renderer.cpp"],
     hdrs = ["opengl_renderer.h"],
     deps = [
-        "@qt//:qt_widgets",
         "@qt//:qt_multimedia",
+        "@qt//:qt_widgets",
     ],
 )

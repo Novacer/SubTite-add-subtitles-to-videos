@@ -4,14 +4,14 @@ if [[ -z ${QT5_INSTALL_PATH} ]]; then
     echo "Please set QT5_INSTALL_PATH env variable to be the QT5 install path containing lib, bin, plugins etc."
     exit 1
 else
-    echo "Using QT5 Path: ${Qt5_Dir}"
+    echo "Using QT5 Path: ${QT5_INSTALL_PATH}"
 fi
 
 if [[ -z ${SUBTITE_RELEASE_PATH} ]]; then
     echo "Please set SUBTITE_RELEASE_PATH env variable to be the directory to copy release binary"
     exit 1
 else
-    echo "Using QT5 Path: ${Qt5_Dir}"
+    echo "Using QT5 Path: ${SUBTITE_RELEASE_PATH}"
 fi
 
 unameOut="$(uname -s)"
@@ -40,10 +40,19 @@ if [[ ${machine} == "MinGw" || ${machine} == "CYGWIN" ]]; then
     mkdir -p ${SUBTITE_RELEASE_PATH}/plugins
     cp -r ${QT5_INSTALL_PATH}/plugins/audio ${SUBTITE_RELEASE_PATH}/plugins/audio
     cp -r ${QT5_INSTALL_PATH}/plugins/platforms ${SUBTITE_RELEASE_PATH}/plugins/platforms
+    ResourceHacker \
+        -open ${SUBTITE_RELEASE_PATH}/subtite.exe \
+        -save ${SUBTITE_RELEASE_PATH}/subtite-icon.exe \
+        -action addskip \
+        -res subtitler/gui/resource/images/logo.ico \
+        -mask ICONGROUP,MAINICON,
+    mv ${SUBTITE_RELEASE_PATH}/subtite-icon.exe ${SUBTITE_RELEASE_PATH}/subtite.exe
 
 elif [[ ${machine} == "Linux" ]]; then
     echo "Using OS: Linux"
     bazel build --config=gcc-prod //subtitler/gui:main
+    cp -r deploy/linux/usr ${SUBTITE_RELEASE_PATH}
+    # TODO
 else
     echo "Unsupported OS: ${machine}"
     exit 1

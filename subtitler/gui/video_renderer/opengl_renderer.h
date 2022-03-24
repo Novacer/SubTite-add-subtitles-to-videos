@@ -2,6 +2,7 @@
 #define SUBTITLER_GUI_VIDEO_RENDERER_OPENGL_RENDERER_H
 
 #include <QOpenGLWidget>
+#include <QVideoFrame>
 
 namespace subtitler {
 namespace gui {
@@ -13,7 +14,7 @@ class OpenGLRenderer : public QOpenGLWidget {
     OpenGLRenderer(QWidget *parent = NULL);
     ~OpenGLRenderer() = default;
 
-    void presentImage(const QImage &&image);
+    void displayFrame(const QVideoFrame &frame);
 
   protected:
     void paintEvent(QPaintEvent *event) override;

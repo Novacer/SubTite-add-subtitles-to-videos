@@ -182,7 +182,7 @@ void MainWindow::onVideoFrameDecoded(const QAVVideoFrame &video_frame) {
         return;
     }
     QVideoFrame videoFrame = video_frame.convertTo(AV_PIX_FMT_RGB32);
-    video_renderer_->presentImage(videoFrame.image());
+    video_renderer_->displayFrame(videoFrame);
 
     std::chrono::milliseconds ms{(quint64)(video_frame.pts() * 1000)};
     if (!user_seeked_) {

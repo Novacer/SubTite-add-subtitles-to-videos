@@ -1,12 +1,5 @@
 #!/bin/bash
 
-if [[ -z ${QT5_INSTALL_PATH} ]]; then
-    echo "Please set QT5_INSTALL_PATH env variable to be the QT5 install path containing lib, bin, plugins etc."
-    exit 1
-else
-    echo "Using QT5 Path: ${QT5_INSTALL_PATH}"
-fi
-
 if [[ -z ${SUBTITE_RELEASE_PATH} ]]; then
     echo "Please set SUBTITE_RELEASE_PATH env variable to be the directory to copy release binary"
     exit 1
@@ -30,6 +23,13 @@ set -e
 
 if [[ ${machine} == "MinGw" || ${machine} == "CYGWIN" ]]; then
     echo "Using OS: Windows"
+    if [[ -z ${QT5_INSTALL_PATH} ]]; then
+        echo "Please set QT5_INSTALL_PATH env variable to be the QT5 path containing lib, bin, plugins etc."
+        exit 1
+    else
+        echo "Using QT5 Path: ${QT5_INSTALL_PATH}"
+    fi
+
     bazel build --config=vs2019-prod //subtitler/gui:main
 
     [ -d ${SUBTITE_RELEASE_PATH} ] && rm -r ${SUBTITE_RELEASE_PATH}
@@ -51,8 +51,21 @@ if [[ ${machine} == "MinGw" || ${machine} == "CYGWIN" ]]; then
 elif [[ ${machine} == "Linux" ]]; then
     echo "Using OS: Linux"
     bazel build --config=gcc-prod //subtitler/gui:main
+
+    [ -d ${SUBTITE_RELEASE_PATH} ] && rm -r ${SUBTITE_RELEASE_PATH}
+
+    mkdir -p ${SUBTITE_RELEASE_PATH}
+
     cp -r deploy/linux/usr ${SUBTITE_RELEASE_PATH}
-    # TODO
+    mkdir -p ${SUBTITE_RELEASE_PATH}/usr/bin
+    cp bazel-bin/subtitler/gui/main ${SUBTITE_RELEASE_PATH}/usr/bin/subtite
+    mkdir -p ${SUBTITE_RELEASE_PATH}/usr/lib
+    cd ${SUBTITE_RELEASE_PATH}
+    linuxdeployqt \
+	${SUBTITE_RELEASE_PATH}/usr/share/applications/subtite.desktop \
+	-appimage
+    mv Subtite-x86_64.AppImage Subtite-linux_x86_64.AppImage
+
 else
     echo "Unsupported OS: ${machine}"
     exit 1

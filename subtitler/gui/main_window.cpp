@@ -13,6 +13,7 @@ extern "C" {
 #include <QDebug>
 #include <QFile>
 #include <QFileDialog>
+#include <QGLWidget>
 #include <QHBoxLayout>
 #include <QMediaObject>
 #include <QMediaService>
@@ -32,63 +33,59 @@ extern "C" {
 namespace subtitler {
 namespace gui {
 
-class VideoRenderer : public QVideoRendererControl {
+class QGLCanvas : public QGLWidget {
   public:
-    QAbstractVideoSurface *surface() const override { return m_surface; }
+    QGLCanvas(QWidget *parent = NULL);
+    void setImage(const QImage &image);
 
-    void setSurface(QAbstractVideoSurface *surface) override {
-        m_surface = surface;
-    }
-
-    QAbstractVideoSurface *m_surface = Q_NULLPTR;
-};
-
-namespace {
-
-class MediaService : public QMediaService {
-  public:
-    MediaService(std::unique_ptr<VideoRenderer> vr, QObject *parent = Q_NULLPTR)
-        : QMediaService(parent), renderer_(std::move(vr)) {}
-
-    QMediaControl *requestControl(const char *name) override {
-        if (qstrcmp(name, QVideoRendererControl_iid) == 0)
-            return renderer_.get();
-
-        return Q_NULLPTR;
-    }
-
-    void releaseControl(QMediaControl *) override {}
+  protected:
+    void paintEvent(QPaintEvent *) override;
+    QRect centeredViewport(int width, int height);
 
   private:
-    std::unique_ptr<VideoRenderer> renderer_ = Q_NULLPTR;
+    QImage img_;
+    bool set_;
 };
 
-class MediaObject : public QMediaObject {
-  public:
-    MediaObject(std::unique_ptr<MediaService> media_service,
-                QObject *parent = Q_NULLPTR)
-        : QMediaObject(parent, media_service.get()),
-          media_service_{std::move(media_service)} {}
+QGLCanvas::QGLCanvas(QWidget *parent) : QGLWidget(parent), set_{false} {
+    QSizePolicy sp = this->sizePolicy();
+    sp.setHorizontalPolicy(QSizePolicy::Preferred);
+    sp.setVerticalPolicy(QSizePolicy::Preferred);
+    sp.setHeightForWidth(true);
+    this->setSizePolicy(sp);
+}
 
-  private:
-    std::unique_ptr<MediaService> media_service_;
-};
+void QGLCanvas::setImage(const QImage &image) {
+    img_ = image;
+    set_ = true;
+}
 
-class VideoWidget : public QVideoWidget {
-  public:
-    explicit VideoWidget(QWidget *parent = Q_NULLPTR) : QVideoWidget(parent) {}
-    ~VideoWidget() { delete media_object_; }
-    bool setMediaObject(QMediaObject *object) override {
-        delete media_object_;
-        media_object_ = object;
-        return QVideoWidget::setMediaObject(object);
+QRect QGLCanvas::centeredViewport(int width, int height) {
+    double aspectRatio = 1.0;
+    if (set_) {
+        aspectRatio = (double) img_.width() / (double) img_.height();
     }
+    int heightFromWidth = (int)(width / aspectRatio);
+    int widthFromHeight = (int)(height * aspectRatio);
 
-  private:
-    QMediaObject *media_object_ = Q_NULLPTR;
-};
+    if (heightFromWidth <= height) {
+        return QRect(0, (height - heightFromWidth) / 2, width, heightFromWidth);
+    } else {
+        return QRect((width - widthFromHeight) / 2.0, 0, widthFromHeight,
+                     height);
+    }
+}
 
-}  // namespace
+void QGLCanvas::paintEvent(QPaintEvent *) {
+    QPainter p(this);
+    p.setViewport(centeredViewport(width(), height()));
+    // Set the painter to use a smooth scaling algorithm.
+    p.setRenderHint(QPainter::SmoothPixmapTransform, 1);
+
+    p.drawImage(QRect(QPoint(0,0), size()), img_);
+}
+
+namespace {}  // namespace
 
 MainWindow::~MainWindow() = default;
 
@@ -98,15 +95,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     QWidget *placeholder = new QWidget{this};
     QVBoxLayout *layout = new QVBoxLayout(placeholder);
 
-    auto video_renderer = std::make_unique<VideoRenderer>();
-    video_renderer_ = video_renderer.get();
-
-    VideoWidget *video_widget = new VideoWidget{placeholder};
-
-    MediaObject *media_object = new MediaObject(
-        std::make_unique<MediaService>(std::move(video_renderer)),
-        video_widget);
-    video_widget->setMediaObject(media_object);
+    video_canvas_ = new QGLCanvas(placeholder);
 
     player_ = std::make_unique<QAVPlayer>();
 
@@ -171,7 +160,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     timeline::Timeline *timeline =
         new timeline::Timeline{duration, output_name, placeholder};
 
-    layout->addWidget(video_widget);
+    layout->addWidget(video_canvas_, 60);
     layout->addWidget(player_controls_placeholder);
     layout->addWidget(timer);
     layout->addWidget(timeline);
@@ -248,25 +237,24 @@ void MainWindow::onAudioFrameDecoded(const QAVAudioFrame &audio_frame) {
 }
 
 void MainWindow::onVideoFrameDecoded(const QAVVideoFrame &video_frame) {
-    if (video_renderer_->m_surface == nullptr) return;
+    if (video_canvas_ == nullptr) return;
     QVideoFrame videoFrame = video_frame.convertTo(AV_PIX_FMT_RGB32);
-    if (!video_renderer_->m_surface->isActive() ||
-        video_renderer_->m_surface->surfaceFormat().frameSize() !=
-            videoFrame.size()) {
-        QVideoSurfaceFormat f(videoFrame.size(), videoFrame.pixelFormat(),
-                              videoFrame.handleType());
-        video_renderer_->m_surface->start(f);
-    }
-    if (video_renderer_->m_surface->isActive()) {
-        video_renderer_->m_surface->present(videoFrame);
-        std::chrono::milliseconds ms{(quint64)(video_frame.pts() * 1000)};
-        if (!user_seeked_) {
-            // Only emit if the user did not seek.
-            // If user seeked, then the player is not changing the time!
-            emit this->playerChangedTime(ms);
-        } else {
-            user_seeked_ = false;
-        }
+    // if (!video_renderer_->m_surface->isActive() ||
+    //     video_renderer_->m_surface->surfaceFormat().frameSize() !=
+    //         videoFrame.size()) {
+    //     QVideoSurfaceFormat f(videoFrame.size(), videoFrame.pixelFormat(),
+    //                           videoFrame.handleType());
+    //     video_renderer_->m_surface->start(f);
+    // }
+    video_canvas_->setImage(videoFrame.image());
+    video_canvas_->update();
+    std::chrono::milliseconds ms{(quint64)(video_frame.pts() * 1000)};
+    if (!user_seeked_) {
+        // Only emit if the user did not seek.
+        // If user seeked, then the player is not changing the time!
+        emit this->playerChangedTime(ms);
+    } else {
+        user_seeked_ = false;
     }
 }
 

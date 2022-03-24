@@ -20,6 +20,7 @@ qt_cc_library(
         "@qt//:qt_widgets",
         "@qt//:qt_multimedia",
         "@qt//:qt_multimediawidgets",
+        "@qt//:qt_opengl",
     ] + select({
         "@bazel_tools//src/conditions:windows": ["@qt_av_player_windows//:qt_av_player"],
         "//conditions:default": ["@qt_av_player_linux//:qt_av_player"],

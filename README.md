@@ -240,6 +240,11 @@ This functionality will eventually be integrated in the SubTite binary. See plan
 * Support simple video editing, such as cropping/trimming
 * Support adding static images on top of the video between certain timestamps.
 
+# Licensing
+SubTite is available under [The Prosperity Public License 3.0.0](https://prosperitylicense.com/versions/3.0.0)
+* If you use SubTite in a non-commercial manner, then you have permission to do so for free.
+* If you use SubTite in any commercial manner, then you are subject to a 30-day free trial. After which, you must initiate contact directly to discuss a commercial licensing agreement.
+
 ## Attribution - SubTite uses the following projects:
 ### LGPL
 * [FFMPEG](https://www.ffmpeg.org/legal.htmlhttps://www.ffmpeg.org/legal.html). Pre-built shared libraries are obtained from https://github.com/BtbN/FFmpeg-Builds/releases

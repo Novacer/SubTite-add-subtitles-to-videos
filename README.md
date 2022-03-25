@@ -2,7 +2,7 @@
 **TLDR:** SubTite allows you to add subtitles and preview it immediately in the video player. The subtitles will be output as a separate SRT file. Existing SRT files can be imported and edited effortlessly. The subtitles can be positioned in 9 different locations along the video. Support for trimming video, adding images, and other video editing features coming soon!
 
 ## GUI Demo
-![gui demo](https://user-images.githubusercontent.com/29148427/160001071-5e0c7743-af52-4817-898b-b90fe15c5ba9.gif)
+![gui demo](https://user-images.githubusercontent.com/29148427/160031296-c35a7ef8-9d46-416b-850c-59f65d9b075c.gif)
 
 ## CLI Demo
 ![cli demo](https://user-images.githubusercontent.com/29148427/151613092-e7dcf2c3-80dd-4f72-a3c9-8bdd220594b8.gif)

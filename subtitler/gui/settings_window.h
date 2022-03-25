@@ -12,8 +12,18 @@ struct Settings {
     QString subtitle_file;
 };
 
+/**
+ * Open the settings dialog and block until the user closes the dialog.
+ * 
+ * @param current_settings the current settings to populate the dialog.
+ * @return Settings the new settings the user has selected.
+ */
 Settings GetSettings(const Settings &current_settings);
 
+
+/**
+ * A dialog for changing the settings.
+ */
 class SettingsWindow : public QDialog {
     Q_OBJECT
   public:

@@ -38,6 +38,15 @@ void OpenGLRenderer::displayFrame(const QVideoFrame &orig_frame) {
     update();
 }
 
+/**
+ * Given a rectangle with of width and height, return a smaller rectangle which
+ * has the same aspect ratio as the image. The returned rectangle will be
+ * centered within the outside one.
+ * 
+ * @param width the width of the outside rectangle.
+ * @param height the height of the outside rectangle.
+ * @return QRect the centered rectangle with the same aspect ratio as the image.
+ */
 QRect OpenGLRenderer::centeredViewport(int width, int height) {
     qreal aspectRatio = 1.0;
     if (!img_.isNull()) {
@@ -59,7 +68,6 @@ void OpenGLRenderer::paintEvent(QPaintEvent *) {
     p.setViewport(centeredViewport(width(), height()));
     // Set the painter to use a smooth scaling algorithm.
     p.setRenderHint(QPainter::SmoothPixmapTransform, 1);
-
     p.drawImage(QRect(QPoint(0, 0), size()), img_);
 }
 

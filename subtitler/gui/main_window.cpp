@@ -41,7 +41,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     if (settings.video_file.isEmpty()) {
         qDebug() << "No video file selected";
-        QCoreApplication::exit(1);
+        throw std::runtime_error{"No video file was selected"};
     }
 
     if (settings.subtitle_file.isEmpty()) {

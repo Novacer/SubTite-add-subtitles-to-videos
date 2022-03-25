@@ -337,7 +337,7 @@ void Ruler::onAddSubtitleIntervalAfter() {
     args.start_x = millisecondsToPosition(args.start_time);
     args.start_y = HEADER_HEIGHT;
 
-    args.end_time = indicator_time_ + 5s;
+    args.end_time = std::min(indicator_time_ + 5s, duration_);
     args.end_x = millisecondsToPosition(args.end_time);
     args.end_y = HEADER_HEIGHT;
     subtitle_intervals_->AddInterval(

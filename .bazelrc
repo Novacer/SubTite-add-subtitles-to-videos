@@ -1,6 +1,7 @@
 build:vs2019 --cxxopt='/std:c++17' --cxxopt='/WX'
 build:vs2019-asan --cxxopt='/std:c++17' --cxxopt='/WX' --cxxopt='/fsanitize=address' -c dbg
 build:vs2019-prod --cxxopt='/std:c++17' --cxxopt='/DQT_NO_DEBUG_OUTPUT' -c opt
+build:vs2019-prod --linkopt='/SUBSYSTEM:windows' --linkopt='/ENTRY:mainCRTStartup'
 
 build:gcc --cxxopt='-std=c++17' --cxxopt='-Werror' --cxxopt='-fPIC'
 build:gcc-asan --cxxopt='-std=c++17' --cxxopt='-Werror' --cxxopt='-fPIC' -c dbg

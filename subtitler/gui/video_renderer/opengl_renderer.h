@@ -8,6 +8,12 @@ namespace subtitler {
 namespace gui {
 namespace video_renderer {
 
+/**
+ * A video renderer using OpenGL.
+ * Suppose you have a decoded QVideoFrame in RGB32 format,
+ * then simply call OpenGLRenderer::displayFrame() to display it.
+ * Will use hardware acceleration through OpenGL if possible.
+ */
 class OpenGLRenderer : public QOpenGLWidget {
     Q_OBJECT
   public:

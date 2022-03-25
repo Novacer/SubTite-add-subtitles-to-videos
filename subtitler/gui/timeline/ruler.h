@@ -58,7 +58,8 @@ class Ruler : public QWidget {
     void onZoomOut(int level);
     void onMoveIndicator(std::chrono::milliseconds frame_time);
     void onStepIndicator(std::chrono::milliseconds delta);
-    void onAddSubtitleInterval();
+    void onAddSubtitleIntervalAfter();
+    void onAddSubtitleIntervalBefore();
 
   protected:
     virtual void paintEvent(QPaintEvent* event) override;
@@ -90,7 +91,8 @@ class Ruler : public QWidget {
 
     // context menu
     QMenu* context_menu_;
-    QAction* add_subtitle_interval_;
+    QAction* add_subtitle_after_;
+    QAction* add_subtitle_before_;
 
     // ruler members
     qreal origin_;

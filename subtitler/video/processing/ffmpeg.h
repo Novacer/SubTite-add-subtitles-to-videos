@@ -20,6 +20,12 @@ class FFMpeg {
     FFMpeg(const std::string& ffmpeg_path,
            std::unique_ptr<subprocess::SubprocessExecutor> executor);
     ~FFMpeg();
+
+    std::string GetVersionInfo();
+
+  private:
+    std::string ffmpeg_path_;
+    std::unique_ptr<subprocess::SubprocessExecutor> executor_;
 };
 
 }  // namespace processing

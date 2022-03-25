@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Build Release version of SubTite GUI.
+# This script should be run from the project root 
+# ie you must invoke with ./deploy/deploy.sh
+
 if [[ -z ${SUBTITE_RELEASE_PATH} ]]; then
     echo "Please set SUBTITE_RELEASE_PATH env variable to be the directory to copy release binary"
     exit 1

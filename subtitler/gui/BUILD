@@ -53,8 +53,6 @@ cc_binary(
         "@qt//:qt_core",
         "@qt//:qt_widgets",
         "@qt//:qt_network",
-        "//subtitler/subprocess:subprocess_executor",
-        "//subtitler/video/processing:ffmpeg",
     ] + select({
         "@bazel_tools//src/conditions:windows": ["@ffmpeg_windows//:ffmpeg_libavutil"],
         "//conditions:default": ["@ffmpeg_linux//:ffmpeg_libavutil"],

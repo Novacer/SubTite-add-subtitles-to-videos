@@ -4,6 +4,9 @@ build:vs2019-prod --cxxopt='/std:c++17' --cxxopt='/DQT_NO_DEBUG_OUTPUT' -c opt
 build:vs2019-prod --linkopt='/SUBSYSTEM:windows' --linkopt='/ENTRY:mainCRTStartup'
 
 build:gcc --cxxopt='-std=c++17' --cxxopt='-Werror' --cxxopt='-fPIC'
+build:gcc --linkopt='-pthread' --linkopt='-lpthread'
 build:gcc-asan --cxxopt='-std=c++17' --cxxopt='-Werror' --cxxopt='-fPIC' -c dbg
 build:gcc-asan --cxxopt='-fsanitize=address' --linkopt='-fsanitize=address'
+build:gcc-asan --linkopt='-pthread' --linkopt='-lpthread'
 build:gcc-prod --cxxopt='-std=c++17' --cxxopt='-DQT_NO_DEBUG_OUTPUT' --cxxopt='-fPIC' -c opt
+build:gcc-prod --linkopt='-pthread' --linkopt='-lpthread'

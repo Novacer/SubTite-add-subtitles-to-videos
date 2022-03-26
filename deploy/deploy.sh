@@ -38,6 +38,7 @@ if [[ ${machine} == "MinGw" || ${machine} == "CYGWIN" ]]; then
     mkdir -p ${SUBTITE_RELEASE_PATH}
     cp bazel-bin/subtitler/gui/*.dll ${SUBTITE_RELEASE_PATH}/
     cp bazel-bin/subtitler/gui/main.exe ${SUBTITE_RELEASE_PATH}/subtite.exe
+    cp bazel-subtitler/external/ffmpeg_windows/bin/ffmpeg.exe ${SUBTITE_RELEASE_PATH}/ffmpeg.exe
     mkdir -p ${SUBTITE_RELEASE_PATH}/plugins
     cp -r ${QT5_INSTALL_PATH}/plugins/audio ${SUBTITE_RELEASE_PATH}/plugins/audio
     cp -r ${QT5_INSTALL_PATH}/plugins/platforms ${SUBTITE_RELEASE_PATH}/plugins/platforms
@@ -62,11 +63,13 @@ elif [[ ${machine} == "Linux" ]]; then
     cp -r deploy/linux/usr ${SUBTITE_RELEASE_PATH}
     mkdir -p ${SUBTITE_RELEASE_PATH}/usr/bin
     cp bazel-bin/subtitler/gui/main ${SUBTITE_RELEASE_PATH}/usr/bin/subtite
+    cp bazel-subtitler/external/ffmpeg_linux/bin/ffmpeg ${SUBTITE_RELEASE_PATH}/usr/bin/ffmpeg
     mkdir -p ${SUBTITE_RELEASE_PATH}/usr/lib
 
     cd ${SUBTITE_RELEASE_PATH}
     linuxdeployqt \
 	${SUBTITE_RELEASE_PATH}/usr/share/applications/subtite.desktop \
+	-executable=${SUBTITE_RELEASE_PATH}/usr/bin/ffmpeg \
 	-appimage
     mv Subtite-x86_64.AppImage Subtite-linux_x86_64.AppImage
     zip Subtite-linux_x86_64.zip Subtite-linux_x86_64.AppImage LICENSE.md

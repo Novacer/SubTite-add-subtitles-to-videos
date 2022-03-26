@@ -42,7 +42,7 @@ elif [[ ${machine} == "Linux" ]]; then
 
     # Copy ffmpeg binary to bazel-bin
     if [ ! -f ${BAZEL_BUILD_DIR}/ffmpeg ]; then
-        cp bazel-subtitler/external/ffmpeg_linux/bin/ffmpeg.exe ${BAZEL_BUILD_DIR}/ffmpeg
+        cp bazel-subtitler/external/ffmpeg_linux/bin/ffmpeg ${BAZEL_BUILD_DIR}/ffmpeg
     fi
 
 else

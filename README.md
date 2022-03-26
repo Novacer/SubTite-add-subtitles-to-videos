@@ -177,16 +177,29 @@ Then SubTite can be built all from one command:
 $ bazel build --config=vs2019-prod //subtitler/gui:main # Build GUI in release mode using MSVC2019
 $ bazel build --config=gcc-prod //subttiler/gui:main    # Build GUI in release mode using GCC
 ```
-All other dependencies like FFMPEG etc. are downloaded for you automatically
-during the build process.
+**IMPORTANT** For the GUI, some additional dependencies (like audio plugins or ffmpeg.exe) needs to be copied into the build folder in order to run.
+To automate the process, you can instead use `./build_gui_dev.sh` which will setup everything you need.
 
-On linux, some additional packages may be needed.
+Note that `bazel build ...` will download dependencies like FFMPEG
+during the build process. If you are on ubuntu 20.04 AND have FFMPEG installed already,
+note that we are using FFMPEG 4.4. If you are on a different ffmpeg version, there
+may be some conflicts. If so, consider installing ffmpeg 4.4 explicitly. AFAIK there's no issue on Windows.
+
+```
+# install ffmpeg 4.4
+sudo add-apt-repository -y ppa:savoury1/ffmpeg4
+sudo apt install -y ffmpeg
+```
+
+On linux, you will also need to install the QT packages.
 ```
 sudo apt-get install -y qt5-default qttools5-dev-tools qtmultimedia5-dev libva-dev
 ```
 
 #### Important for Windows Audio!
 The binaries and dynamic libraries are contained in `bazel-bin/subtitler/gui/`. In order to have audio played in the integrated player on windows, you need to copy the QT audio plugins into this folder. In particular, you need to create the folder `bazel-bin/subtitler/gui/plugins`. Then, copy the audio folder from `C:\Qt\5.15.2\msvc2019_64\plugins\` into `bazel-bin/subtitler/gui/plugins`.
+
+Or, just use `build_gui_dev.sh` to do all of that and more for you in one command.
 
 You can reference the [deployment section](#deploying---packaging-subtite-with-its-dependencies) for further tips on making sure the dependencies are in the right place.
 

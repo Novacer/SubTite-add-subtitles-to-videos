@@ -467,7 +467,7 @@ void Commands::_GeneratePreviewSubs() {
         if (!temp_file_) {
             throw std::runtime_error("Could not make a temp file for the subs");
         }
-        ffplay_->subtitles_path(temp_file_->EscapedFileName());
+        ffplay_->subtitles_path(temp_file_->FileName());
     } else {
         // Also deletes the temp file if it is not null.
         temp_file_.reset();

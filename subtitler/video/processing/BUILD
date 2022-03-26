@@ -8,6 +8,7 @@ cc_library(
     hdrs = ["ffmpeg.h"],
     deps = [
         "//subtitler/subprocess:subprocess_executor",
+        "//subtitler/video/util:video_utils",
     ],
 )
 

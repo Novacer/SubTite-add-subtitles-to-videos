@@ -183,8 +183,8 @@ int main(int argc, char **argv) {
 
     // If any binary path has spaces, let's make sure they are not
     // interpreted wrongly by wrapping them up with quotes.
-    FixInputPath(FLAGS_ffprobe_path, /* should_have_quotes= */ true);
-    FixInputPath(FLAGS_ffprobe_path, /* should_have_quotes= */ true);
+    FixInputPath(FLAGS_ffplay_path, /* should_have_quotes= */ true);
+    FixInputPath(FLAGS_ffmpeg_path, /* should_have_quotes= */ true);
     FixInputPath(FLAGS_ffprobe_path, /* should_have_quotes= */ true);
 
     try {

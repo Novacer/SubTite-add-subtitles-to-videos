@@ -20,23 +20,6 @@ namespace subtitler {
 
 namespace {
 
-// Replaces backwards slashes with forward slashes.
-// Replaces 'C:' with 'C\:'
-// Needed to make windows file paths work with ffmpeg.
-std::string FixPath(const std::string &path) {
-    std::ostringstream output;
-    for (const auto &c : path) {
-        if (c == '\\') {
-            output << '/';
-        } else if (c == ':') {
-            output << "\\:";
-        } else {
-            output << c;
-        }
-    }
-    return output.str();
-}
-
 std::string GetRandomString(int length) {
     std::string random_str;
     random_str.reserve(length);
@@ -99,7 +82,6 @@ TempFile::TempFile(const std::string &data, const fs::path &parent_path,
     CloseHandle(hFile);
 
     temp_file_name_ = random_file_name;
-    escaped_temp_file_name_ = FixPath(temp_file_name_);
 }
 
 #else
@@ -129,7 +111,6 @@ TempFile::TempFile(const std::string &data, const fs::path &parent_path,
     fclose(fp);
 
     temp_file_name_ = random_file_name;
-    escaped_temp_file_name_ = FixPath(temp_file_name_);
 }
 #endif
 

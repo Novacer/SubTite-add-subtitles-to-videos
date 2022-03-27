@@ -33,9 +33,16 @@ class SubprocessExecutor {
     virtual void SetCommand(const std::string &command);
 
     // Sets the callback to be called as repeatedly as data is read from stdout.
+    // Allows live processing of stdout.
+    // Callback will be reset by WaitUntilFinished(), so you will have to 
+    // set it again.
+    //
+    // Can be used in conjunction with CaptureOutput if you want the full stdout
+    // to be returned by WaitUntilFinished as well.
     virtual void SetCallback(std::function<void(const char *)> callback);
 
-    // Sets whether stdout and stderr should be captured.
+    // Sets whether stdout and stderr should be captured and returned
+    // by WaitUntilFinished.
     virtual void CaptureOutput(bool capture_output);
 
     // Start executing the command. Throws std::runtime_error if unable to
@@ -51,7 +58,7 @@ class SubprocessExecutor {
     // If capture output is set false, then returns empty string.
     // If timeout is not set then wait forever.
     // If timeout is set, then wait at most 2 * timeout_ms before force
-    // terminating the process.
+    // terminating the process. Also resets the callback.
     virtual Output WaitUntilFinished(
         std::optional<int> timeout_ms = std::nullopt);
 

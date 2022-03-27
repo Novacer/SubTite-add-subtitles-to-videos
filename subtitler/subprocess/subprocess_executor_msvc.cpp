@@ -65,11 +65,11 @@ std::string PollHandle(const HANDLE handle, bool return_output,
         // ensure null termination.
         buffer[amount_read] = '\0';
 
-        if (return_output) {
-            str << buffer;
-        }
         if (callback) {
             callback(buffer);
+        }
+        if (return_output) {
+            str << buffer;
         }
     }
 
@@ -222,11 +222,12 @@ void SubprocessExecutor::Start() {
         // Launch 2 theads to read from stdout and stderr respectively.
         fields->captured_output = std::make_unique<std::future<std::string>>(
             std::async(std::launch::async, [this] {
-                return PollHandle(fields->hStdOutPipeRead, capture_output_, callback_);
+                return PollHandle(fields->hStdOutPipeRead, capture_output_,
+                                  callback_);
             }));
         fields->captured_error = std::make_unique<std::future<std::string>>(
             std::async(std::launch::async, [this] {
-                return PollHandle(fields->hStdErrPipeRead, capture_output_, callback_);
+                return PollHandle(fields->hStdErrPipeRead, capture_output_, {});
             }));
     }
 }

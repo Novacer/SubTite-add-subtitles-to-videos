@@ -232,11 +232,14 @@ void SubprocessExecutor::Start() {
 
     if (capture_output_ || callback_) {
         fields->captured_output = std::make_unique<std::future<std::string>>(
-            std::async(std::launch::async,
-                       [this] { return PollHandle(fields->stdout_fd); }));
+            std::async(std::launch::async, [this] {
+                return PollHandle(fields->stdout_fd, capture_output_,
+                                  callback_);
+            }));
         fields->captured_error = std::make_unique<std::future<std::string>>(
-            std::async(std::launch::async,
-                       [this] { return PollHandle(fields->stderr_fd); }));
+            std::async(std::launch::async, [this] {
+                return PollHandle(fields->stderr_fd, capture_output_, {});
+            }));
     }
 }
 
@@ -278,6 +281,7 @@ SubprocessExecutor::Output SubprocessExecutor::WaitUntilFinished(
     fields->actions.reset();
     fields->captured_output.reset();
     fields->captured_error.reset();
+    callback_ = {};
 
     return output;
 }

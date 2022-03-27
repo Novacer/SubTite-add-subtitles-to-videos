@@ -30,3 +30,13 @@ cc_library(
     hdrs = ["progress_parser.h"],
     deps = [],
 )
+
+cc_test(
+    name = "progress_parser_test",
+    size = "small",
+    srcs = ["progress_parser_test.cpp"],
+    deps = [
+        ":progress_parser",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

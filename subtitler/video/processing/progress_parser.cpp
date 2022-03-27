@@ -72,8 +72,9 @@ Progress ParseProgress(const std::string& str) {
     }
     progress.out_time_us =
         std::chrono::microseconds{std::stoull(split2(line, '=').at(1))};
-    
-    if (!std::getline(line_splitter, line) || line.rfind("out_time_ms=", 0) != 0) {
+
+    if (!std::getline(line_splitter, line) ||
+        line.rfind("out_time_ms=", 0) != 0) {
         throwMissingKey("out_time_ms");
     }
     // Skip out_time_ms, since it is same as out_time_us.
@@ -83,12 +84,14 @@ Progress ParseProgress(const std::string& str) {
         throwMissingKey("out_time");
     }
     // Skip out_time, since we can do our own formatting from out_time_us.
-    if (!std::getline(line_splitter, line) || line.rfind("dup_frames=", 0) != 0) {
+    if (!std::getline(line_splitter, line) ||
+        line.rfind("dup_frames=", 0) != 0) {
         throwMissingKey("dup_frames");
     }
     progress.dup_frames = std::stoi(split2(line, '=').at(1));
-    
-    if (!std::getline(line_splitter, line) || line.rfind("drop_frames=", 0) != 0) {
+
+    if (!std::getline(line_splitter, line) ||
+        line.rfind("drop_frames=", 0) != 0) {
         throwMissingKey("drop_frames");
     }
     progress.drop_frames = std::stoi(split2(line, '=').at(1));

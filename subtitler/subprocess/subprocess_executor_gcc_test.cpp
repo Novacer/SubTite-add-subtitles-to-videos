@@ -12,7 +12,7 @@ TEST(SubprocessExecutorTest, SanityCheck) {
         /* capture_output= */ true);
 
     bool callback_run = false;
-    executor.SetCallback([&callback_run](const char * buffer){
+    executor.SetCallback([&callback_run](const char *buffer) {
         std::string line{buffer};
         ASSERT_STREQ(buffer, "hello world\n");
         callback_run = true;

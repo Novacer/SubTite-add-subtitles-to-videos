@@ -1,10 +1,10 @@
 #ifndef SUBTITLER_SUBPROCESS_SUBPROCESS_EXECUTOR_H
 #define SUBTITLER_SUBPROCESS_SUBPROCESS_EXECUTOR_H
 
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
-#include <functional>
 
 namespace subtitler {
 namespace subprocess {
@@ -34,7 +34,7 @@ class SubprocessExecutor {
 
     // Sets the callback to be called as repeatedly as data is read from stdout.
     // Allows live processing of stdout.
-    // Callback will be reset by WaitUntilFinished(), so you will have to 
+    // Callback will be reset by WaitUntilFinished(), so you will have to
     // set it again.
     //
     // Can be used in conjunction with CaptureOutput if you want the full stdout

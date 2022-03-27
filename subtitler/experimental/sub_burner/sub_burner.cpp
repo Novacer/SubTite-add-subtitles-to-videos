@@ -46,6 +46,8 @@ int main(int argc, char **argv) {
     google::InitGoogleLogging(argv[0]);
     gflags::ParseCommandLineFlags(&argc, &argv, /* remove_flags= */ true);
 
+    ValidateFFMpeg();
+
     auto executor = std::make_unique<subprocess::SubprocessExecutor>();
     video::processing::FFMpeg ffmpeg{FLAGS_ffmpeg_path, std::move(executor)};
 

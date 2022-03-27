@@ -1,17 +1,24 @@
 #include <gflags/gflags.h>
 #include <glog/logging.h>
 
-#include <filesystem>
-#include <string>
 #include <memory>
+#include <string>
 
 #include "subtitler/subprocess/subprocess_executor.h"
 #include "subtitler/video/processing/ffmpeg.h"
 #include "subtitler/video/processing/progress_parser.h"
 
 DEFINE_string(ffmpeg_path, "ffmpeg", "Required. Path to ffmpeg binary.");
+DEFINE_string(video_path, "", "Required. Path to the input video.");
+DEFINE_string(subtitle_path, "", "Required. Path to the input subtitles.");
+DEFINE_string(output_path, "", "Required. Path to the output video.");
 
 namespace {
+
+// Checks that the value of the flag is not empty string.
+bool ValidateFlagNonEmpty(const char *flagname, const std::string &value) {
+    return !value.empty();
+}
 
 // Checks that binaries FFmpeg exists.
 void ValidateFFMpeg() {
@@ -28,25 +35,26 @@ void ValidateFFMpeg() {
 
 }  // namespace
 
+DEFINE_validator(ffmpeg_path, &ValidateFlagNonEmpty);
+DEFINE_validator(video_path, &ValidateFlagNonEmpty);
+DEFINE_validator(subtitle_path, &ValidateFlagNonEmpty);
+DEFINE_validator(output_path, &ValidateFlagNonEmpty);
+
 int main(int argc, char **argv) {
     using namespace subtitler;
-    namespace fs = std::filesystem;
 
     google::InitGoogleLogging(argv[0]);
     gflags::ParseCommandLineFlags(&argc, &argv, /* remove_flags= */ true);
-
-    std::string video_path =
-        "D:/Lecture Videos/CLAS_201 Videos/Week 1ii - Introduction.mp4";
-    std::string subtitles = "D:/Lecture Videos/CLAS_201 Videos/test.srt";
-    std::string output = "D:/Lecture Videos/CLAS_201 Videos/output.mp4";
 
     auto executor = std::make_unique<subprocess::SubprocessExecutor>();
     video::processing::FFMpeg ffmpeg{FLAGS_ffmpeg_path, std::move(executor)};
 
     LOG(INFO) << ffmpeg.GetVersionInfo();
-    
-    ffmpeg.BurnSubtitlesAsync(video_path, subtitles, output, [](const video::processing::Progress& progress) {
-        LOG(INFO) << "frame=" << progress.frame << " fps=" << progress.fps;
-    });
+
+    ffmpeg.BurnSubtitlesAsync(
+        FLAGS_video_path, FLAGS_subtitle_path, FLAGS_output_path,
+        [](const video::processing::Progress &progress) {
+            LOG(INFO) << "frame=" << progress.frame << " fps=" << progress.fps;
+        });
     ffmpeg.WaitForAsyncTask();
 }

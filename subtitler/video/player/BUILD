@@ -9,6 +9,7 @@ cc_library(
     deps = [
         "//subtitler/subprocess:subprocess_executor",
         "//subtitler/util:font_config",
+        "//subtitler/video/util:video_utils",
         "@howard_hinnant_date//:date",
     ],
 )

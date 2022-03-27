@@ -7,6 +7,7 @@
 #include "date/date.h"
 #include "subtitler/subprocess/subprocess_executor.h"
 #include "subtitler/util/font_config.h"
+#include "subtitler/video/util/video_utils.h"
 
 namespace subtitler {
 namespace video {
@@ -38,6 +39,11 @@ FFPlay::FFPlay(const std::string &ffplay_path,
 }
 
 FFPlay::~FFPlay() = default;
+
+FFPlay *FFPlay::subtitles_path(const std::string &path) {
+    subtitles_path_ = util::FixPathForFilters(path);
+    return this;
+}
 
 std::vector<std::string> FFPlay::BuildArgs() {
     // Consult https://ffmpeg.org/ffplay.html#toc-Main-options

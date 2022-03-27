@@ -112,6 +112,18 @@ TEST(FFPlayTest, OpenPlayerWithSubtitlesEnabled) {
     ffplay.subtitles_path("subtitle.srt")->OpenPlayer("video.mp4");
 }
 
+TEST(FFPlayTest, OpenPlayerWithWindowsSubtitlePathEnabled) {
+    auto mock_executor = std::make_unique<NiceMock<MockSubprocessExecutor>>();
+    EXPECT_CALL(*mock_executor,
+                SetCommand("ffplay \"video.mp4\" -sn "
+                           "-vf \"subtitles='C\\:/foo/subtitle.srt'\" "
+                           "-loglevel error"))
+        .Times(1);
+
+    FFPlay ffplay("ffplay", std::move(mock_executor));
+    ffplay.subtitles_path("C:\\foo\\subtitle.srt")->OpenPlayer("video.mp4");
+}
+
 TEST(FFPlayTest, OpenPlayerWithTimeStampsAndSubtitles) {
     auto mock_executor = std::make_unique<NiceMock<MockSubprocessExecutor>>();
     EXPECT_CALL(

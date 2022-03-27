@@ -98,10 +98,7 @@ class FFPlay {
         return this;
     }
 
-    FFPlay* subtitles_path(const std::string& path) {
-        subtitles_path_ = path;
-        return this;
-    }
+    FFPlay* subtitles_path(const std::string& path);
 
   private:
     std::string ffplay_path_;

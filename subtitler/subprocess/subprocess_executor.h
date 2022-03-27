@@ -4,6 +4,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <functional>
 
 namespace subtitler {
 namespace subprocess {
@@ -31,6 +32,9 @@ class SubprocessExecutor {
     // Sets the command to be used upon Start().
     virtual void SetCommand(const std::string &command);
 
+    // Sets the callback to be called as repeatedly as data is read from stdout.
+    virtual void SetCallback(std::function<void(const char *)> callback);
+
     // Sets whether stdout and stderr should be captured.
     virtual void CaptureOutput(bool capture_output);
 
@@ -55,6 +59,7 @@ class SubprocessExecutor {
     std::string command_;
     bool capture_output_;
     bool is_running_;
+    std::function<void(const char *)> callback_;
 
     struct PlatformDependentFields;
     std::unique_ptr<PlatformDependentFields> fields;

@@ -45,6 +45,7 @@ class MainWindow : public QMainWindow {
     void onAudioFrameDecoded(const QAVAudioFrame &audio_frame);
     void onVideoFrameDecoded(const QAVVideoFrame &video_frame);
     void onSubtitleFileChanged(std::size_t num_loaded);
+    void onExport(bool checked);
 
   private:
     std::unique_ptr<QAVPlayer> player_;

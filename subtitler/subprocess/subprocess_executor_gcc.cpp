@@ -27,7 +27,8 @@ namespace {
 
 const int BUFFER_SIZE = 1024;
 
-std::string PollHandle(int fd) {
+std::string PollHandle(int fd, bool return_output,
+                       std::function<void(const char *)> callback) {
     int bytes_read = 0;
     char buffer[BUFFER_SIZE + 1];
     std::ostringstream str;
@@ -43,7 +44,13 @@ std::string PollHandle(int fd) {
         }
         // Ensure null termiantion
         buffer[bytes_read] = '\0';
-        str << buffer;
+
+        if (callback) {
+            callback(buffer);
+        }
+        if (return_output) {
+            str << buffer;
+        }
     }
 
     return str.str();
@@ -90,9 +97,9 @@ void WaitTimeoutOrKill(pid_t pid, int timeout_ms) {
 }  // namespace
 
 struct SubprocessExecutor::PlatformDependentFields {
-    int stderr_fd = 0;
-    int stdout_fd = 0;
-    pid_t pid = 0;
+    int stderr_fd = -1;
+    int stdout_fd = -1;
+    pid_t pid = -1;
     std::unique_ptr<posix_spawn_file_actions_t> actions = nullptr;
     std::unique_ptr<std::future<std::string>> captured_output = nullptr;
     std::unique_ptr<std::future<std::string>> captured_error = nullptr;
@@ -123,17 +130,23 @@ SubprocessExecutor::~SubprocessExecutor() {
         fields->captured_error.reset();
 
         close(fields->stdout_fd);
-        fields->stdout_fd = 0;
+        fields->stdout_fd = -1;
         close(fields->stderr_fd);
-        fields->stderr_fd = 0;
-        fields->pid = 0;
+        fields->stderr_fd = -1;
+        fields->pid = -1;
         posix_spawn_file_actions_destroy(fields->actions.get());
         fields->actions.reset();
+        callback_ = {};
     }
 }
 
 void SubprocessExecutor::SetCommand(const std::string &command) {
     command_ = command;
+}
+
+void SubprocessExecutor::SetCallback(
+    std::function<void(const char *)> callback) {
+    callback_ = callback;
 }
 
 void SubprocessExecutor::CaptureOutput(bool capture) {
@@ -150,39 +163,41 @@ void SubprocessExecutor::Start() {
     }
 
     // pipe[0] is for our side, pipe[1] is for subprocess side.
-    int cout_pipe[2];
-    int cerr_pipe[2];
+    int cout_pipe[2] = {-1};
+    int cerr_pipe[2] = {-1};
     auto action = std::make_unique<posix_spawn_file_actions_t>();
 
-    if (pipe(cout_pipe) < 0) {
-        throw std::runtime_error("Could not create stdout pipe");
-    }
-    if (pipe(cerr_pipe) < 0) {
-        throw std::runtime_error("Could not create stderr pipe");
-    }
-    if (posix_spawn_file_actions_init(action.get())) {
-        throw std::runtime_error("Error while initializing subprocess");
-    }
-    // Tell spawned process to close our side of the pipes
-    if (posix_spawn_file_actions_addclose(action.get(), cout_pipe[0])) {
-        throw std::runtime_error("Error while configuring subprocess");
-    }
-    if (posix_spawn_file_actions_addclose(action.get(), cerr_pipe[0])) {
-        throw std::runtime_error("Error while configuring subprocess");
-    }
-    // Tell spawned process to make a duplicate of their end of the pipe.
-    if (posix_spawn_file_actions_adddup2(action.get(), cout_pipe[1], 1)) {
-        throw std::runtime_error("Error while configuring subprocess");
-    }
-    if (posix_spawn_file_actions_adddup2(action.get(), cerr_pipe[1], 2)) {
-        throw std::runtime_error("Error while configuring subprocess");
-    }
-    // Tell spanwed process to close their (old) end of the pipe.
-    if (posix_spawn_file_actions_addclose(action.get(), cout_pipe[1])) {
-        throw std::runtime_error("Error while configuring subprocess");
-    }
-    if (posix_spawn_file_actions_addclose(action.get(), cerr_pipe[1])) {
-        throw std::runtime_error("Error while configuring subprocess");
+    if (capture_output_ || callback_) {
+        if (pipe(cout_pipe) < 0) {
+            throw std::runtime_error("Could not create stdout pipe");
+        }
+        if (pipe(cerr_pipe) < 0) {
+            throw std::runtime_error("Could not create stderr pipe");
+        }
+        if (posix_spawn_file_actions_init(action.get())) {
+            throw std::runtime_error("Error while initializing subprocess");
+        }
+        // Tell spawned process to close our side of the pipes
+        if (posix_spawn_file_actions_addclose(action.get(), cout_pipe[0])) {
+            throw std::runtime_error("Error while configuring subprocess");
+        }
+        if (posix_spawn_file_actions_addclose(action.get(), cerr_pipe[0])) {
+            throw std::runtime_error("Error while configuring subprocess");
+        }
+        // Tell spawned process to make a duplicate of their end of the pipe.
+        if (posix_spawn_file_actions_adddup2(action.get(), cout_pipe[1], 1)) {
+            throw std::runtime_error("Error while configuring subprocess");
+        }
+        if (posix_spawn_file_actions_adddup2(action.get(), cerr_pipe[1], 2)) {
+            throw std::runtime_error("Error while configuring subprocess");
+        }
+        // Tell spanwed process to close their (old) end of the pipe.
+        if (posix_spawn_file_actions_addclose(action.get(), cout_pipe[1])) {
+            throw std::runtime_error("Error while configuring subprocess");
+        }
+        if (posix_spawn_file_actions_addclose(action.get(), cerr_pipe[1])) {
+            throw std::runtime_error("Error while configuring subprocess");
+        }
     }
 
     // Expands command str into an array of args
@@ -215,13 +230,16 @@ void SubprocessExecutor::Start() {
     fields->pid = pid;
     fields->actions = std::move(action);
 
-    if (capture_output_) {
+    if (capture_output_ || callback_) {
         fields->captured_output = std::make_unique<std::future<std::string>>(
-            std::async(std::launch::async,
-                       [this] { return PollHandle(fields->stdout_fd); }));
+            std::async(std::launch::async, [this] {
+                return PollHandle(fields->stdout_fd, capture_output_,
+                                  callback_);
+            }));
         fields->captured_error = std::make_unique<std::future<std::string>>(
-            std::async(std::launch::async,
-                       [this] { return PollHandle(fields->stderr_fd); }));
+            std::async(std::launch::async, [this] {
+                return PollHandle(fields->stderr_fd, capture_output_, {});
+            }));
     }
 }
 
@@ -255,14 +273,15 @@ SubprocessExecutor::Output SubprocessExecutor::WaitUntilFinished(
 
     // Cleanup everything
     close(fields->stdout_fd);
-    fields->stdout_fd = 0;
+    fields->stdout_fd = -1;
     close(fields->stderr_fd);
-    fields->stderr_fd = 0;
-    fields->pid = 0;
+    fields->stderr_fd = -1;
+    fields->pid = -1;
     posix_spawn_file_actions_destroy(fields->actions.get());
     fields->actions.reset();
     fields->captured_output.reset();
     fields->captured_error.reset();
+    callback_ = {};
 
     return output;
 }

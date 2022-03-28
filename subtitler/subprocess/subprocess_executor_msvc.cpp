@@ -42,7 +42,8 @@ BOOL CALLBACK SendWMCloseMsg(HWND hwnd, LPARAM lParam) {
     return TRUE;
 }
 
-std::string PollHandle(const HANDLE handle) {
+std::string PollHandle(const HANDLE handle, bool return_output,
+                       const std::function<void(const char *)> callback) {
     DWORD amount_read;
     CHAR buffer[BUFFER_SIZE + 1];  // Ensure space for null-terminator.
     BOOL success = FALSE;
@@ -63,7 +64,13 @@ std::string PollHandle(const HANDLE handle) {
 
         // ensure null termination.
         buffer[amount_read] = '\0';
-        str << buffer;
+
+        if (callback) {
+            callback(buffer);
+        }
+        if (return_output) {
+            str << buffer;
+        }
     }
 
     return str.str();
@@ -86,6 +93,7 @@ SubprocessExecutor::SubprocessExecutor()
     : command_{},
       capture_output_{false},
       is_running_{false},
+      callback_{},
       fields{std::make_unique<PlatformDependentFields>()} {}
 
 SubprocessExecutor::SubprocessExecutor(const std::string &command,
@@ -112,11 +120,17 @@ SubprocessExecutor::~SubprocessExecutor() {
         CleanupHandle(fields->hStdErrPipeWrite);
         CleanupHandle(fields->hProcess);
         fields->dwProcessId = 0;
+        callback_ = {};
     }
 }
 
 void SubprocessExecutor::SetCommand(const std::string &command) {
     command_ = command;
+}
+
+void SubprocessExecutor::SetCallback(
+    std::function<void(const char *)> callback) {
+    callback_ = callback;
 }
 
 void SubprocessExecutor::CaptureOutput(bool capture) {
@@ -137,7 +151,7 @@ void SubprocessExecutor::Start() {
     security_attributes.bInheritHandle = TRUE;
     security_attributes.lpSecurityDescriptor = NULL;
 
-    if (capture_output_) {
+    if (capture_output_ || callback_) {
         if (!CreatePipe(&fields->hStdOutPipeRead, &fields->hStdOutPipeWrite,
                         &security_attributes, 0)) {
             throw std::runtime_error(
@@ -204,14 +218,17 @@ void SubprocessExecutor::Start() {
     CleanupHandle(fields->hStdOutPipeWrite);
     CleanupHandle(fields->hStdErrPipeWrite);
 
-    if (capture_output_) {
+    if (capture_output_ || callback_) {
         // Launch 2 theads to read from stdout and stderr respectively.
         fields->captured_output = std::make_unique<std::future<std::string>>(
-            std::async(std::launch::async,
-                       [this] { return PollHandle(fields->hStdOutPipeRead); }));
+            std::async(std::launch::async, [this] {
+                return PollHandle(fields->hStdOutPipeRead, capture_output_,
+                                  callback_);
+            }));
         fields->captured_error = std::make_unique<std::future<std::string>>(
-            std::async(std::launch::async,
-                       [this] { return PollHandle(fields->hStdErrPipeRead); }));
+            std::async(std::launch::async, [this] {
+                return PollHandle(fields->hStdErrPipeRead, capture_output_, {});
+            }));
     }
 }
 
@@ -256,6 +273,7 @@ SubprocessExecutor::Output SubprocessExecutor::WaitUntilFinished(
     fields->dwProcessId = 0;
     fields->captured_output.reset();
     fields->captured_error.reset();
+    callback_ = {};
 
     return output;
 }

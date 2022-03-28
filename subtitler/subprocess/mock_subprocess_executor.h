@@ -14,6 +14,8 @@ namespace subprocess {
 class MockSubprocessExecutor : public SubprocessExecutor {
   public:
     MOCK_METHOD(void, SetCommand, (const std::string &), (override));
+    MOCK_METHOD(void, SetCallback, (std::function<void(const char *)> callback),
+                (override));
     MOCK_METHOD(void, CaptureOutput, (bool), (override));
     MOCK_METHOD(void, Start, (), (override));
     MOCK_METHOD(SubprocessExecutor::Output, WaitUntilFinished,

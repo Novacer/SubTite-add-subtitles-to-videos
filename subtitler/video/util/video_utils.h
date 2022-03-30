@@ -1,8 +1,8 @@
 #ifndef SUBTITLER_VIDEO_UTIL_VIDEO_UTILS_H
 #define SUBTITLER_VIDEO_UTIL_VIDEO_UTILS_H
 
-#include <string>
 #include <chrono>
+#include <string>
 
 namespace subtitler {
 namespace video {

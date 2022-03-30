@@ -22,6 +22,7 @@ qt_cc_library(
     }),
     deps = [
         ":settings_window",
+        "//subtitler/gui/exporting:export_dialog",
         "//subtitler/gui/player_controls:play_button",
         "//subtitler/gui/player_controls:step_button",
         "//subtitler/gui/subtitle_editor:subtitle_editor",
@@ -29,7 +30,6 @@ qt_cc_library(
         "//subtitler/gui/timeline:timeline_window",
         "//subtitler/gui/video_renderer:opengl_renderer",
         "//subtitler/video/util:video_utils",
-        "//subtitler/gui/exporting:export_dialog",
         "@qt//:qt_widgets",
         "@qt//:qt_multimedia",
         "@qt//:qt_multimediawidgets",

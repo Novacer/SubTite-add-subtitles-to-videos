@@ -79,12 +79,16 @@ ExportWindow::ExportWindow(Inputs inputs, QWidget *parent)
     if (inputs_.video_file.isEmpty()) {
         throw std::runtime_error{"Cannot export empty video path!"};
     }
-    QLabel *input_video_name = new QLabel{tr("Using: ") + inputs_.video_file};
+    QLabel *input_video_name =
+        new QLabel{tr("Video File: ") + inputs_.video_file};
+    input_video_name->setFrameStyle(QFrame::Panel | QFrame::Plain);
 
-    QLabel *input_subtitle_name = new QLabel{tr("Using: None"), this};
+    QLabel *input_subtitle_name = new QLabel{tr("Subtitle File: None"), this};
     if (!inputs_.subtitle_file.isEmpty()) {
-        input_subtitle_name->setText(tr("Using: ") + inputs_.subtitle_file);
+        input_subtitle_name->setText(tr("Subtitle File: ") +
+                                     inputs_.subtitle_file);
     }
+    input_subtitle_name->setFrameStyle(QFrame::Panel | QFrame::Plain);
 
     QPushButton *choose_output_file =
         new QPushButton{tr("Choose Output Location"), this};
@@ -96,8 +100,8 @@ ExportWindow::ExportWindow(Inputs inputs, QWidget *parent)
     progress_->hide();
 
     QGridLayout *layout = new QGridLayout{this};
-    layout->addWidget(input_video_name, 0, 0);
-    layout->addWidget(input_subtitle_name, 1, 0);
+    layout->addWidget(input_video_name, 0, 0, 1, 2);
+    layout->addWidget(input_subtitle_name, 1, 0, 1, 2);
     layout->addWidget(choose_output_file, 2, 0);
     layout->addWidget(output_choice, 2, 1);
     layout->addWidget(progress_, 3, 0);

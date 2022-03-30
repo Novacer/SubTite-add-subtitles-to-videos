@@ -180,10 +180,8 @@ $ bazel build --config=gcc-prod //subttiler/gui:main    # Build GUI in release m
 **IMPORTANT** For the GUI, some additional dependencies (like audio plugins or ffmpeg.exe) needs to be copied into the build folder in order to run.
 To automate the process, you can instead use `./build_gui_dev.sh` which will setup everything you need.
 
-Note that `bazel build ...` will download dependencies like FFMPEG
-during the build process. If you are on ubuntu 20.04 AND have FFMPEG installed already,
-note that we are using FFMPEG 4.4. If you are on a different ffmpeg version, there
-may be some conflicts. If so, consider installing ffmpeg 4.4 explicitly. AFAIK there's no issue on Windows.
+Note that `bazel build ...` will download various dependencies during the build process. If you are on Linux,
+you may need to separately install ffmpeg 4.4 to run SubTite. AFAIK there's no issue on windows.
 
 ```
 # install ffmpeg 4.4

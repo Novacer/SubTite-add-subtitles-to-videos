@@ -50,6 +50,35 @@ std::string FFMpeg::GetVersionInfo() {
     return output.subproc_stdout;
 }
 
+void FFMpeg::RemuxSubtitlesAsync(
+    const std::string& video, const std::string& subtitles,
+    const std::string& output,
+    std::function<void(const Progress&)> progress_callback) {
+    throwIfRunning();
+
+    std::ostringstream stream;
+    stream << ffmpeg_path_;
+    stream << " -y -i " << '"' << video << '"';
+    stream << " -i " << '"' << subtitles << '"';
+    stream << " -map 0 -map 1:s -c copy";
+    stream << " " << '"' << output << '"';
+    stream << " -loglevel error -progress pipe:1 -stats_period 5";
+
+    executor_->SetCommand(stream.str());
+    executor_->CaptureOutput(false);
+
+    progress_parser_ = std::make_unique<ProgressParser>();
+    executor_->SetCallback(
+        [this, pcb = std::move(progress_callback)](const char* buffer) {
+            const auto progress = progress_parser_->Receive(buffer);
+            if (progress) {
+                pcb(*progress);
+            }
+        });
+    executor_->Start();
+    is_running_ = true;
+}
+
 void FFMpeg::BurnSubtitlesAsync(
     const std::string& video, const std::string& subtitles,
     const std::string& output,

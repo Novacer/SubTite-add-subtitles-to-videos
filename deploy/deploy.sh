@@ -11,6 +11,8 @@ else
     echo "Using SUBTITE_RELEASE_PATH: ${SUBTITE_RELEASE_PATH}"
 fi
 
+CUR_PROJECT_ROOT=$(pwd)
+
 unameOut="$(uname -s)"
 case "${unameOut}" in
     Linux*)     machine=Linux;;
@@ -67,7 +69,8 @@ elif [[ ${machine} == "Linux" ]]; then
     mkdir -p ${SUBTITE_RELEASE_PATH}/usr/lib
 
     cd ${SUBTITE_RELEASE_PATH}
-    linuxdeployqt \
+    LD_LIBRARY_PATH=${CUR_PROJECT_ROOT}/bazel-subtitler/external/ffmpeg_linux/lib \
+	linuxdeployqt \
 	${SUBTITE_RELEASE_PATH}/usr/share/applications/subtite.desktop \
 	-executable=${SUBTITE_RELEASE_PATH}/usr/bin/ffmpeg \
 	-appimage

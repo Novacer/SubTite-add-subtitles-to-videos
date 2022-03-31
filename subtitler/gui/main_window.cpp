@@ -1,9 +1,5 @@
 #include "subtitler/gui/main_window.h"
 
-extern "C" {
-#include <libavformat/avformat.h>
-}
-
 #include <QtAVPlayer/qavaudiooutput.h>
 #include <QtAVPlayer/qavplayer.h>
 #include <QtAVPlayer/qavvideoframe.h>
@@ -14,10 +10,12 @@ extern "C" {
 #include <QFile>
 #include <QFileDialog>
 #include <QHBoxLayout>
+#include <QMenuBar>
 #include <QVBoxLayout>
 #include <chrono>
 #include <stdexcept>
 
+#include "subtitler/gui/exporting/export_dialog.h"
 #include "subtitler/gui/player_controls/play_button.h"
 #include "subtitler/gui/player_controls/step_button.h"
 #include "subtitler/gui/settings_window.h"
@@ -25,6 +23,7 @@ extern "C" {
 #include "subtitler/gui/timeline/timeline.h"
 #include "subtitler/gui/timeline/timer.h"
 #include "subtitler/gui/video_renderer/opengl_renderer.h"
+#include "subtitler/video/util/video_utils.h"
 
 namespace subtitler {
 namespace gui {
@@ -56,6 +55,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
         throw std::runtime_error{"Invalid video file path"};
     }
 
+    QMenu *menu = menuBar()->addMenu(tr("&File"));
+    QAction *export_video_action = menu->addAction(tr("Export Video"));
+
     video_renderer_ = new video_renderer::OpenGLRenderer(placeholder);
 
     player_ = std::make_unique<QAVPlayer>();
@@ -78,17 +80,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     timeline::Timer *timer = new timeline::Timer{placeholder};
 
-    // Get video duration
-    // TODO: make util class?
-    AVFormatContext *pFormatCtx = avformat_alloc_context();
-    auto file_stdstr = settings.video_file.toStdString();
-    avformat_open_input(&pFormatCtx, file_stdstr.c_str(), NULL, NULL);
-    avformat_find_stream_info(pFormatCtx, NULL);
-    auto duration_us = pFormatCtx->duration;
-    avformat_close_input(&pFormatCtx);
-    avformat_free_context(pFormatCtx);
+    auto duration_us =
+        video::util::GetVideoDuration(video_file_->fileName().toStdString());
 
-    std::chrono::milliseconds duration{duration_us / 1000};
+    std::chrono::milliseconds duration =
+        std::chrono::duration_cast<std::chrono::milliseconds>(duration_us);
     timeline::Timeline *timeline =
         new timeline::Timeline{duration, settings.subtitle_file, placeholder};
 
@@ -147,6 +143,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     connect(timeline, &timeline::Timeline::subtitleFileLoaded, this,
             &MainWindow::onSubtitleFileChanged);
 
+    // Handles top menu bar actions
+    connect(export_video_action, &QAction::triggered, this,
+            &MainWindow::onExport);
+
     if (!subtitle_file_.isEmpty()) {
         timeline->LoadSubtitles();
     }
@@ -193,6 +193,14 @@ void MainWindow::onSubtitleFileChanged(std::size_t num_loaded) {
     QString escaped_path = subtitle_file_;
     escaped_path.replace(":", "\\:");
     player_->setFilter("subtitles='" + escaped_path + "'");
+}
+
+void MainWindow::onExport(bool checked) {
+    exporting::Inputs inputs;
+    inputs.video_file = video_file_->fileName();
+    inputs.subtitle_file = subtitle_file_;
+    exporting::ExportWindow window{inputs, this};
+    window.exec();
 }
 
 }  // namespace gui

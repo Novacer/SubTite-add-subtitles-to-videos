@@ -44,10 +44,10 @@ class FFMpeg {
      * Starts async task to remux subtitles with video, writing to output.
      * Progress_callback will be called approx every 5s with how many frames
      * have been processed by ffmpeg and other stats.
-     * 
+     *
      * Caller must eventually call WaitForAsyncTask() after calling this.
      * Throws runtime_error if another async task is running at the call.
-     * 
+     *
      * @param video The path of the input video file.
      * @param subtitles The path of the input subtitle (.srt) file.
      * @param output The path of the output file.

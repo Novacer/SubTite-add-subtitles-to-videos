@@ -75,8 +75,10 @@ class FFMpegBurnSubtitleTask : public QRunnable {
 }  // namespace
 
 ExportWindow::ExportWindow(Inputs inputs, QWidget *parent)
-    : QDialog{parent}, inputs_{std::move(inputs)} {
+    : QDialog{parent}, inputs_{std::move(inputs)}, can_close_{true} {
     setWindowTitle(tr("Export Video"));
+    setWindowFlags(windowFlags() | Qt::CustomizeWindowHint);
+    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
     if (inputs_.video_file.isEmpty()) {
         throw std::runtime_error{"Cannot export empty video path!"};
@@ -139,6 +141,7 @@ void ExportWindow::onExport() {
 
     export_btn_->setEnabled(false);
     export_btn_->setVisible(false);
+    can_close_ = false;
 
     QThreadPool::globalInstance()->start(new FFMpegBurnSubtitleTask{
         inputs_.video_file, inputs_.subtitle_file, output_file_, this});
@@ -160,11 +163,24 @@ void ExportWindow::onProgressUpdate(
 }
 
 void ExportWindow::onExportComplete(QString error) {
-    export_btn_->setVisible(true);
     export_btn_->setEnabled(true);
+    export_btn_->setVisible(true);
+    can_close_ = true;
 
     if (!error.isEmpty()) {
         progress_->setText(tr("Error: ") + error);
+    }
+}
+
+void ExportWindow::accept() {
+    if (can_close_) {
+        QDialog::accept();
+    }
+}
+
+void ExportWindow::reject() {
+    if (can_close_) {
+        QDialog::reject();
     }
 }
 

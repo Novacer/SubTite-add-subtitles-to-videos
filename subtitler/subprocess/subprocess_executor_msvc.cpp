@@ -193,7 +193,7 @@ void SubprocessExecutor::Start() {
         /* lpProcessAttributes= */ NULL,
         /* lpThreadAttributes= */ NULL,
         /* bInheritHandles= */ TRUE,
-        /* dwCreationFlags= */ 0,
+        /* dwCreationFlags= */ CREATE_NO_WINDOW,
         /* lpEnvironment= */ NULL,
         /* lpCurrentDirectory= */ NULL,
         /* lpStartupInfo= */ &start_info,

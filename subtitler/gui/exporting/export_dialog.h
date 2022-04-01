@@ -4,18 +4,11 @@
 #include <QDialog>
 #include <QString>
 #include <chrono>
-#include <memory>
 
 #include "subtitler/video/processing/progress_parser.h"
 
 QT_FORWARD_DECLARE_CLASS(QLabel)
 QT_FORWARD_DECLARE_CLASS(QPushButton)
-
-namespace subtitler::video::processing {
-
-class FFMpeg;
-
-}  // namespace subtitler::video::processing
 
 namespace subtitler {
 namespace gui {
@@ -46,16 +39,25 @@ class ExportWindow : public QDialog {
     void onProgressUpdate(
         const subtitler::video::processing::Progress progress);
     void onExportComplete(QString error);
+    void onExportTypeChanged(int index);
 
   private:
     Inputs inputs_;
     QString output_file_;
+    QLabel* output_choice_;
     QLabel* progress_;
     QPushButton* export_btn_;
-    std::unique_ptr<video::processing::FFMpeg> ffmpeg_;
     std::chrono::microseconds video_duration_;
     // Disables dialog from being closed during export job.
     bool can_close_;
+
+    enum ExportType {
+        EXPORT_TYPE_UNKNOWN,
+        REMUX_SUBTITLE,
+        BURN_SUBTITLE,
+    };
+    ExportType export_type_;
+    QLabel* export_type_explanation_;
 };
 
 }  // namespace exporting

@@ -1,23 +1,17 @@
 #include "subtitler/gui/exporting/export_dialog.h"
 
-#include <QCoreApplication>
+#include <QComboBox>
 #include <QDebug>
 #include <QFileDialog>
 #include <QGridLayout>
 #include <QLabel>
 #include <QPushButton>
-#include <QRunnable>
 #include <QThreadPool>
 #include <stdexcept>
 
-#include "subtitler/subprocess/subprocess_executor.h"
-#include "subtitler/video/processing/ffmpeg.h"
+#include "subtitler/gui/exporting/tasks/burn_subtitle_task.h"
+#include "subtitler/gui/exporting/tasks/remux_subtitle_task.h"
 #include "subtitler/video/util/video_utils.h"
-
-// Reference https://stackoverflow.com/a/14713932/17786559
-// Both Q_DECLARE_METATYPE and qRegisterMetaType in the ctor are needed
-// so that QT can pass Progress through QMetaObject::invokeMethod
-Q_DECLARE_METATYPE(subtitler::video::processing::Progress)
 
 namespace subtitler {
 namespace gui {
@@ -25,57 +19,20 @@ namespace exporting {
 
 namespace {
 
-class FFMpegBurnSubtitleTask : public QRunnable {
-  public:
-    FFMpegBurnSubtitleTask(QString video, QString subtitle, QString output,
-                           ExportWindow *parent)
-        : QRunnable{},
-          video_{video},
-          subtitle_{subtitle},
-          output_{output},
-          parent_{parent} {
-        qRegisterMetaType<subtitler::video::processing::Progress>();
-    }
-
-    void run() override {
-        std::string ffmpeg_path =
-            QCoreApplication::applicationDirPath().toStdString() + "/ffmpeg";
-
-        video::processing::FFMpeg ffmpeg{
-            ffmpeg_path, std::make_unique<subprocess::SubprocessExecutor>()};
-
-        try {
-            ffmpeg.BurnSubtitlesAsync(
-                video_.toStdString(), subtitle_.toStdString(),
-                output_.toStdString(),
-                [this](const video::processing::Progress &progress) {
-                    QMetaObject::invokeMethod(
-                        parent_, "onProgressUpdate",
-                        // Q_ARG expects fully qualified name.
-                        Q_ARG(subtitler::video::processing::Progress,
-                              progress));
-                });
-            ffmpeg.WaitForAsyncTask();
-            QMetaObject::invokeMethod(parent_, "onExportComplete",
-                                      Q_ARG(QString, ""));
-        } catch (const std::exception &e) {
-            qDebug() << "Error starting ffmpeg: " << e.what();
-            QMetaObject::invokeMethod(parent_, "onExportComplete",
-                                      Q_ARG(QString, e.what()));
-        }
-    }
-
-  private:
-    QString video_;
-    QString subtitle_;
-    QString output_;
-    ExportWindow *parent_;
-};
+const char *REMUX_SUBTITLE_MESSAGE =
+    "Export as mkv. Fastest processing times but may not be supported on all "
+    "players";
+const char *BURN_SUBTITLE_MESSAGE =
+    "Export as mp4. Subtitles are permanently placed (burned) into the video.\n"
+    "Slower processing times but supported on more players";
 
 }  // namespace
 
 ExportWindow::ExportWindow(Inputs inputs, QWidget *parent)
-    : QDialog{parent}, inputs_{std::move(inputs)}, can_close_{true} {
+    : QDialog{parent},
+      inputs_{std::move(inputs)},
+      can_close_{true},
+      export_type_{REMUX_SUBTITLE} {
     setWindowTitle(tr("Export Video"));
     setWindowFlags(windowFlags() | Qt::CustomizeWindowHint);
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
@@ -96,8 +53,17 @@ ExportWindow::ExportWindow(Inputs inputs, QWidget *parent)
 
     QPushButton *choose_output_file =
         new QPushButton{tr("Choose Output Location"), this};
-    QLabel *output_choice = new QLabel{this};
-    output_choice->setMinimumWidth(300);
+    output_choice_ = new QLabel{this};
+    output_choice_->setMinimumWidth(300);
+
+    QComboBox *export_type_choice = new QComboBox{this};
+    export_type_choice->addItem(tr("Remux as mkv (Recommended)"));
+    export_type_choice->addItem(tr("Burn to mp4"));
+    export_type_choice->setCurrentIndex(0);
+    export_type_choice->setEditable(false);
+
+    export_type_explanation_ = new QLabel{tr(REMUX_SUBTITLE_MESSAGE), this};
+    export_type_explanation_->setWordWrap(true);
 
     export_btn_ = new QPushButton{tr("Export"), this};
     progress_ = new QLabel{this};
@@ -106,29 +72,34 @@ ExportWindow::ExportWindow(Inputs inputs, QWidget *parent)
     layout->addWidget(input_video_name, 0, 0, 1, 2);
     layout->addWidget(input_subtitle_name, 1, 0, 1, 2);
     layout->addWidget(choose_output_file, 2, 0);
-    layout->addWidget(output_choice, 2, 1);
-    layout->addWidget(progress_, 3, 0);
-    layout->addWidget(export_btn_, 3, 1, Qt::AlignRight);
+    layout->addWidget(output_choice_, 2, 1);
+    layout->addWidget(export_type_choice, 3, 0, 1, 2);
+    layout->addWidget(export_type_explanation_, 4, 0, 1, 2);
+    layout->addWidget(progress_, 5, 0);
+    layout->addWidget(export_btn_, 5, 1, Qt::AlignRight);
 
     layout->setVerticalSpacing(5);
 
-    // TODO: add drop down to choose the video encoding mode
-    // (remux vs transcode)
+    connect(choose_output_file, &QPushButton::clicked, this, [this]() {
+        std::string filter = "Video Files (*.mp4)";
+        if (export_type_ == ExportType::REMUX_SUBTITLE) {
+            filter = "Video Files (*.mkv)";
+        }
+        output_file_ = QFileDialog::getSaveFileName(
+            /* parent= */ this,
+            /* caption= */ tr("Save Video"),
+            /* directory= */ "",
+            /* filter= */ tr(filter.c_str()));
+        output_choice_->setText(output_file_);
+    });
 
-    connect(choose_output_file, &QPushButton::clicked, this,
-            [this, output_choice]() {
-                output_file_ = QFileDialog::getSaveFileName(
-                    /* parent= */ this,
-                    /* caption= */ tr("Save Video"),
-                    /* directory= */ "",
-                    /* filter= */ tr("Video Files (*.mp4)"));
-                output_choice->setText(output_file_);
-            });
-
+    connect(export_type_choice,
+            QOverload<int>::of(&QComboBox::currentIndexChanged), this,
+            &ExportWindow::onExportTypeChanged);
     connect(export_btn_, &QPushButton::clicked, this, &ExportWindow::onExport);
 }
 
-ExportWindow::~ExportWindow(){};
+ExportWindow::~ExportWindow() = default;
 
 void ExportWindow::onExport() {
     if (output_file_.isEmpty()) {
@@ -143,8 +114,19 @@ void ExportWindow::onExport() {
     export_btn_->setVisible(false);
     can_close_ = false;
 
-    QThreadPool::globalInstance()->start(new FFMpegBurnSubtitleTask{
-        inputs_.video_file, inputs_.subtitle_file, output_file_, this});
+    switch (export_type_) {
+        case REMUX_SUBTITLE:
+            QThreadPool::globalInstance()->start(new tasks::RemuxSubtitleTask{
+                inputs_.video_file, inputs_.subtitle_file, output_file_, this});
+            break;
+        case BURN_SUBTITLE:
+            QThreadPool::globalInstance()->start(new tasks::BurnSubtitleTask{
+                inputs_.video_file, inputs_.subtitle_file, output_file_, this});
+            break;
+        case EXPORT_TYPE_UNKNOWN:
+            progress_->setText(tr("Unknown export type, try again"));
+            break;
+    }
 }
 
 void ExportWindow::onProgressUpdate(
@@ -182,6 +164,26 @@ void ExportWindow::reject() {
     if (can_close_) {
         QDialog::reject();
     }
+}
+
+void ExportWindow::onExportTypeChanged(int index) {
+    switch (index) {
+        case 0:
+            export_type_ = REMUX_SUBTITLE;
+            export_type_explanation_->setText(tr(REMUX_SUBTITLE_MESSAGE));
+            break;
+        case 1:
+            export_type_ = BURN_SUBTITLE;
+            export_type_explanation_->setText(tr(BURN_SUBTITLE_MESSAGE));
+            break;
+        default:
+            export_type_ = EXPORT_TYPE_UNKNOWN;
+            export_type_explanation_->setText("");
+            break;
+    }
+
+    output_file_ = "";
+    output_choice_->setText(output_file_);
 }
 
 }  // namespace exporting

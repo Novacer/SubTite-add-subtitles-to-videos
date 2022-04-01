@@ -10,6 +10,7 @@ QT_FORWARD_DECLARE_CLASS(QAVAudioOutput)
 QT_FORWARD_DECLARE_CLASS(QAVAudioFrame)
 QT_FORWARD_DECLARE_CLASS(QAVVideoFrame)
 QT_FORWARD_DECLARE_CLASS(QFile)
+QT_FORWARD_DECLARE_CLASS(QDialog)
 
 namespace subtitler::gui {
 namespace subtitle_editor {
@@ -57,6 +58,7 @@ class MainWindow : public QMainWindow {
     // and reset once the next video frame is decoded.
     bool user_seeked_;
     QString subtitle_file_;
+    QDialog *export_dialog_;
 };
 
 }  // namespace gui

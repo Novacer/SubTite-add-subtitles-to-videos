@@ -51,11 +51,6 @@ ExportWindow::ExportWindow(Inputs inputs, QWidget *parent)
     }
     input_subtitle_name->setFrameStyle(QFrame::Panel | QFrame::Plain);
 
-    QPushButton *choose_output_file =
-        new QPushButton{tr("Choose Output Location"), this};
-    output_choice_ = new QLabel{this};
-    output_choice_->setMinimumWidth(300);
-
     QComboBox *export_type_choice = new QComboBox{this};
     export_type_choice->addItem(tr("Remux as mkv (Recommended)"));
     export_type_choice->addItem(tr("Burn to mp4"));
@@ -65,20 +60,25 @@ ExportWindow::ExportWindow(Inputs inputs, QWidget *parent)
     export_type_explanation_ = new QLabel{tr(REMUX_SUBTITLE_MESSAGE), this};
     export_type_explanation_->setWordWrap(true);
 
+    QPushButton *choose_output_file =
+        new QPushButton{tr("Choose Output Location"), this};
+    output_choice_ = new QLabel{this};
+    output_choice_->setMinimumWidth(300);
+
     export_btn_ = new QPushButton{tr("Export"), this};
     progress_ = new QLabel{this};
 
     QGridLayout *layout = new QGridLayout{this};
     layout->addWidget(input_video_name, 0, 0, 1, 2);
     layout->addWidget(input_subtitle_name, 1, 0, 1, 2);
-    layout->addWidget(choose_output_file, 2, 0);
-    layout->addWidget(output_choice_, 2, 1);
-    layout->addWidget(export_type_choice, 3, 0, 1, 2);
-    layout->addWidget(export_type_explanation_, 4, 0, 1, 2);
+    layout->addWidget(export_type_choice, 2, 0, 1, 2);
+    layout->addWidget(export_type_explanation_, 3, 0, 1, 2);
+    layout->addWidget(choose_output_file, 4, 0);
+    layout->addWidget(output_choice_, 4, 1);
     layout->addWidget(progress_, 5, 0);
     layout->addWidget(export_btn_, 5, 1, Qt::AlignRight);
 
-    layout->setVerticalSpacing(5);
+    layout->setVerticalSpacing(10);
 
     connect(choose_output_file, &QPushButton::clicked, this, [this]() {
         std::string filter = "Video Files (*.mp4)";

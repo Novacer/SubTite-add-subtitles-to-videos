@@ -29,15 +29,18 @@ SettingsWindow::SettingsWindow(Settings &settings, QWidget *parent)
     video_choice->setMinimumWidth(300);
     QLabel *subtitle_choice = new QLabel{this};
     subtitle_choice->setMinimumWidth(300);
+    error_msg_ = new QLabel{this};
+    error_msg_->setWordWrap(true);
 
     QGridLayout *layout = new QGridLayout{this};
     layout->addWidget(choose_video, 0, 0);
     layout->addWidget(video_choice, 0, 1);
     layout->addWidget(choose_subtitle, 1, 0);
     layout->addWidget(subtitle_choice, 1, 1);
+    layout->addWidget(error_msg_, 2, 0);
     layout->addWidget(close, 2, 1, Qt::AlignRight);
 
-    layout->setVerticalSpacing(5);
+    layout->setVerticalSpacing(10);
 
     connect(choose_video, &QPushButton::clicked, this, [this, video_choice]() {
         settings_.video_file = QFileDialog::getOpenFileName(
@@ -58,7 +61,15 @@ SettingsWindow::SettingsWindow(Settings &settings, QWidget *parent)
                 subtitle_choice->setText(settings_.subtitle_file);
             });
 
-    connect(close, &QPushButton::clicked, this, [this]() { this->done(0); });
+    connect(close, &QPushButton::clicked, this, [this]() {
+        if (settings_.video_file.isEmpty()) {
+            error_msg_->setText(tr("Choose video file!"));
+        } else if (settings_.subtitle_file.isEmpty()) {
+            error_msg_->setText(tr("Choose subtitle file!"));
+        } else {
+            this->done(0);
+        }
+    });
 }
 
 }  // namespace gui

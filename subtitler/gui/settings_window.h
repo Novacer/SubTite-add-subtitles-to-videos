@@ -4,6 +4,8 @@
 #include <QDialog>
 #include <QString>
 
+QT_FORWARD_DECLARE_CLASS(QLabel)
+
 namespace subtitler {
 namespace gui {
 
@@ -32,6 +34,7 @@ class SettingsWindow : public QDialog {
 
   private:
     Settings &settings_;
+    QLabel *error_msg_;
 };
 
 }  // namespace gui

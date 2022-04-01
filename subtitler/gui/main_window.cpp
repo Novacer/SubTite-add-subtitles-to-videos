@@ -45,6 +45,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     if (settings.subtitle_file.isEmpty()) {
         qDebug() << "No output file selected";
+        throw std::runtime_error{"No subtitle file was selected"};
     }
 
     subtitle_file_ = settings.subtitle_file;
@@ -86,7 +87,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     std::chrono::milliseconds duration =
         std::chrono::duration_cast<std::chrono::milliseconds>(duration_us);
     timeline::Timeline *timeline =
-        new timeline::Timeline{duration, settings.subtitle_file, placeholder};
+        new timeline::Timeline{duration, subtitle_file_, placeholder};
 
     layout->addWidget(video_renderer_, 60);
     layout->addWidget(player_controls_placeholder);
@@ -99,6 +100,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     editor_->setWindowTitle(tr("Subtitle Editor"));
     editor_->setVisible(false);
     addDockWidget(Qt::RightDockWidgetArea, editor_);
+
+    export_dialog_ = Q_NULLPTR;
 
     // Play/Pause/Step connections
     connect(play_button, &player_controls::PlayButton::play, player_.get(),
@@ -146,6 +149,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     // Handles top menu bar actions
     connect(export_video_action, &QAction::triggered, this,
             &MainWindow::onExport);
+    connect(export_video_action, &QAction::triggered, this,
+            [play_button](bool checked) {
+                // If player is playing at export, then emulate pausing the
+                // player.
+                if (play_button->is_playing()) {
+                    play_button->onClick();
+                }
+            });
 
     if (!subtitle_file_.isEmpty()) {
         timeline->LoadSubtitles();
@@ -187,7 +198,7 @@ void MainWindow::onVideoFrameDecoded(const QAVVideoFrame &video_frame) {
 
 void MainWindow::onSubtitleFileChanged(std::size_t num_loaded) {
     player_->setFilter("");
-    if (num_loaded == 0) {
+    if (num_loaded == 0 || subtitle_file_.isEmpty()) {
         return;
     }
     QString escaped_path = subtitle_file_;
@@ -196,11 +207,17 @@ void MainWindow::onSubtitleFileChanged(std::size_t num_loaded) {
 }
 
 void MainWindow::onExport(bool checked) {
+    if (export_dialog_) {
+        return;
+    }
     exporting::Inputs inputs;
     inputs.video_file = video_file_->fileName();
     inputs.subtitle_file = subtitle_file_;
-    exporting::ExportWindow window{inputs, this};
-    window.exec();
+    export_dialog_ = new exporting::ExportWindow{std::move(inputs), this};
+    export_dialog_->setAttribute(Qt::WA_DeleteOnClose);
+    export_dialog_->open();
+    connect(export_dialog_, &QDialog::finished,
+            [this](int result) { export_dialog_ = Q_NULLPTR; });
 }
 
 }  // namespace gui

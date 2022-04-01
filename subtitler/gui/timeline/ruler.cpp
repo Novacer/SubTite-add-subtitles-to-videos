@@ -104,8 +104,10 @@ void Ruler::onMoveIndicator(std::chrono::milliseconds frame_time) {
 }
 
 void Ruler::onStepIndicator(std::chrono::milliseconds delta) {
-    std::chrono::milliseconds new_frame_time = indicator_time_ + delta;
-    onMoveIndicator(new_frame_time);
+    std::chrono::milliseconds new_frame_time =
+        std::max(0ms, indicator_time_ + delta);
+    new_frame_time = std::min(new_frame_time, duration_);
+    onMoveIndicator(std::move(new_frame_time));
     emit userChangedIndicatorTime(indicator_time_);
 }
 

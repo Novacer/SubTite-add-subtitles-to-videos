@@ -38,6 +38,9 @@ class ExportWindow : public QDialog {
     ExportWindow(Inputs inputs, QWidget* parent = Q_NULLPTR);
     ~ExportWindow();
 
+    void accept() override;
+    void reject() override;
+
   public slots:
     void onExport();
     void onProgressUpdate(
@@ -51,6 +54,8 @@ class ExportWindow : public QDialog {
     QPushButton* export_btn_;
     std::unique_ptr<video::processing::FFMpeg> ffmpeg_;
     std::chrono::microseconds video_duration_;
+    // Disables dialog from being closed during export job.
+    bool can_close_;
 };
 
 }  // namespace exporting

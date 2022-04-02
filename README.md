@@ -1,4 +1,7 @@
 # SubTite: Easy way to create and add subtitles for your videos
+
+![Latest Build Status](https://github.com/Novacer/SubTite-add-subtitles-to-videos/actions/workflows/main.yml/badge.svg?branch=master)
+
 **TLDR:** SubTite allows you to add subtitles and preview it immediately in the video player. The subtitles will be output as a separate SRT file. Existing SRT files can be imported and edited effortlessly. The subtitles can be positioned in 9 different locations along the video. Support for trimming video, adding images, and other video editing features coming soon!
 
 ## GUI Demo
@@ -9,13 +12,13 @@
 
 ## Feature Overview (Current v0.9)
 * Supports Windows and Linux
-* GUI for adding subtitles
-* CLI for adding subtitles
+* GUI + CLI for adding subtitles
 * Intuitive interface to make subtitling as fast and pain-free as possible
 * Full UTF-8 Unicode support on Windows and Linux
 * Subtitles can be positioned in 9 different locations: top right, middle center, bottom left etc.
 * Added subtitles can immediately be previewed in a video player on the fly
 * Existing subtitles (.srt) can be loaded and easily edited
+* Video with subtitles can be exported either by remuxing to mkv or burning subtitles into the mp4.
 
 ## Installation
 
@@ -50,6 +53,7 @@ The CLI edition of SubTite is the Keep-It-Simple solution to quickly add subtitl
 5. Enter the subtitle text on the pane to the right.
 6. (Optional) Select the subtitle position from one of the 9 positions.
 7. Use mouse to adjust the subtitle's start and end time. Any changes are saved automatically.
+8. Select `File > Export` if you want to combine the video and subtitles!
 
 
 ### CLI
@@ -151,12 +155,13 @@ There are a number of remaning commands available. This includes, but not limite
 ## Building from source
 SubTite uses bazel as the main build system. Setup bazel on your environment following this link: https://docs.bazel.build/versions/main/install.html.
 
-Compiling for windows requires MSVC 2019. Compiling for linux requires GCC.
+### Windows
+Compiling for windows requires MSVC 2019.
 
 With bazel setup, here are some sample commands for building the CLI.
+
 ```bash
 $ bazel build --config=vs2019-prod //subtitler/cli:cli # Build CLI in release mode using MSVC2019
-$ bazel build --config=gcc-prod //subttiler/cli:cli    # Build CLI in release mode using GCC
 ```
 
 Building the GUI requires QT 5 to be installed on your machine. On windows specifically, we expect the path to be somewhat similar to
@@ -164,42 +169,58 @@ Building the GUI requires QT 5 to be installed on your machine. On windows speci
 C:\Qt\5.15.2\msvc2019_64\... etc
 ```
 
-and on linux,
+Then SubTite can be built with
+
+```bash
+./build_gui_dev.sh
+```
+
+It is recommended to use the build script instead of building with `bazel build ...`, as the build script copies in additional runtime dependencies (qt audio plugins etc.) which are required to run SubTite. You may need to set `QT5_INSTALL_PATH` env variable to be something like `C:\\Qt\\5.15.2\\msvc2019_64\\`
+
+If for some reason the build script doesn't work for you, here's how to build manually on Windows.
+
+---
+
+First `bazel build --config=vs2019-prod //subtitler/gui:main`
+
+The binaries and dynamic libraries are contained in `bazel-bin/subtitler/gui/`. In order to have audio played in the integrated player on windows, you need to copy the QT audio plugins into this folder. In particular, you need to create the folder `bazel-bin/subtitler/gui/plugins`. Then, copy the audio folder from `C:\Qt\5.15.2\msvc2019_64\plugins\` into `bazel-bin/subtitler/gui/plugins`.
+
+Finally, you want to copy ffmpeg.exe into `bazel-bin/subtitler/gui/`. When you ran bazel build, a copy of ffmpeg.exe is already downloaded to `bazel-subtitler/external/ffmpeg_windows/bin/ffmpeg.exe`. You may copy that or any other ffmpeg binary you obtain elsewhere.
+
+### Linux
+
+Compiling for linux requires GCC.
+
+With bazel setup, here are some sample commands for building the CLI.
+```bash
+$ bazel build --config=gcc-prod //subttiler/cli:cli    # Build CLI in release mode using GCC
+```
+
+To compile the GUI, you will need to install QT5.
+
+```bash
+sudo apt-get install -y qt5-default qttools5-dev-tools qtmultimedia5-dev libva-dev
+```
+
+This should install QT 5 to one of the following locations.
+
 ```
 /usr/include/x86_64-linux-gnu/qt5
 or
 /usr/include/qt
 ```
 
-Then SubTite can be built all from one command:
+Now SubTite can be built all from one command:
 
 ```bash
-$ bazel build --config=vs2019-prod //subtitler/gui:main # Build GUI in release mode using MSVC2019
-$ bazel build --config=gcc-prod //subttiler/gui:main    # Build GUI in release mode using GCC
+./build_gui_dev.sh
 ```
-**IMPORTANT** For the GUI, some additional dependencies (like audio plugins or ffmpeg.exe) needs to be copied into the build folder in order to run.
-To automate the process, you can instead use `./build_gui_dev.sh` which will setup everything you need.
+It is recommended to use the build script instead of compiling manually, since the build script ensures the correct runtime dependencies are copied to the right places. If the script doesn't work for you, here's how to compile manually.
 
-Note that `bazel build ...` will download various dependencies during the build process. If you are on Linux,
-you may need to separately install ffmpeg 4.4 to run SubTite. AFAIK there's no issue on windows.
+---
+First, `bazel build --config=gcc-prod //subtitler/gui:main`
 
-```
-# install ffmpeg 4.4
-sudo add-apt-repository -y ppa:savoury1/ffmpeg4
-sudo apt install -y ffmpeg
-```
-
-On linux, you will also need to install the QT packages.
-```
-sudo apt-get install -y qt5-default qttools5-dev-tools qtmultimedia5-dev libva-dev
-```
-
-#### Important for Windows Audio!
-The binaries and dynamic libraries are contained in `bazel-bin/subtitler/gui/`. In order to have audio played in the integrated player on windows, you need to copy the QT audio plugins into this folder. In particular, you need to create the folder `bazel-bin/subtitler/gui/plugins`. Then, copy the audio folder from `C:\Qt\5.15.2\msvc2019_64\plugins\` into `bazel-bin/subtitler/gui/plugins`.
-
-Or, just use `build_gui_dev.sh` to do all of that and more for you in one command.
-
-You can reference the [deployment section](#deploying---packaging-subtite-with-its-dependencies) for further tips on making sure the dependencies are in the right place.
+Next, copy `bazel-subtitler/external/ffmpeg_linux/bin/ffmpeg` into `bazel-bin/subtitler/gui`. You should be ready to go from here.
 
 ## Build configs
 
@@ -212,8 +233,8 @@ The following build options are configured in [.bazelrc](https://github.com/Nova
 
 Unit tests can be run using
 ```bash
-$ bazel test --config=vs2019 ... # used for running on windows
-$ bazel test --config=gcc ...    # used for running on linux
+$ bazel test --config=vs2019-asan ... # used for running on windows
+$ bazel test --config=gcc-asan ...    # used for running on linux
 ```
 
 ## Deploying - Packaging Subtite with it's dependencies.
@@ -221,9 +242,15 @@ Since Subtite uses Dynamic Linking with QT and FFMPEG (so it can remain LGPL com
 
 In addition to the dependencies required to build Subtite, deploying also requires [Resource Hacker](http://www.angusj.com/resourcehacker/) on Windows, and [linuxdeployqt](https://github.com/probonopd/linuxdeployqt) on Linux.
 
+On Windows only, the script requires setting `QT5_INSTALL_PATH` env variable to the directory where QT 5 is installed. This should look something like `C:\\Qt\\5.15.2\\msvc2019_64\\`.
+
+On both Windows and Linux, the script requires setting `SUBTITE_RELEASE_PATH` which is the path to the output directory that you want to write the deployed binaries to.
+
 ## Experimental
 Some experimental binaries are also placed in the `subtitler/experimental` folder.
 These contain some methods which are not ready to use in production but are interesting demos.
+
+### Trimmer
 
 `subtitler/experimental/trimmer_msvc.cpp` implements trimming of a video on windows.
 You select a video, a timestamp file, and an output video path.
@@ -239,15 +266,28 @@ Will produce an output video with **only** the sections from `0s - 1min` and `3m
 
 Trimmer can be built using
 ```
-$ bazel build --config=vs2019 //subtitler/experimental:trimmer
+$ bazel build --config=vs2019 //subtitler/experimental/trimmer:trimmer
 ```
 
-This functionality will eventually be integrated in the SubTite binary. See planned features below.
+This functionality will eventually be integrated in the SubTite binary.
+
+### Subtitle Burner (In production)
+`subtitler/experimental/sub_burner.cpp` demonstrates how subtitles can be permanently burned into a video. It requires as input 3 command line flags:
+
+```
+--video_path: path to the input video file
+--subtitle_path: path to the SRT subtitle file
+--output_path: path to where the output file will be written
+```
+
+SubBurner can be built using
+```
+$ bazel build --config=vs2019 //subtitler/experimental/sub_burner:sub_burner
+```
 
 ## Planned Features
-### V1.0-2.0
+### V1.1-2.0
 * Support for subtitles of various fonts and colours
-* Subtitles can be baked directly into the video
 * Support simple video editing, such as cropping/trimming
 * Support adding static images on top of the video between certain timestamps.
 

@@ -16,6 +16,8 @@ class PlayButton : public QPushButton {
     PlayButton(QWidget *parent = Q_NULLPTR);
     ~PlayButton() = default;
 
+    bool is_playing() const { return is_playing_; }
+
   signals:
     void play();
     void pause();

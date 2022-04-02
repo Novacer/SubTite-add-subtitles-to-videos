@@ -119,7 +119,7 @@ void SubtitleIntervalContainer::SaveSubripFile() {
 std::pair<bool, std::size_t> SubtitleIntervalContainer::LoadSubripFile(
     qreal interval_width, quint32 ms_per_interval, int y_coord) {
     srt::SubRipFile srt_file;
-    if (!fs::exists(output_srt_file_) || output_srt_file_.empty()) {
+    if (output_srt_file_.empty() || !fs::exists(output_srt_file_)) {
         qDebug() << "No subtitle file to load";
         return std::make_pair(false, 0);
     }

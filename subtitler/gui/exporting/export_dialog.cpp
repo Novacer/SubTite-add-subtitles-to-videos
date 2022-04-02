@@ -23,7 +23,7 @@ const char *REMUX_SUBTITLE_MESSAGE =
     "Export as mkv. Fastest processing times but may not be supported on all "
     "players";
 const char *BURN_SUBTITLE_MESSAGE =
-    "Export as mp4. Subtitles are permanently placed (burned) into the video.\n"
+    "Export as mp4. Subtitles are permanently placed (burned) into the video. "
     "Slower processing times but supported on more players";
 
 }  // namespace

@@ -214,6 +214,7 @@ void MainWindow::onExport(bool checked) {
     inputs.video_file = video_file_->fileName();
     inputs.subtitle_file = subtitle_file_;
     export_dialog_ = new exporting::ExportWindow{std::move(inputs), this};
+    // WA_DeleteOnClose will delete dialog when done() is called.
     export_dialog_->setAttribute(Qt::WA_DeleteOnClose);
     export_dialog_->open();
     connect(export_dialog_, &QDialog::finished,

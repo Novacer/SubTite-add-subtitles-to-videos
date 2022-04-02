@@ -110,11 +110,10 @@ void ExportWindow::onExport() {
     video_duration_ =
         video::util::GetVideoDuration(inputs_.video_file.toStdString());
 
-    export_btn_->setEnabled(false);
-    export_btn_->setVisible(false);
-    can_close_ = false;
-
     switch (export_type_) {
+        case EXPORT_TYPE_UNKNOWN:
+            progress_->setText(tr("Unknown export type, try again"));
+            return;
         case REMUX_SUBTITLE:
             QThreadPool::globalInstance()->start(new tasks::RemuxSubtitleTask{
                 inputs_.video_file, inputs_.subtitle_file, output_file_, this});
@@ -123,10 +122,11 @@ void ExportWindow::onExport() {
             QThreadPool::globalInstance()->start(new tasks::BurnSubtitleTask{
                 inputs_.video_file, inputs_.subtitle_file, output_file_, this});
             break;
-        case EXPORT_TYPE_UNKNOWN:
-            progress_->setText(tr("Unknown export type, try again"));
-            break;
     }
+
+    export_btn_->setEnabled(false);
+    export_btn_->setVisible(false);
+    can_close_ = false;
 }
 
 void ExportWindow::onProgressUpdate(

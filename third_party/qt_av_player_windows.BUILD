@@ -6,6 +6,7 @@ WINDOWS_EXCLUDE_LIST = [
     # "**/qavhwdevice_d3d11.*",
     "**/qavhwdevice_mediacodec.*",
     "**/qavhwdevice_videotoolbox.*",
+    "**/qavhwdevice_vdpau.*",
 ]
 
 qt_cc_library(

@@ -10,7 +10,7 @@
 ## CLI Demo
 ![cli demo](https://user-images.githubusercontent.com/29148427/151613092-e7dcf2c3-80dd-4f72-a3c9-8bdd220594b8.gif)
 
-## Feature Overview (Current v0.9)
+## Feature Overview (Current v1.0.0)
 * Supports Windows and Linux
 * GUI + CLI for adding subtitles
 * Intuitive interface to make subtitling as fast and pain-free as possible

@@ -78,8 +78,8 @@ void Timeline::onChangeSubtitleStartEndTime(SubtitleInterval* subtitle) {
 }
 
 void Timeline::onChangeSubtitleStartEndTimeFinished(
-    SubtitleInterval* subtitle) {
-    emit changeSubtitleStartEndTimeFinished(subtitle);
+    SubtitleIntervalContainer* container, SubtitleInterval* subtitle) {
+    emit changeSubtitleStartEndTimeFinished(container, subtitle);
 }
 
 void Timeline::onSubtitleFileLoaded(std::size_t num_loaded) {

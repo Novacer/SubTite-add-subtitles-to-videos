@@ -50,7 +50,8 @@ class Ruler : public QWidget {
     void subtitleIntervalClicked(SubtitleIntervalContainer* container,
                                  SubtitleInterval* interval);
     void changeSubtitleIntervalTime(SubtitleInterval* interval);
-    void changeSubtitleIntervalTimeFinished(SubtitleInterval* interval);
+    void changeSubtitleIntervalTimeFinished(
+        SubtitleIntervalContainer* container, SubtitleInterval* interval);
     void subtitleFileLoaded(std::size_t num_subtitles);
 
   public slots:

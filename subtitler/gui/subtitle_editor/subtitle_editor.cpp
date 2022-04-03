@@ -66,7 +66,8 @@ SubtitleEditor::SubtitleEditor(QWidget* parent)
 
     connect(text_edit_, &QPlainTextEdit::textChanged, this,
             &SubtitleEditor::onSubtitleTextChanged);
-    connect(save_button, &QPushButton::clicked, this, &SubtitleEditor::onSave);
+    connect(save_button, &QPushButton::clicked, this,
+            [this]() { this->onSave(); });
     connect(delete_button, &QPushButton::clicked, this,
             &SubtitleEditor::onDelete);
     connect(this, &SubtitleEditor::visibilityChanged, this,
@@ -114,9 +115,14 @@ void SubtitleEditor::onSubtitleChangeStartEndTime(
     begin_end_time_->setText(FormatSubtitleStartEndString(subtitle));
 }
 
-void SubtitleEditor::onSave() {
-    if (!container_) {
+// Null container means to keep using the container member.
+// A valid container ptr means to use the new container for successive calls.
+void SubtitleEditor::onSave(timeline::SubtitleIntervalContainer* container) {
+    if (!container_ && !container) {
         return;
+    }
+    if (container) {
+        container_ = container;
     }
     container_->SaveSubripFile();
     emit saved(container_->intervals().size());

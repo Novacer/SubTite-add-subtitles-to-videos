@@ -40,7 +40,8 @@ class Timeline : public QScrollArea {
     void openSubtitleEditor(SubtitleIntervalContainer* container,
                             SubtitleInterval* subtitle);
     void changeSubtitleStartEndTime(SubtitleInterval* subtitle);
-    void changeSubtitleStartEndTimeFinished(SubtitleInterval* subtitle);
+    void changeSubtitleStartEndTimeFinished(
+        SubtitleIntervalContainer* container, SubtitleInterval* subtitle);
     void subtitleFileLoaded(std::size_t num_loaded);
 
   public slots:
@@ -60,7 +61,8 @@ class Timeline : public QScrollArea {
     void onSubtitleIntervalClicked(SubtitleIntervalContainer* container,
                                    SubtitleInterval* subtitle);
     void onChangeSubtitleStartEndTime(SubtitleInterval* subtitle);
-    void onChangeSubtitleStartEndTimeFinished(SubtitleInterval* subtitle);
+    void onChangeSubtitleStartEndTimeFinished(
+        SubtitleIntervalContainer* container, SubtitleInterval* subtitle);
     void onSubtitleFileLoaded(std::size_t num_loaded);
 
   private:

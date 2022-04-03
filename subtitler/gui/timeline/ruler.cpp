@@ -223,7 +223,8 @@ bool Ruler::eventFilter(QObject* watched, QEvent* event) {
             } else if (auto* interval =
                            subtitle_intervals_->GetIntervalFromMarker(watched);
                        interval != Q_NULLPTR) {
-                emit changeSubtitleIntervalTimeFinished(interval);
+                emit changeSubtitleIntervalTimeFinished(subtitle_intervals_,
+                                                        interval);
             }
         }
     } else if (auto* interval =

@@ -23,7 +23,7 @@ const char *REMUX_SUBTITLE_MESSAGE =
     "Export as mkv. Fastest processing times but may not be supported on all "
     "players";
 const char *BURN_SUBTITLE_MESSAGE =
-    "Export as mp4. Subtitles are permanently placed (burned) into the video.\n"
+    "Export as mp4. Subtitles are permanently placed (burned) into the video. "
     "Slower processing times but supported on more players";
 
 }  // namespace
@@ -82,14 +82,27 @@ ExportWindow::ExportWindow(Inputs inputs, QWidget *parent)
 
     connect(choose_output_file, &QPushButton::clicked, this, [this]() {
         std::string filter = "Video Files (*.mp4)";
+        QString required_suffix = ".mp4";
         if (export_type_ == ExportType::REMUX_SUBTITLE) {
             filter = "Video Files (*.mkv)";
+            required_suffix = ".mkv";
         }
-        output_file_ = QFileDialog::getSaveFileName(
-            /* parent= */ this,
-            /* caption= */ tr("Save Video"),
-            /* directory= */ "",
-            /* filter= */ tr(filter.c_str()));
+
+        // On Linux we're using QT 5.12, which getSaveFileName does not
+        // add any extension by default. Thus, we create the dialog
+        // manually and use setDefaultSuffix instead.
+        QFileDialog save_dialog{/* parent= */ this,
+                                /* caption= */ tr("Save Video"),
+                                /* directory= */ "",
+                                /* filter= */ tr(filter.c_str())};
+        save_dialog.setDefaultSuffix(required_suffix);
+        save_dialog.setAcceptMode(QFileDialog::AcceptSave);
+        if (save_dialog.exec() == QDialog::Accepted) {
+            output_file_ = save_dialog.selectedFiles().front();
+        } else {
+            output_file_ = "";
+        }
+
         output_choice_->setText(output_file_);
     });
 

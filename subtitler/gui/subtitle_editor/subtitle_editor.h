@@ -47,7 +47,10 @@ class SubtitleEditor : public QDockWidget {
                         timeline::SubtitleInterval* subtitle);
     void onSubtitleTextChanged();
     void onSubtitleChangeStartEndTime(timeline::SubtitleInterval* subtitle);
-    void onSave();
+
+    // Pass a container pointer to use this new container for successive calls.
+    // Pass null container to keep using the last container.
+    void onSave(timeline::SubtitleIntervalContainer* container = Q_NULLPTR);
     void onDelete();
     void onVisibilityChanged(bool visible);
     void onPositionSelected(const std::string& position_id);

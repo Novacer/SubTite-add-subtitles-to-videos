@@ -1,12 +1,13 @@
 load("@com_justbuchanan_rules_qt//:qt.bzl", "qt_cc_library")
 
 LINUX_EXCLUDE_LIST = [
-    "**/qavhwdevice_vaapi_drm_egl.*",
-    # "**/qavhwdevice_vaapi_x11_glx.*",
-    "**/qavhwdevice_d3d11.*",
-    "**/qavhwdevice_mediacodec.*",
-    "**/qavhwdevice_videotoolbox.*",
-    "**/qavhwdevice_vdpau.*",
+    "**/qavhwdevice_vaapi_drm_egl*",
+    # "**/qavhwdevice_vaapi_x11_glx*",
+    "**/qavhwdevice_d3d11*",
+    "**/qavhwdevice_dxva2*",
+    "**/qavhwdevice_mediacodec*",
+    "**/qavhwdevice_videotoolbox*",
+    "**/qavhwdevice_vdpau*",
 ]
 
 qt_cc_library(

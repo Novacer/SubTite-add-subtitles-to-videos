@@ -33,7 +33,7 @@ if [[ ${machine} == "MinGw" || ${machine} == "CYGWIN" ]]; then
     fi
     # Copy ffmpeg binary to bazel-bin
     if [ ! -f ${BAZEL_BUILD_DIR}/ffmpeg.exe ]; then
-        cp bazel-subtitler/external/ffmpeg_windows/bin/ffmpeg.exe ${BAZEL_BUILD_DIR}/ffmpeg.exe
+        cp bazel-$(basename $(pwd))/external/ffmpeg_windows/bin/ffmpeg.exe ${BAZEL_BUILD_DIR}/ffmpeg.exe
     fi
 
 elif [[ ${machine} == "Linux" ]]; then
@@ -42,7 +42,7 @@ elif [[ ${machine} == "Linux" ]]; then
 
     # Copy ffmpeg binary to bazel-bin
     if [ ! -f ${BAZEL_BUILD_DIR}/ffmpeg ]; then
-        cp bazel-subtitler/external/ffmpeg_linux/bin/ffmpeg ${BAZEL_BUILD_DIR}/ffmpeg
+        cp bazel-$(basename $(pwd))/external/ffmpeg_linux/bin/ffmpeg ${BAZEL_BUILD_DIR}/ffmpeg
     fi
 
 else

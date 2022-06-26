@@ -1,0 +1,799 @@
+{
+    "DisplayText": "You may be an open book Sponge Bob, but I'm a bit more complicated than that. The inner machinations of my mind are an enigma.",
+    "Duration": 105400000,
+    "Id": "ae0b8d69b1b0485d99e062eacc8ab2cd",
+    "NBest": [
+      {
+        "Confidence": 0.9128909,
+        "Display": "You may be an open book Sponge Bob, but I'm a bit more complicated than that. The inner machinations of my mind are an enigma.",
+        "ITN": "you may be an open book sponge bob but i'm a bit more complicated than that the inner machinations of my mind are an enigma",       
+        "Lexical": "you may be an open book sponge bob but i'm a bit more complicated than that the inner machinations of my mind are an enigma",   
+        "MaskedITN": "you may be an open book sponge bob but i'm a bit more complicated than that the inner machinations of my mind are an enigma", 
+        "Words": [
+          {
+            "Confidence": 0.9010055,
+            "Duration": 3000000,
+            "Offset": 800000,
+            "Word": "you"
+          },
+          {
+            "Confidence": 0.9662595,
+            "Duration": 2300000,
+            "Offset": 3900000,
+            "Word": "may"
+          },
+          {
+            "Confidence": 0.9542538,
+            "Duration": 1900000,
+            "Offset": 6300000,
+            "Word": "be"
+          },
+          {
+            "Confidence": 0.86893976,
+            "Duration": 1100000,
+            "Offset": 8300000,
+            "Word": "an"
+          },
+          {
+            "Confidence": 0.9627254,
+            "Duration": 3500000,
+            "Offset": 9500000,
+            "Word": "open"
+          },
+          {
+            "Confidence": 0.9810710499999999,
+            "Duration": 2300000,
+            "Offset": 13100000,
+            "Word": "book"
+          },
+          {
+            "Confidence": 0.86028844,
+            "Duration": 4500000,
+            "Offset": 15500000,
+            "Word": "sponge"
+          },
+          {
+            "Confidence": 0.9743362,
+            "Duration": 6300000,
+            "Offset": 20100000,
+            "Word": "bob"
+          },
+          {
+            "Confidence": 0.8276096,
+            "Duration": 3500000,
+            "Offset": 26900000,
+            "Word": "but"
+          },
+          {
+            "Confidence": 0.63035345,
+            "Duration": 5100000,
+            "Offset": 30900000,
+            "Word": "i'm"
+          },
+          {
+            "Confidence": 0.9386915,
+            "Duration": 1900000,
+            "Offset": 36100000,
+            "Word": "a"
+          },
+          {
+            "Confidence": 0.9728961,
+            "Duration": 2900000,
+            "Offset": 38100000,
+            "Word": "bit"
+          },
+          {
+            "Confidence": 0.9579737,
+            "Duration": 3500000,
+            "Offset": 41100000,
+            "Word": "more"
+          },
+          {
+            "Confidence": 0.99404657,
+            "Duration": 8500000,
+            "Offset": 44700000,
+            "Word": "complicated"
+          },
+          {
+            "Confidence": 0.99274266,
+            "Duration": 1700000,
+            "Offset": 53300000,
+            "Word": "than"
+          },
+          {
+            "Confidence": 0.9588078,
+            "Duration": 4900000,
+            "Offset": 55100000,
+            "Word": "that"
+          },
+          {
+            "Confidence": 0.1345028,
+            "Duration": 3100000,
+            "Offset": 63500000,
+            "Word": "the"
+          },
+          {
+            "Confidence": 0.8387083,
+            "Duration": 4200000,
+            "Offset": 66700000,
+            "Word": "inner"
+          },
+          {
+            "Confidence": 0.97322154,
+            "Duration": 9800000,
+            "Offset": 71000000,
+            "Word": "machinations"
+          },
+          {
+            "Confidence": 0.99040806,
+            "Duration": 1500000,
+            "Offset": 80900000,
+            "Word": "of"
+          },
+          {
+            "Confidence": 0.9689655,
+            "Duration": 3100000,
+            "Offset": 82500000,
+            "Word": "my"
+          },
+          {
+            "Confidence": 0.9918681,
+            "Duration": 5700000,
+            "Offset": 85700000,
+            "Word": "mind"
+          },
+          {
+            "Confidence": 0.98285234,
+            "Duration": 4300000,
+            "Offset": 91500000,
+            "Word": "are"
+          },
+          {
+            "Confidence": 0.98601997,
+            "Duration": 1300000,
+            "Offset": 95900000,
+            "Word": "an"
+          },
+          {
+            "Confidence": 0.9947027,
+            "Duration": 8900000,
+            "Offset": 97300000,
+            "Word": "enigma"
+          }
+        ]
+      },
+      {
+        "Confidence": 0.9105725,
+        "Display": "you may be an open book spongebob but i'm a bit more complicated than that the inner machinations of my mind are an enigma",
+        "ITN": "you may be an open book spongebob but i'm a bit more complicated than that the inner machinations of my mind are an enigma",
+        "Lexical": "you may be an open book spongebob but i'm a bit more complicated than that the inner machinations of my mind are an enigma",
+        "MaskedITN": "you may be an open book spongebob but i'm a bit more complicated than that the inner machinations of my mind are an enigma",
+        "Words": [
+          {
+            "Confidence": 0.9010055,
+            "Duration": 3000000,
+            "Offset": 800000,
+            "Word": "you"
+          },
+          {
+            "Confidence": 0.9662595,
+            "Duration": 2300000,
+            "Offset": 3900000,
+            "Word": "may"
+          },
+          {
+            "Confidence": 0.9542538,
+            "Duration": 1900000,
+            "Offset": 6300000,
+            "Word": "be"
+          },
+          {
+            "Confidence": 0.86893976,
+            "Duration": 1100000,
+            "Offset": 8300000,
+            "Word": "an"
+          },
+          {
+            "Confidence": 0.9627254,
+            "Duration": 3500000,
+            "Offset": 9500000,
+            "Word": "open"
+          },
+          {
+            "Confidence": 0.9810710499999999,
+            "Duration": 2300000,
+            "Offset": 13100000,
+            "Word": "book"
+          },
+          {
+            "Confidence": 0.8857323,
+            "Duration": 10900000,
+            "Offset": 15500000,
+            "Word": "spongebob"
+          },
+          {
+            "Confidence": 0.9224623,
+            "Duration": 3500000,
+            "Offset": 26900000,
+            "Word": "but"
+          },
+          {
+            "Confidence": 0.60606486,
+            "Duration": 5100000,
+            "Offset": 30900000,
+            "Word": "i'm"
+          },
+          {
+            "Confidence": 0.9386915,
+            "Duration": 1900000,
+            "Offset": 36100000,
+            "Word": "a"
+          },
+          {
+            "Confidence": 0.9728961,
+            "Duration": 2900000,
+            "Offset": 38100000,
+            "Word": "bit"
+          },
+          {
+            "Confidence": 0.9579737,
+            "Duration": 3500000,
+            "Offset": 41100000,
+            "Word": "more"
+          },
+          {
+            "Confidence": 0.99404657,
+            "Duration": 8500000,
+            "Offset": 44700000,
+            "Word": "complicated"
+          },
+          {
+            "Confidence": 0.99274266,
+            "Duration": 1700000,
+            "Offset": 53300000,
+            "Word": "than"
+          },
+          {
+            "Confidence": 0.9588078,
+            "Duration": 4900000,
+            "Offset": 55100000,
+            "Word": "that"
+          },
+          {
+            "Confidence": 0.1345028,
+            "Duration": 3100000,
+            "Offset": 63500000,
+            "Word": "the"
+          },
+          {
+            "Confidence": 0.8387083,
+            "Duration": 4200000,
+            "Offset": 66700000,
+            "Word": "inner"
+          },
+          {
+            "Confidence": 0.97322154,
+            "Duration": 9800000,
+            "Offset": 71000000,
+            "Word": "machinations"
+          },
+          {
+            "Confidence": 0.99040806,
+            "Duration": 1500000,
+            "Offset": 80900000,
+            "Word": "of"
+          },
+          {
+            "Confidence": 0.9689655,
+            "Duration": 3100000,
+            "Offset": 82500000,
+            "Word": "my"
+          },
+          {
+            "Confidence": 0.9918681,
+            "Duration": 5700000,
+            "Offset": 85700000,
+            "Word": "mind"
+          },
+          {
+            "Confidence": 0.98285234,
+            "Duration": 4300000,
+            "Offset": 91500000,
+            "Word": "are"
+          },
+          {
+            "Confidence": 0.98601997,
+            "Duration": 1300000,
+            "Offset": 95900000,
+            "Word": "an"
+          },
+          {
+            "Confidence": 0.9947027,
+            "Duration": 8900000,
+            "Offset": 97300000,
+            "Word": "enigma"
+          }
+        ]
+      },
+      {
+        "Confidence": 0.89608413,
+        "Display": "you may be an open book sponge bob 's but i'm a bit more complicated than that the inner machinations of my mind are an enigma",
+        "ITN": "you may be an open book sponge bob 's but i'm a bit more complicated than that the inner machinations of my mind are an enigma",
+        "Lexical": "you may be an open book sponge bob 's but i'm a bit more complicated than that the inner machinations of my mind are an enigma",
+        "MaskedITN": "you may be an open book sponge bob 's but i'm a bit more complicated than that the inner machinations of my mind are an enigma",
+        "Words": [
+          {
+            "Confidence": 0.9010055,
+            "Duration": 3000000,
+            "Offset": 800000,
+            "Word": "you"
+          },
+          {
+            "Confidence": 0.9662595,
+            "Duration": 2300000,
+            "Offset": 3900000,
+            "Word": "may"
+          },
+          {
+            "Confidence": 0.9542538,
+            "Duration": 1900000,
+            "Offset": 6300000,
+            "Word": "be"
+          },
+          {
+            "Confidence": 0.86893976,
+            "Duration": 1100000,
+            "Offset": 8300000,
+            "Word": "an"
+          },
+          {
+            "Confidence": 0.9627254,
+            "Duration": 3500000,
+            "Offset": 9500000,
+            "Word": "open"
+          },
+          {
+            "Confidence": 0.9810710499999999,
+            "Duration": 2300000,
+            "Offset": 13100000,
+            "Word": "book"
+          },
+          {
+            "Confidence": 0.86028844,
+            "Duration": 4500000,
+            "Offset": 15500000,
+            "Word": "sponge"
+          },
+          {
+            "Confidence": 0.65546286,
+            "Duration": 6300000,
+            "Offset": 20100000,
+            "Word": "bob"
+          },
+          {
+            "Confidence": 0.90168136,
+            "Duration": 300000,
+            "Offset": 26500000,
+            "Word": "'s"
+          },
+          {
+            "Confidence": 0.8971865,
+            "Duration": 3500000,
+            "Offset": 26900000,
+            "Word": "but"
+          },
+          {
+            "Confidence": 0.6487302,
+            "Duration": 5100000,
+            "Offset": 30900000,
+            "Word": "i'm"
+          },
+          {
+            "Confidence": 0.9336845,
+            "Duration": 1900000,
+            "Offset": 36100000,
+            "Word": "a"
+          },
+          {
+            "Confidence": 0.9728961,
+            "Duration": 2900000,
+            "Offset": 38100000,
+            "Word": "bit"
+          },
+          {
+            "Confidence": 0.9579737,
+            "Duration": 3500000,
+            "Offset": 41100000,
+            "Word": "more"
+          },
+          {
+            "Confidence": 0.99404657,
+            "Duration": 8500000,
+            "Offset": 44700000,
+            "Word": "complicated"
+          },
+          {
+            "Confidence": 0.99274266,
+            "Duration": 1700000,
+            "Offset": 53300000,
+            "Word": "than"
+          },
+          {
+            "Confidence": 0.9588078,
+            "Duration": 4900000,
+            "Offset": 55100000,
+            "Word": "that"
+          },
+          {
+            "Confidence": 0.1345028,
+            "Duration": 3100000,
+            "Offset": 63500000,
+            "Word": "the"
+          },
+          {
+            "Confidence": 0.8387083,
+            "Duration": 4200000,
+            "Offset": 66700000,
+            "Word": "inner"
+          },
+          {
+            "Confidence": 0.97322154,
+            "Duration": 9800000,
+            "Offset": 71000000,
+            "Word": "machinations"
+          },
+          {
+            "Confidence": 0.99040806,
+            "Duration": 1500000,
+            "Offset": 80900000,
+            "Word": "of"
+          },
+          {
+            "Confidence": 0.9689655,
+            "Duration": 3100000,
+            "Offset": 82500000,
+            "Word": "my"
+          },
+          {
+            "Confidence": 0.9918681,
+            "Duration": 5700000,
+            "Offset": 85700000,
+            "Word": "mind"
+          },
+          {
+            "Confidence": 0.98285234,
+            "Duration": 4300000,
+            "Offset": 91500000,
+            "Word": "are"
+          },
+          {
+            "Confidence": 0.98601997,
+            "Duration": 1300000,
+            "Offset": 95900000,
+            "Word": "an"
+          },
+          {
+            "Confidence": 0.9947027,
+            "Duration": 8900000,
+            "Offset": 97300000,
+            "Word": "enigma"
+          }
+        ]
+      },
+      {
+        "Confidence": 0.8917738,
+        "Display": "you may be an open book spongebob 's but i'm a bit more complicated than that the inner machinations of my mind are an enigma",
+        "ITN": "you may be an open book spongebob 's but i'm a bit more complicated than that the inner machinations of my mind are an enigma",
+        "Lexical": "you may be an open book spongebob 's but i'm a bit more complicated than that the inner machinations of my mind are an enigma",
+        "MaskedITN": "you may be an open book spongebob 's but i'm a bit more complicated than that the inner machinations of my mind are an enigma",
+        "Words": [
+          {
+            "Confidence": 0.91557944,
+            "Duration": 2900000,
+            "Offset": 900000,
+            "Word": "you"
+          },
+          {
+            "Confidence": 0.9662595,
+            "Duration": 2300000,
+            "Offset": 3900000,
+            "Word": "may"
+          },
+          {
+            "Confidence": 0.9542538,
+            "Duration": 1900000,
+            "Offset": 6300000,
+            "Word": "be"
+          },
+          {
+            "Confidence": 0.86893976,
+            "Duration": 1100000,
+            "Offset": 8300000,
+            "Word": "an"
+          },
+          {
+            "Confidence": 0.9627254,
+            "Duration": 3500000,
+            "Offset": 9500000,
+            "Word": "open"
+          },
+          {
+            "Confidence": 0.9810710499999999,
+            "Duration": 2300000,
+            "Offset": 13100000,
+            "Word": "book"
+          },
+          {
+            "Confidence": 0.7009151,
+            "Duration": 10900000,
+            "Offset": 15500000,
+            "Word": "spongebob"
+          },
+          {
+            "Confidence": 0.90693605,
+            "Duration": 300000,
+            "Offset": 26500000,
+            "Word": "'s"
+          },
+          {
+            "Confidence": 0.8857875,
+            "Duration": 3500000,
+            "Offset": 26900000,
+            "Word": "but"
+          },
+          {
+            "Confidence": 0.6487302,
+            "Duration": 5100000,
+            "Offset": 30900000,
+            "Word": "i'm"
+          },
+          {
+            "Confidence": 0.9336845,
+            "Duration": 1900000,
+            "Offset": 36100000,
+            "Word": "a"
+          },
+          {
+            "Confidence": 0.9728961,
+            "Duration": 2900000,
+            "Offset": 38100000,
+            "Word": "bit"
+          },
+          {
+            "Confidence": 0.9579737,
+            "Duration": 3500000,
+            "Offset": 41100000,
+            "Word": "more"
+          },
+          {
+            "Confidence": 0.99404657,
+            "Duration": 8500000,
+            "Offset": 44700000,
+            "Word": "complicated"
+          },
+          {
+            "Confidence": 0.99274266,
+            "Duration": 1700000,
+            "Offset": 53300000,
+            "Word": "than"
+          },
+          {
+            "Confidence": 0.9588078,
+            "Duration": 4900000,
+            "Offset": 55100000,
+            "Word": "that"
+          },
+          {
+            "Confidence": 0.1345028,
+            "Duration": 3100000,
+            "Offset": 63500000,
+            "Word": "the"
+          },
+          {
+            "Confidence": 0.8387083,
+            "Duration": 4200000,
+            "Offset": 66700000,
+            "Word": "inner"
+          },
+          {
+            "Confidence": 0.97322154,
+            "Duration": 9800000,
+            "Offset": 71000000,
+            "Word": "machinations"
+          },
+          {
+            "Confidence": 0.99040806,
+            "Duration": 1500000,
+            "Offset": 80900000,
+            "Word": "of"
+          },
+          {
+            "Confidence": 0.9689655,
+            "Duration": 3100000,
+            "Offset": 82500000,
+            "Word": "my"
+          },
+          {
+            "Confidence": 0.9918681,
+            "Duration": 5700000,
+            "Offset": 85700000,
+            "Word": "mind"
+          },
+          {
+            "Confidence": 0.98285234,
+            "Duration": 4300000,
+            "Offset": 91500000,
+            "Word": "are"
+          },
+          {
+            "Confidence": 0.98601997,
+            "Duration": 1300000,
+            "Offset": 95900000,
+            "Word": "an"
+          },
+          {
+            "Confidence": 0.9947027,
+            "Duration": 8900000,
+            "Offset": 97300000,
+            "Word": "enigma"
+          }
+        ]
+      },
+      {
+        "Confidence": 0.90091604,
+        "Display": "you may be an open book spongebob but i'm a bit more complicated than that that inner machinations of my mind are an enigma",
+        "ITN": "you may be an open book spongebob but i'm a bit more complicated than that that inner machinations of my mind are an enigma",
+        "Lexical": "you may be an open book spongebob but i'm a bit more complicated than that that inner machinations of my mind are an enigma",
+        "MaskedITN": "you may be an open book spongebob but i'm a bit more complicated than that that inner machinations of my mind are an enigma",
+        "Words": [
+          {
+            "Confidence": 0.91557944,
+            "Duration": 2900000,
+            "Offset": 900000,
+            "Word": "you"
+          },
+          {
+            "Confidence": 0.9662595,
+            "Duration": 2300000,
+            "Offset": 3900000,
+            "Word": "may"
+          },
+          {
+            "Confidence": 0.9542538,
+            "Duration": 1900000,
+            "Offset": 6300000,
+            "Word": "be"
+          },
+          {
+            "Confidence": 0.86893976,
+            "Duration": 1100000,
+            "Offset": 8300000,
+            "Word": "an"
+          },
+          {
+            "Confidence": 0.9627254,
+            "Duration": 3500000,
+            "Offset": 9500000,
+            "Word": "open"
+          },
+          {
+            "Confidence": 0.9810710499999999,
+            "Duration": 2300000,
+            "Offset": 13100000,
+            "Word": "book"
+          },
+          {
+            "Confidence": 0.8857323,
+            "Duration": 10900000,
+            "Offset": 15500000,
+            "Word": "spongebob"
+          },
+          {
+            "Confidence": 0.9224623,
+            "Duration": 3500000,
+            "Offset": 26900000,
+            "Word": "but"
+          },
+          {
+            "Confidence": 0.60606486,
+            "Duration": 5100000,
+            "Offset": 30900000,
+            "Word": "i'm"
+          },
+          {
+            "Confidence": 0.9386915,
+            "Duration": 1900000,
+            "Offset": 36100000,
+            "Word": "a"
+          },
+          {
+            "Confidence": 0.9728961,
+            "Duration": 2900000,
+            "Offset": 38100000,
+            "Word": "bit"
+          },
+          {
+            "Confidence": 0.9579737,
+            "Duration": 3500000,
+            "Offset": 41100000,
+            "Word": "more"
+          },
+          {
+            "Confidence": 0.99404657,
+            "Duration": 8500000,
+            "Offset": 44700000,
+            "Word": "complicated"
+          },
+          {
+            "Confidence": 0.99274266,
+            "Duration": 1700000,
+            "Offset": 53300000,
+            "Word": "than"
+          },
+          {
+            "Confidence": 0.9588078,
+            "Duration": 4900000,
+            "Offset": 55100000,
+            "Word": "that"
+          },
+          {
+            "Confidence": 0.32889804,
+            "Duration": 3100000,
+            "Offset": 63500000,
+            "Word": "that"
+          },
+          {
+            "Confidence": 0.48719814,
+            "Duration": 4200000,
+            "Offset": 66700000,
+            "Word": "inner"
+          },
+          {
+            "Confidence": 0.96019566,
+            "Duration": 9800000,
+            "Offset": 71000000,
+            "Word": "machinations"
+          },
+          {
+            "Confidence": 0.98819804,
+            "Duration": 1500000,
+            "Offset": 80900000,
+            "Word": "of"
+          },
+          {
+            "Confidence": 0.9689655,
+            "Duration": 3100000,
+            "Offset": 82500000,
+            "Word": "my"
+          },
+          {
+            "Confidence": 0.9918681,
+            "Duration": 5700000,
+            "Offset": 85700000,
+            "Word": "mind"
+          },
+          {
+            "Confidence": 0.98285234,
+            "Duration": 4300000,
+            "Offset": 91500000,
+            "Word": "are"
+          },
+          {
+            "Confidence": 0.98601997,
+            "Duration": 1300000,
+            "Offset": 95900000,
+            "Word": "an"
+          },
+          {
+            "Confidence": 0.9947027,
+            "Duration": 8900000,
+            "Offset": 97300000,
+            "Word": "enigma"
+          }
+        ]
+      }
+    ],
+    "Offset": 800000,
+    "RecognitionStatus": "Success"
+  }
+ 

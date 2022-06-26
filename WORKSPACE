@@ -94,3 +94,9 @@ http_archive(
     strip_prefix = "QtAVPlayer-master",
     urls = ["https://github.com/Novacer/QtAVPlayer/archive/refs/heads/master.zip"],
 )
+
+new_local_repository(
+    name = "microsoft_cognitive_speech",
+    build_file = "//third_party:speech.BUILD",
+    path = "C:\\Program Files\\PackageManagement\\NuGet\\Packages\\Microsoft.CognitiveServices.Speech.1.22.0",
+)

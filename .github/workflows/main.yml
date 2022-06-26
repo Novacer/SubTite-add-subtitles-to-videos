@@ -24,6 +24,21 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
+      - name: Cache MS Speech SDK
+        id: cache-speech-sdk
+        uses: actions/cache@v1
+        with:
+          path: "C:\\Program Files\\PackageManagement\\NuGet\\Packages\\Microsoft.CognitiveServices.Speech.1.22.0"
+          key: ${{ runner.os }}-MS-Speech-SDK-Cache
+      
+      - name: Install MS Speech SDK
+        run: Install-Package Microsoft.CognitiveServices.Speech -RequiredVersion 1.22.0 -Force
+        shell: pwsh
+      
+      - name: Debug MS Speech SDK Install
+        run: (Get-Item((Get-Package -Name Microsoft.CognitiveServices.Speech).Source))
+        shell: pwsh
+
       - name: Cache Qt
         id: cache-qt
         uses: actions/cache@v1  # not v2!

@@ -21,7 +21,10 @@ cc_test(
     srcs = ["auto_transcriber_test.cpp"],
     deps = [
         ":auto_transcriber",
-        "//subtitler/speech_recognition/cloud_service:mock_cloud_service",
+        "//subtitler/speech_recognition/cloud_service:cloud_service_base",
+        "//subtitler/speech_recognition/cloud_service:microsoft_cognitive_service",
+        "//subtitler/speech_recognition/cloud_service:mock_microsoft_cognitive_service",
+        "@com_github_nlohmann_json//:json",
         "@com_google_googletest//:gtest_main",
     ],
 )

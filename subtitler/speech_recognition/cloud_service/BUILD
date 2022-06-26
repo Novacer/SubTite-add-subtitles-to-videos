@@ -6,6 +6,7 @@ cc_library(
     name = "cloud_service_base",
     hdrs = ["cloud_service_base.h"],
     deps = [
+        "@com_github_nlohmann_json//:json",
     ],
 )
 
@@ -23,11 +24,13 @@ cc_library(
 )
 
 cc_library(
-    name = "mock_cloud_service",
+    name = "mock_microsoft_cognitive_service",
     testonly = True,
-    hdrs = ["mock_cloud_service.h"],
+    hdrs = ["mock_microsoft_cognitive_service.h"],
     deps = [
         ":cloud_service_base",
+        ":microsoft_cognitive_service",
+        "@com_github_nlohmann_json//:json",
         "@com_google_googletest//:gtest",
     ],
 )

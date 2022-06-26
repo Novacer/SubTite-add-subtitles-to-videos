@@ -1,6 +1,6 @@
-#include <stdexcept>
+#include "subtitler/speech_recognition/cloud_service/microsoft_cognitive_service.h"
 
-#include "subtitler/speech_recognition/cloud_service/microsoft_congnitive_service.h"
+#include <stdexcept>
 
 namespace subtitler {
 namespace speech_recognition {
@@ -17,10 +17,14 @@ MicrosoftCognitiveService::MicrosoftCognitiveService(
     }
 }
 
-TranscriptionResult MicrosoftCognitiveService::TranscribeBlocking(
+nlohmann::json MicrosoftCognitiveService::getTranscriptionJson(
     const std::string& input_wav,
     std::function<void(const std::string&)> progress_msg_callback) {
-    // TODO: implement.
+    return {};
+}
+
+TranscriptionResult MicrosoftCognitiveService::parseJson(
+    const nlohmann::json& json) {
     return {};
 }
 

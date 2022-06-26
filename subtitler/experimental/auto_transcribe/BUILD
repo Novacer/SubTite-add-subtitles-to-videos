@@ -10,6 +10,8 @@ cc_binary(
         "@com_github_gflags_gflags//:gflags",
         "@com_github_google_glog//:glog",
         "@com_github_nlohmann_json//:json",
-        "@microsoft_cognitive_speech//:microsoft_cognitive_speech_cxx",
-    ],
+    ] + select({
+        "@bazel_tools//src/conditions:windows": ["@microsoft_cognitive_speech//:microsoft_cognitive_speech_cxx"],
+        "//conditions:default": [],
+    }),
 )

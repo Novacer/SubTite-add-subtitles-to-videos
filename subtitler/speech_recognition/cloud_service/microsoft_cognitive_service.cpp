@@ -17,7 +17,7 @@ MicrosoftCognitiveService::MicrosoftCognitiveService(
     }
 }
 
-nlohmann::json MicrosoftCognitiveService::TranscribeBlocking(
+TranscriptionResult MicrosoftCognitiveService::TranscribeBlocking(
     const std::string& input_wav,
     std::function<void(const std::string&)> progress_msg_callback) {
     // TODO: implement.

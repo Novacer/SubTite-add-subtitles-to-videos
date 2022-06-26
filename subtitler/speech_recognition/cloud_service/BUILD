@@ -6,7 +6,6 @@ cc_library(
     name = "cloud_service_base",
     hdrs = ["cloud_service_base.h"],
     deps = [
-        "@com_github_nlohmann_json//:json",
     ],
 )
 

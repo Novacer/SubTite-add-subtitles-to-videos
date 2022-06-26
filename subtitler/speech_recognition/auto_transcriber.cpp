@@ -22,10 +22,11 @@ srt::SubRipFile AutoTranscriber::Transcribe(
     std::function<void(const std::string&)> progress_msg_callback) {
     const auto json_result =
         cloud_service_->TranscribeBlocking(input_wav, progress_msg_callback);
-    return parseJsonResult(json_result);
+    return convertTranscriptionToSRT(json_result);
 }
 
-srt::SubRipFile AutoTranscriber::parseJsonResult(const nlohmann::json& result) {
+srt::SubRipFile AutoTranscriber::convertTranscriptionToSRT(
+    const cloud_service::TranscriptionResult& result) {
     // TODO
     return srt::SubRipFile{};
 }

@@ -14,7 +14,7 @@ namespace cloud_service {
  */
 class MockCloudService : public STTCloudServiceBase {
   public:
-    MOCK_METHOD(nlohmann::json, TranscribeBlocking,
+    MOCK_METHOD(TranscriptionResult, TranscribeBlocking,
                 (const std::string&, std::function<void(const std::string&)>),
                 (override));
 };

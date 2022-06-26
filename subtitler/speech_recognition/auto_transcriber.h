@@ -11,6 +11,7 @@
 // Forward declaration
 namespace subtitler::speech_recognition::cloud_service {
 
+struct TranscriptionResult;
 class STTCloudServiceBase;
 
 }
@@ -32,7 +33,8 @@ class AutoTranscriber {
   private:
     std::unique_ptr<cloud_service::STTCloudServiceBase> cloud_service_;
 
-    srt::SubRipFile parseJsonResult(const nlohmann::json& result);
+    srt::SubRipFile convertTranscriptionToSRT(
+        const cloud_service::TranscriptionResult& transcription);
 };
 
 }  // namespace speech_recognition

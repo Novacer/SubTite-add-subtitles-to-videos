@@ -20,9 +20,9 @@ AutoTranscriber::~AutoTranscriber() = default;
 srt::SubRipFile AutoTranscriber::Transcribe(
     const std::string& input_wav,
     std::function<void(const std::string&)> progress_msg_callback) {
-    const auto json_result =
+    const auto transcription =
         cloud_service_->TranscribeBlocking(input_wav, progress_msg_callback);
-    return convertTranscriptionToSRT(json_result);
+    return convertTranscriptionToSRT(transcription);
 }
 
 srt::SubRipFile AutoTranscriber::convertTranscriptionToSRT(

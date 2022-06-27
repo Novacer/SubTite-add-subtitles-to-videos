@@ -12,7 +12,7 @@ namespace speech_recognition {
 namespace cloud_service {
 
 /**
- * Mock class used to test speech-to-text cloud services.
+ * Mock class used to test MCS Speech-to-Text service
  */
 class MockMicrosoftCognitiveService : public MicrosoftCognitiveService {
   public:

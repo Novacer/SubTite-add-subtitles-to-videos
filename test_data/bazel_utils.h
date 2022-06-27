@@ -15,7 +15,7 @@ namespace test_data {
  *
  * For example, to access mcs_speech_to_text.json, one would query
  * GetBazelDataAbsolutePath("__main__/test_data/mcs_speech_to_text.json")
- * 
+ *
  * Note that __main__ is the default workspace name. If in the WORKSPACE file
  * there is a user provided name then it will be set to that.
  *

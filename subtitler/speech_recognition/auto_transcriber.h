@@ -14,7 +14,7 @@ namespace subtitler::speech_recognition::cloud_service {
 struct TranscriptionResult;
 class STTCloudServiceBase;
 
-}
+}  // namespace subtitler::speech_recognition::cloud_service
 
 namespace subtitler {
 namespace speech_recognition {

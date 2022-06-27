@@ -9,7 +9,7 @@ namespace subtitler::speech_recognition::cloud_service {
 
 struct TranscriptionResult;
 
-}
+}  // namespace subtitler::speech_recognition::cloud_service
 
 namespace subtitler {
 namespace speech_recognition {

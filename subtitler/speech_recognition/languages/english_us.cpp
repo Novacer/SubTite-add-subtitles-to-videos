@@ -10,11 +10,10 @@
 namespace subtitler {
 namespace speech_recognition {
 namespace languages {
+namespace {
 
-srt::SubRipFile EnglishUS::ConvertToSRT(
-    const cloud_service::TranscriptionResult& transcription) {
-    srt::SubRipFile srt_file;
-
+void groupSentences(srt::SubRipFile& srt_file,
+                    const cloud_service::TranscriptionResult& transcription) {
     std::istringstream tokenizer{transcription.display_text};
 
     std::string sentence_so_far;
@@ -57,6 +56,17 @@ srt::SubRipFile EnglishUS::ConvertToSRT(
             }
         }
         ++word_index;
+    }
+}
+
+}  // namespace
+
+srt::SubRipFile EnglishUS::ConvertToSRT(
+    const std::vector<cloud_service::TranscriptionResult>& transcriptions) {
+    srt::SubRipFile srt_file;
+
+    for (const auto& transcription : transcriptions) {
+        groupSentences(srt_file, transcription);
     }
 
     return srt_file;

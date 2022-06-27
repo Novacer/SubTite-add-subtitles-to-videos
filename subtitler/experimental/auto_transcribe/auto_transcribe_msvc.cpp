@@ -7,6 +7,11 @@
 #include <nlohmann/json.hpp>
 #include <sstream>
 
+#include "subtitler/speech_recognition/auto_transcriber.h"
+#include "subtitler/speech_recognition/cloud_service/microsoft_cognitive_service.h"
+#include "subtitler/speech_recognition/languages/english_us.h"
+#include "subtitler/srt/subrip_file.h"
+
 DEFINE_string(api_key, "",
               "Required. API Key of Microsoft.CognitiveServices.Speech.");
 
@@ -32,54 +37,25 @@ int main(int argc, char** argv) {
     google::InitGoogleLogging(argv[0]);
     gflags::ParseCommandLineFlags(&argc, &argv, /* remove_flags= */ true);
 
-    auto speechConfig =
-        SpeechConfig::FromSubscription(FLAGS_api_key, FLAGS_api_region);
-    speechConfig->SetSpeechRecognitionLanguage("en-US");
-    speechConfig->RequestWordLevelTimestamps();
+    using namespace subtitler::speech_recognition;
 
-    auto audioInput = AudioConfig::FromWavFileInput(
-        "C:\\Users\\zhang\\Videos\\patrick\\patrick.wav");
-    auto recognizer = SpeechRecognizer::FromConfig(speechConfig, audioInput);
-    std::promise<void> recognitionEnd;
+    auto mcs_cloud_service =
+        std::make_unique<cloud_service::MicrosoftCognitiveService>(
+            FLAGS_api_key, FLAGS_api_region);
+    auto english_us = std::make_unique<languages::EnglishUS>();
+    auto auto_transcriber = std::make_unique<AutoTranscriber>(
+        std::move(mcs_cloud_service), std::move(english_us));
 
-    recognizer->Recognized.Connect([](const SpeechRecognitionEventArgs& e) {
-        if (e.Result->Reason == ResultReason::RecognizedSpeech) {
-            auto start = e.Result->Offset();
-            auto end = start + e.Result->Duration();
-            LOG(INFO) << "RECOGNIZED: Text=" << e.Result->Text
-                      << " start: " << start << " end: " << end;
+    try {
+        auto srt = auto_transcriber->Transcribe(
+            "D:\\Videos\\unicode_demo.wav",
+            [&](const std::string& msg) { LOG(INFO) << msg; });
 
-            auto result =
-                nlohmann::json::parse(e.Result->Properties.GetProperty(
-                    PropertyId::SpeechServiceResponse_JsonResult));
+        std::ostringstream output;
+        srt.ToStream(output);
 
-            LOG(INFO) << result.dump(2);
-        } else if (e.Result->Reason == ResultReason::NoMatch) {
-            LOG(INFO) << "NOMATCH: Speech could not be recognized.";
-        }
-    });
-
-    recognizer->Canceled.Connect(
-        [&recognitionEnd](const SpeechRecognitionCanceledEventArgs& e) {
-            LOG(INFO) << "CANCELED: Reason=" << (int)e.Reason;
-            if (e.Reason == CancellationReason::Error) {
-                LOG(INFO)
-                    << "CANCELED: ErrorCode=" << (int)e.ErrorCode << "\n"
-                    << "CANCELED: ErrorDetails=" << e.ErrorDetails << "\n"
-                    << "CANCELED: Did you set the speech resource key and "
-                       "region values?";
-
-                recognitionEnd.set_value();  // Notify to stop recognition.
-            }
-        });
-
-    recognizer->SessionStopped.Connect(
-        [&recognitionEnd](const SessionEventArgs& e) {
-            LOG(INFO) << "Session stopped.";
-            recognitionEnd.set_value();  // Notify to stop recognition.
-        });
-
-    recognizer->StartContinuousRecognitionAsync().get();
-    recognitionEnd.get_future().get();
-    recognizer->StopContinuousRecognitionAsync().get();
+        LOG(INFO) << output.str();
+    } catch (const std::exception& e) {
+        LOG(ERROR) << e.what();
+    }
 }

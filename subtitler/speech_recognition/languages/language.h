@@ -1,6 +1,8 @@
 #ifndef SUBTITLER_SPEECH_RECOGNITION_LANGUAGES_LANGUAGE_H
 #define SUBTITLER_SPEECH_RECOGNITION_LANGUAGES_LANGUAGE_H
 
+#include <vector>
+
 #include "subtitler/srt/subrip_file.h"
 
 // Forward declaration
@@ -26,7 +28,8 @@ class Language {
 
     // Derived classes must override.
     virtual srt::SubRipFile ConvertToSRT(
-        const cloud_service::TranscriptionResult& transcription) = 0;
+        const std::vector<cloud_service::TranscriptionResult>&
+            transcriptions) = 0;
 };
 
 }  // namespace languages

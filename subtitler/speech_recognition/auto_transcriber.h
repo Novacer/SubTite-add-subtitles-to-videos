@@ -5,6 +5,7 @@
 #include <memory>
 #include <nlohmann/json.hpp>
 #include <string>
+#include <vector>
 
 #include "subtitler/srt/subrip_file.h"
 
@@ -25,6 +26,10 @@ class Language;
 namespace subtitler {
 namespace speech_recognition {
 
+/**
+ * Given an uncompressed audio wav file, produces a SRT subtitle file
+ * with timestamps.
+ */
 class AutoTranscriber {
   public:
     AutoTranscriber(
@@ -43,7 +48,7 @@ class AutoTranscriber {
      * @return srt::SubRipFile the transcribed SRT file.
      */
     srt::SubRipFile Transcribe(
-        const std::string& input_wav,
+        const std::string input_wav,
         std::function<void(const std::string&)> progress_msg_callback);
 
   private:
@@ -51,7 +56,7 @@ class AutoTranscriber {
     std::unique_ptr<languages::Language> language_;
 
     srt::SubRipFile convertTranscriptionToSRT(
-        const cloud_service::TranscriptionResult& transcription);
+        const std::vector<cloud_service::TranscriptionResult>& transcriptions);
 };
 
 }  // namespace speech_recognition

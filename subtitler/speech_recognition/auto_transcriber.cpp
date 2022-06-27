@@ -23,7 +23,7 @@ AutoTranscriber::AutoTranscriber(
 AutoTranscriber::~AutoTranscriber() = default;
 
 srt::SubRipFile AutoTranscriber::Transcribe(
-    const std::string& input_wav,
+    const std::string input_wav,
     std::function<void(const std::string&)> progress_msg_callback) {
     const auto transcription =
         cloud_service_->TranscribeBlocking(input_wav, progress_msg_callback);
@@ -31,8 +31,8 @@ srt::SubRipFile AutoTranscriber::Transcribe(
 }
 
 srt::SubRipFile AutoTranscriber::convertTranscriptionToSRT(
-    const cloud_service::TranscriptionResult& transcription) {
-    return language_->ConvertToSRT(transcription);
+    const std::vector<cloud_service::TranscriptionResult>& transcriptions) {
+    return language_->ConvertToSRT(transcriptions);
 }
 
 }  // namespace speech_recognition

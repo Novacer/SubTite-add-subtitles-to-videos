@@ -7,6 +7,12 @@ cc_binary(
         "@platforms//os:windows",
     ],
     deps = [
+        "//subtitler/srt:subrip_file",
+        "//subtitler/speech_recognition:auto_transcriber",
+        "//subtitler/speech_recognition/cloud_service:microsoft_cognitive_service",
+        "//subtitler/speech_recognition/cloud_service:cloud_service_base",
+        "//subtitler/speech_recognition/languages:english_us",
+        "//subtitler/speech_recognition/languages:language",
         "@com_github_gflags_gflags//:gflags",
         "@com_github_google_glog//:glog",
         "@com_github_nlohmann_json//:json",

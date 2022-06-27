@@ -19,7 +19,7 @@ srt::SubRipFile EnglishUS::ConvertToSRT(
 
     std::string sentence_so_far;
     std::string next_word;
-    int word_index = -1;
+    unsigned int word_index = 0;
     std::chrono::milliseconds start;
 
     while (tokenizer >> next_word) {
@@ -29,9 +29,6 @@ srt::SubRipFile EnglishUS::ConvertToSRT(
         if (transcription.timings.empty()) {
             throw std::runtime_error{"Transcription did not have word timings"};
         }
-
-        ++word_index;
-
         if (sentence_so_far.empty()) {
             start = transcription.timings.at(word_index).offset;
         } else {
@@ -59,6 +56,7 @@ srt::SubRipFile EnglishUS::ConvertToSRT(
                 break;
             }
         }
+        ++word_index;
     }
 
     return srt_file;

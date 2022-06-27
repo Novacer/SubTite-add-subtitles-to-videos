@@ -19,6 +19,8 @@ struct WordTimings {
 struct TranscriptionResult {
     std::string display_text;
     std::vector<WordTimings> timings;
+    std::chrono::milliseconds initial_offset;
+    std::chrono::milliseconds total_duration;
 };
 
 // Abstract Interface for a speech-to-text cloud service.

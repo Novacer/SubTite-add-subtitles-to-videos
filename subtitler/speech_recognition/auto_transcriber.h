@@ -25,7 +25,16 @@ class AutoTranscriber {
         std::unique_ptr<cloud_service::STTCloudServiceBase> cloud_service);
     ~AutoTranscriber();
 
-    // Long running function, should be run in separate thread.
+    /**
+     * Using the cloud service, obtain an SRT transcription of the audio.
+     *
+     * This function may run for a long time, so clients should run this in a
+     * separate thread.
+     *
+     * @param input_wav the wav audio file path.
+     * @param progress_msg_callback a callback to receive progress updates.
+     * @return srt::SubRipFile the transcribed SRT file.
+     */
     srt::SubRipFile Transcribe(
         const std::string& input_wav,
         std::function<void(const std::string&)> progress_msg_callback);

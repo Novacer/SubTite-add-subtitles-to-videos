@@ -10,6 +10,10 @@ namespace subtitler {
 namespace speech_recognition {
 namespace cloud_service {
 
+/**
+ * Using
+ * https://docs.microsoft.com/en-us/azure/cognitive-services/Speech-Service/
+ */
 class MicrosoftCognitiveService : public STTCloudServiceBase {
   public:
     MicrosoftCognitiveService(const std::string& api_key,

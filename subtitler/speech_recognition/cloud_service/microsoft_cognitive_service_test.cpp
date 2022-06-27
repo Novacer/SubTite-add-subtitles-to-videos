@@ -5,6 +5,7 @@
 #include <fstream>
 #include <functional>
 #include <nlohmann/json.hpp>
+#include <vector>
 
 #include "subtitler/speech_recognition/cloud_service/mock_microsoft_cognitive_service.h"
 #include "test_data/bazel_utils.h"
@@ -36,10 +37,11 @@ TEST(MicrosoftCognitiveService, ParseJson) {
 
     EXPECT_CALL(*mock_service, getTranscriptionJson(input_wav, _))
         .Times(1)
-        .WillOnce(Return(mock_response));
+        .WillOnce(Return(std::vector<nlohmann::json>{mock_response}));
 
     auto result =
-        mock_service->TranscribeBlocking(input_wav, [](const std::string&) {});
+        mock_service->TranscribeBlocking(input_wav, [](const std::string&) {})
+            .at(0);
 
     EXPECT_EQ(
         result.display_text,

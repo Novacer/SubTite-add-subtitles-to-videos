@@ -19,7 +19,7 @@ class MockMicrosoftCognitiveService : public MicrosoftCognitiveService {
     MockMicrosoftCognitiveService()
         : MicrosoftCognitiveService{"api-key", "api-region"} {};
 
-    MOCK_METHOD(nlohmann::json, getTranscriptionJson,
+    MOCK_METHOD(std::vector<nlohmann::json>, getTranscriptionJson,
                 (const std::string&, std::function<void(const std::string&)>),
                 (override));
 };

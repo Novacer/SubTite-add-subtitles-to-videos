@@ -1,6 +1,8 @@
 #ifndef SUBTITLER_SPEECH_RECOGNITION_LANGUAGES_ENGLISH_US_H
 #define SUBTITLER_SPEECH_RECOGNITION_LANGUAGES_ENGLISH_US_H
 
+#include <vector>
+
 #include "subtitler/speech_recognition/languages/language.h"
 #include "subtitler/srt/subrip_file.h"
 
@@ -25,7 +27,8 @@ class EnglishUS final : public Language {
     ~EnglishUS() = default;
 
     srt::SubRipFile ConvertToSRT(
-        const cloud_service::TranscriptionResult& transcription) override;
+        const std::vector<cloud_service::TranscriptionResult>& transcriptions)
+        override;
 };
 
 }  // namespace languages

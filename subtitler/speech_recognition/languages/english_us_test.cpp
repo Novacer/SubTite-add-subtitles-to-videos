@@ -45,7 +45,8 @@ TEST(EnglishUS, SplitSentences) {
     };
     transcription.timings = std::move(timings);
 
-    auto srt_file = english.ConvertToSRT(transcription);
+    auto srt_file =
+        english.ConvertToSRT(std::vector<TranscriptionResult>{transcription});
     std::ostringstream output;
     srt_file.ToStream(output);
 
@@ -71,7 +72,8 @@ TEST(EnglishUS, EmptySentenceReturnsEmptyFile) {
     transcription.initial_offset = 0ms;
     transcription.total_duration = 10s;
 
-    auto srt_file = english.ConvertToSRT(transcription);
+    auto srt_file =
+        english.ConvertToSRT(std::vector<TranscriptionResult>{transcription});
 
     EXPECT_EQ(srt_file.NumItems(), 0);
 }
@@ -93,7 +95,8 @@ TEST(EnglishUS, NoSentenceEnderReturnsOneSentence) {
     };
     transcription.timings = std::move(timings);
 
-    auto srt_file = english.ConvertToSRT(transcription);
+    auto srt_file =
+        english.ConvertToSRT(std::vector<TranscriptionResult>{transcription});
     std::ostringstream output;
     srt_file.ToStream(output);
 

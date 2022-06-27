@@ -53,7 +53,7 @@ class STTCloudServiceBase {
      * @param progress_msg_callback callback to receive progress updates.
      * @return TranscriptionResult the transcription from the cloud service.
      */
-    TranscriptionResult TranscribeBlocking(
+    std::vector<TranscriptionResult> TranscribeBlocking(
         const std::string& input_wav,
         std::function<void(const std::string&)> progress_msg_callback) {
         return parseJson(
@@ -69,7 +69,7 @@ class STTCloudServiceBase {
      * @param progress_msg_callback a callback to push progress updates.
      * @return nlohmann::json the raw json response from the service.
      */
-    virtual nlohmann::json getTranscriptionJson(
+    virtual std::vector<nlohmann::json> getTranscriptionJson(
         const std::string& input_wav,
         std::function<void(const std::string&)> progress_msg_callback) = 0;
 
@@ -81,7 +81,8 @@ class STTCloudServiceBase {
      * @param json the json response from the server.
      * @return TranscriptionResult the standardized transcription result.
      */
-    virtual TranscriptionResult parseJson(const nlohmann::json& json) = 0;
+    virtual std::vector<TranscriptionResult> parseJson(
+        const std::vector<nlohmann::json>& jsons) = 0;
 };
 
 }  // namespace cloud_service

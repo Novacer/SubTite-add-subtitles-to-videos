@@ -3,6 +3,7 @@
 
 #include <nlohmann/json.hpp>
 #include <string>
+#include <vector>
 
 #include "subtitler/speech_recognition/cloud_service/cloud_service_base.h"
 
@@ -21,11 +22,12 @@ class MicrosoftCognitiveService : public STTCloudServiceBase {
     virtual ~MicrosoftCognitiveService() = default;
 
   protected:
-    nlohmann::json getTranscriptionJson(
+    std::vector<nlohmann::json> getTranscriptionJson(
         const std::string& input_wav,
         std::function<void(const std::string&)> progress_msg_callback) override;
 
-    TranscriptionResult parseJson(const nlohmann::json& json) override;
+    std::vector<TranscriptionResult> parseJson(
+        const std::vector<nlohmann::json>& jsons) override;
 
   private:
     const std::string api_key_;

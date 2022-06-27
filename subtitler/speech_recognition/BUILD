@@ -8,6 +8,7 @@ cc_library(
     hdrs = ["auto_transcriber.h"],
     deps = [
         "//subtitler/speech_recognition/cloud_service:cloud_service_base",
+        "//subtitler/speech_recognition/languages:language",
         "//subtitler/srt:subrip_file",
         "@com_github_nlohmann_json//:json",
     ],
@@ -24,6 +25,7 @@ cc_test(
     deps = [
         ":auto_transcriber",
         "//subtitler/speech_recognition/cloud_service:mock_microsoft_cognitive_service",
+        "//subtitler/speech_recognition/languages:english_us",
         "//test_data:bazel_utils",
         "@com_github_nlohmann_json//:json",
         "@com_google_googletest//:gtest_main",

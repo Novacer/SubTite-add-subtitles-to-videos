@@ -17,7 +17,7 @@ using ::testing::Return;
 using ::testing::SizeIs;
 using namespace std::chrono_literals;
 
-TEST(AutoTranscriber, UsingMicrosoftCongitiveService) {
+TEST(MicrosoftCognitiveService, ParseJson) {
     auto mock_service = std::make_unique<MockMicrosoftCognitiveService>();
     std::function<void(const std::string&)> callback =
         [](const std::string& x) {};

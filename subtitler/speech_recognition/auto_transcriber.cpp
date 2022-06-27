@@ -3,15 +3,20 @@
 #include <stdexcept>
 
 #include "subtitler/speech_recognition/cloud_service/cloud_service_base.h"
+#include "subtitler/speech_recognition/languages/language.h"
 
 namespace subtitler {
 namespace speech_recognition {
 
 AutoTranscriber::AutoTranscriber(
-    std::unique_ptr<cloud_service::STTCloudServiceBase> cloud_service)
-    : cloud_service_{std::move(cloud_service)} {
+    std::unique_ptr<cloud_service::STTCloudServiceBase> cloud_service,
+    std::unique_ptr<languages::Language> language)
+    : cloud_service_{std::move(cloud_service)}, language_{std::move(language)} {
     if (!cloud_service_) {
         throw std::invalid_argument{"cloud service cannot be null"};
+    }
+    if (!language_) {
+        throw std::invalid_argument{"language cannot be null"};
     }
 }
 
@@ -26,9 +31,8 @@ srt::SubRipFile AutoTranscriber::Transcribe(
 }
 
 srt::SubRipFile AutoTranscriber::convertTranscriptionToSRT(
-    const cloud_service::TranscriptionResult& result) {
-    // TODO
-    return srt::SubRipFile{};
+    const cloud_service::TranscriptionResult& transcription) {
+    return language_->ConvertToSRT(transcription);
 }
 
 }  // namespace speech_recognition

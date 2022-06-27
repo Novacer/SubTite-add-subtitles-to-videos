@@ -20,7 +20,7 @@ namespace subtitler::speech_recognition::languages {
 
 class Language;
 
-}
+}  // namespace subtitler::speech_recognition::languages
 
 namespace subtitler {
 namespace speech_recognition {

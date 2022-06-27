@@ -5,6 +5,7 @@
 #include <functional>
 #include <nlohmann/json.hpp>
 #include <string>
+#include <vector>
 
 namespace subtitler {
 namespace speech_recognition {

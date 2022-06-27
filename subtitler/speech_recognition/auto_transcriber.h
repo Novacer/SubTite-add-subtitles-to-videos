@@ -16,13 +16,20 @@ class STTCloudServiceBase;
 
 }  // namespace subtitler::speech_recognition::cloud_service
 
+namespace subtitler::speech_recognition::languages {
+
+class Language;
+
+}
+
 namespace subtitler {
 namespace speech_recognition {
 
 class AutoTranscriber {
   public:
     AutoTranscriber(
-        std::unique_ptr<cloud_service::STTCloudServiceBase> cloud_service);
+        std::unique_ptr<cloud_service::STTCloudServiceBase> cloud_service,
+        std::unique_ptr<languages::Language> language);
     ~AutoTranscriber();
 
     /**
@@ -41,6 +48,7 @@ class AutoTranscriber {
 
   private:
     std::unique_ptr<cloud_service::STTCloudServiceBase> cloud_service_;
+    std::unique_ptr<languages::Language> language_;
 
     srt::SubRipFile convertTranscriptionToSRT(
         const cloud_service::TranscriptionResult& transcription);

@@ -55,8 +55,6 @@ int main(int argc, char** argv) {
     auto ffmpeg = std::make_unique<video::processing::FFMpeg>(
         "ffmpeg", std::make_unique<subprocess::SubprocessExecutor>());
 
-    std::cout << "Please select the video file you want to auto transcribe."
-              << std::endl;
     std::string video_path = "D:\\Videos\\patrick.mp4";
 
     TempFile temp{"", std::filesystem::path{video_path}.parent_path().string(),

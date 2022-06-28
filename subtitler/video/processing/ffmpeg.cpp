@@ -1,5 +1,6 @@
 #include "subtitler/video/processing/ffmpeg.h"
 
+#include <filesystem>
 #include <iostream>
 #include <sstream>
 #include <stdexcept>
@@ -7,6 +8,8 @@
 #include "subtitler/subprocess/subprocess_executor.h"
 #include "subtitler/video/processing/progress_parser.h"
 #include "subtitler/video/util/video_utils.h"
+
+namespace fs = std::filesystem;
 
 namespace subtitler {
 namespace video {
@@ -48,6 +51,28 @@ std::string FFMpeg::GetVersionInfo() {
     }
 
     return output.subproc_stdout;
+}
+
+void FFMpeg::ExtractUncompressedAudio(const std::string& input_video_path,
+                                      const std::string& output_wav_path) {
+    throwIfRunning();
+
+    std::ostringstream stream;
+    stream << ffmpeg_path_;
+    stream << " -y -i " << '"' << input_video_path << '"';
+    stream << " " << '"' << output_wav_path << '"';
+    stream << " -loglevel error";
+
+    executor_->SetCommand(stream.str());
+    executor_->CaptureOutput(true);
+    executor_->Start();
+    is_running_ = true;
+    auto output = executor_->WaitUntilFinished();
+    is_running_ = false;
+    if (!output.subproc_stderr.empty()) {
+        throw std::runtime_error{"Error running ffmpeg: " +
+                                 output.subproc_stderr};
+    }
 }
 
 void FFMpeg::RemuxSubtitlesAsync(

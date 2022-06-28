@@ -76,6 +76,25 @@ TEST(FFMpegTest, GetVersionInfo_ThrowsStdErr) {
     }
 }
 
+TEST(FFMpegTest, ExtractUncompressedAudio) {
+    auto mock_executor = std::make_unique<NiceMock<MockSubprocessExecutor>>();
+    {
+        InSequence sequence;
+        EXPECT_CALL(
+            *mock_executor,
+            SetCommand(
+                "ffmpeg -y -i \"video.mp4\" \"audio.wav\" -loglevel error"))
+            .Times(1);
+        EXPECT_CALL(*mock_executor, Start()).Times(1);
+        EXPECT_CALL(*mock_executor, WaitUntilFinished(std::optional<int>()))
+            .Times(1)
+            .WillOnce(Return(MockSubprocessExecutor::Output{"", ""}));
+    }
+
+    FFMpeg ffmpeg("ffmpeg", std::move(mock_executor));
+    ffmpeg.ExtractUncompressedAudio("video.mp4", "audio.wav");
+}
+
 TEST(FFMpegTest, BurnSubtitlesAsync_Success) {
     auto mock_executor = std::make_unique<NiceMock<MockSubprocessExecutor>>();
     std::function<void(const char*)> intercepted_callback;

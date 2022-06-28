@@ -41,6 +41,16 @@ class FFMpeg {
     std::string GetVersionInfo();
 
     /**
+     * Given a video with an audio track (.mp4), extract the uncompressed
+     * audio as a wav file.
+     *
+     * @param input_video_path the input mp4 file.
+     * @param output_wav_path the wav file path to write the output.
+     */
+    void ExtractUncompressedAudio(const std::string& input_video_path,
+                                  const std::string& output_wav_path);
+
+    /**
      * Starts async task to remux subtitles with video, writing to output.
      * Progress_callback will be called approx every 5s with how many frames
      * have been processed by ffmpeg and other stats.

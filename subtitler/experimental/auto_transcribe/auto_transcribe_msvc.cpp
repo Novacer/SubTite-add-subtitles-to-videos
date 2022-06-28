@@ -2,6 +2,7 @@
 #include <glog/logging.h>
 #include <speechapi_cxx.h>
 
+#include <filesystem>
 #include <future>
 #include <iostream>
 #include <nlohmann/json.hpp>
@@ -11,6 +12,10 @@
 #include "subtitler/speech_recognition/cloud_service/microsoft_cognitive_service.h"
 #include "subtitler/speech_recognition/languages/english_us.h"
 #include "subtitler/srt/subrip_file.h"
+#include "subtitler/subprocess/subprocess_executor.h"
+#include "subtitler/util/temp_file.h"
+#include "subtitler/util/unicode.h"
+#include "subtitler/video/processing/ffmpeg.h"
 
 DEFINE_string(api_key, "",
               "Required. API Key of Microsoft.CognitiveServices.Speech.");
@@ -37,6 +42,7 @@ int main(int argc, char** argv) {
     google::InitGoogleLogging(argv[0]);
     gflags::ParseCommandLineFlags(&argc, &argv, /* remove_flags= */ true);
 
+    using namespace subtitler;
     using namespace subtitler::speech_recognition;
 
     auto mcs_cloud_service =
@@ -46,10 +52,21 @@ int main(int argc, char** argv) {
     auto auto_transcriber = std::make_unique<AutoTranscriber>(
         std::move(mcs_cloud_service), std::move(english_us));
 
+    auto ffmpeg = std::make_unique<video::processing::FFMpeg>(
+        "ffmpeg", std::make_unique<subprocess::SubprocessExecutor>());
+
+    std::cout << "Please select the video file you want to auto transcribe."
+              << std::endl;
+    std::string video_path = "D:\\Videos\\patrick.mp4";
+
+    TempFile temp{"", std::filesystem::path{video_path}.parent_path().string(),
+                  ".wav"};
+
+    ffmpeg->ExtractUncompressedAudio(video_path, temp.FileName());
+
     try {
         auto srt = auto_transcriber->Transcribe(
-            "D:\\Videos\\unicode_demo.wav",
-            [&](const std::string& msg) { LOG(INFO) << msg; });
+            temp.FileName(), [&](const std::string& msg) { LOG(INFO) << msg; });
 
         std::ostringstream output;
         srt.ToStream(output);

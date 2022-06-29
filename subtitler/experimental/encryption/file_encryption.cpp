@@ -1,7 +1,5 @@
 extern "C" {
-
 #include <sodium.h>
-
 }
 
 #include <array>
@@ -38,37 +36,50 @@ GeneratedKey keyDerivation(const SaltedPassword& salted_pwd) {
     return key;
 }
 
+/**
+ * We allow ourselves to assume that the input plaintext can fit entirely
+ * in memory. However, the encryption/decryption methods are written to
+ * handle 4KB pages in a stream. Thus, we can easily transition if we encounter
+ * inputs which do not fit into memory in the future.
+ */
 void encrypt(const std::string& file_name, const std::string& plaintext,
              const std::string& password) {
+    std::ofstream output_file{file_name, std::ios_base::binary};
+    if (!output_file) {
+        throw std::runtime_error{"Could not open output file"};
+    }
+
+    // Generate random salt, and use password hash (expensive) to derive key.
     SaltedPassword salted_pwd;
     salted_pwd.password = password;
     randombytes_buf(salted_pwd.salt.data(), salted_pwd.salt.size());
     const auto key = keyDerivation(salted_pwd);
 
+    // Write salt to the front of file.
+    output_file.write((char*)key.salt.data(), key.salt.size());
+
+    // Allocate buffers for io, headers.
     unsigned char buf_in[CHUNK_SIZE];
     unsigned char
         buf_out[CHUNK_SIZE + crypto_secretstream_xchacha20poly1305_ABYTES];
     unsigned char header[crypto_secretstream_xchacha20poly1305_HEADERBYTES];
     crypto_secretstream_xchacha20poly1305_state st;
 
-    std::ofstream output_file{file_name, std::ios_base::binary};
-    if (!output_file) {
-        throw std::runtime_error{"Could not open output file"};
-    }
-
-    // Write salt at front of file.
-    output_file.write((char*)key.salt.data(), key.salt.size());
-
+    // Write header to file.
     crypto_secretstream_xchacha20poly1305_init_push(&st, header,
                                                     key.key.data());
     output_file.write((char*)header, sizeof(header));
-    std::istringstream input_stream{plaintext};
 
+    // Encrypt the plaintext as a stream
+    std::istringstream input_stream{plaintext};
     while (input_stream) {
         input_stream.read((char*)buf_in, sizeof(buf_in));
         unsigned long long out_len = 0;
+        // At the end of each block, if there is a subsequent block then
+        // it is tagged 0. If this is the final block, then use FINAL tag.
         unsigned char tag =
             input_stream ? 0 : crypto_secretstream_xchacha20poly1305_TAG_FINAL;
+        // Write encrypted output to file.
         crypto_secretstream_xchacha20poly1305_push(
             &st, buf_out, &out_len, buf_in, input_stream.gcount(), nullptr, 0,
             tag);
@@ -81,14 +92,17 @@ std::string decrypt(const std::string& file_name, const std::string& password) {
     if (!input_file) {
         throw std::runtime_error{"Could not open input file"};
     }
+
     SaltedPassword salted;
     // Extract the salt at front of the file.
     if (!input_file.read((char*)salted.salt.data(), salted.salt.size())) {
         throw std::runtime_error{"Could not extract salt!"};
     }
     salted.password = password;
+    // Re-derive the key from the password.
     const auto key = keyDerivation(salted);
 
+    // Allocate buffers.
     unsigned char
         buf_in[CHUNK_SIZE + crypto_secretstream_xchacha20poly1305_ABYTES];
     unsigned char header[crypto_secretstream_xchacha20poly1305_HEADERBYTES];
@@ -103,7 +117,7 @@ std::string decrypt(const std::string& file_name, const std::string& password) {
     }
 
     std::string decrypted_bytes;
-
+    // Decrypt the bytes from the input file.
     while (input_file) {
         input_file.read((char*)buf_in, sizeof(buf_in));
         unsigned long long out_len = 0;
@@ -117,8 +131,7 @@ std::string decrypt(const std::string& file_name, const std::string& password) {
             input_file) {
             throw std::runtime_error{"premature end of file"};
         }
-        decrypted_bytes +=
-            std::string{(char*)buf_out, out_len};
+        decrypted_bytes += std::string{(char*)buf_out, out_len};
     }
 
     return decrypted_bytes;

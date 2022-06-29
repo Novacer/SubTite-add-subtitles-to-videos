@@ -7,4 +7,8 @@ cc_binary(
         "@bazel_tools//src/conditions:windows": ["@libsodium_windows//:libsodium"],
         "//conditions:default": [],
     }),
+    linkopts = select({
+        "@bazel_tools//src/conditions:windows": [""],
+        "//conditions:default": ["-lsodium"],
+    })
 )

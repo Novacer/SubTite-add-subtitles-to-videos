@@ -4,7 +4,6 @@ load("@rules_cc//cc:defs.bzl", "cc_import", "cc_library")
 cc_import(
     name = "libsodium_import",
     hdrs = ["include/sodium.h"] + glob(["include/sodium/*.h"]),
-    # static_library = "x64/Release/v142/static/libsodium.lib",
     interface_library = "x64/Release/v142/dynamic/libsodium.lib",
     shared_library = "x64/Release/v142/dynamic/libsodium.dll",
 )

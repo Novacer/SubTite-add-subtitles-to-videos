@@ -100,3 +100,11 @@ new_local_repository(
     build_file = "//third_party:speech.BUILD",
     path = "C:\\Program Files\\PackageManagement\\NuGet\\Packages\\Microsoft.CognitiveServices.Speech.1.22.0",
 )
+
+http_archive(
+    name = "libsodium_windows",
+    build_file = "//third_party:libsodium_windows.BUILD",
+    sha256 = "e67895679e54031950d3c9c86ace057dfb299001a84b1380bfb87417d3d33998",
+    strip_prefix = "libsodium",
+    urls = ["https://download.libsodium.org/libsodium/releases/libsodium-1.0.18-stable-msvc.zip"],
+)

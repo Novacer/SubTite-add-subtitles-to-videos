@@ -1,16 +1,34 @@
+#include "subtitler/encryption/file_encryption.h"
+
 extern "C" {
 #include <sodium.h>
 }
 
 #include <array>
 #include <fstream>
-#include <iostream>
 #include <sstream>
-#include <string>
+#include <stdexcept>
 
-#define CHUNK_SIZE 4096
-
+namespace subtitler {
+namespace encryption {
 namespace {
+
+const int CHUNK_SIZE = 4096;
+
+void throwIfEmpty(const std::string& param_name, const std::string& value) {
+    if (value.empty()) {
+        throw std::invalid_argument{param_name + " cannot be empty!"};
+    }
+}
+
+class SodiumInitializer {
+  public:
+    SodiumInitializer() {
+        if (sodium_init() < 0) {
+            throw std::runtime_error{"Could not initialize sodium"};
+        }
+    }
+};
 
 struct SaltedPassword {
     std::array<unsigned char, crypto_pwhash_SALTBYTES> salt;
@@ -18,33 +36,40 @@ struct SaltedPassword {
 };
 
 struct GeneratedKey {
-    std::array<unsigned char, crypto_pwhash_SALTBYTES> salt;
     std::array<unsigned char, crypto_secretstream_xchacha20poly1305_KEYBYTES>
         key;
 };
 
-GeneratedKey keyDerivation(const SaltedPassword& salted_pwd) {
-    GeneratedKey key;
-    key.salt = salted_pwd.salt;
-    if (crypto_pwhash(key.key.data(), key.key.size(),
-                      salted_pwd.password.c_str(), salted_pwd.password.length(),
-                      key.salt.data(), crypto_pwhash_OPSLIMIT_INTERACTIVE,
-                      crypto_pwhash_MEMLIMIT_INTERACTIVE,
-                      crypto_pwhash_ALG_DEFAULT) != 0) {
+GeneratedKey keyDerivation(const SaltedPassword& salted) {
+    GeneratedKey generated_key;
+    auto& key = generated_key.key;
+    auto& password = salted.password;
+    if (crypto_pwhash(
+            /* out= */ key.data(),
+            /* outlen= */ key.size(),
+            /* passwd= */ password.c_str(),
+            /* passwdlen= */ password.length(),
+            /* salt= */ salted.salt.data(),
+            /* opslimit= */ crypto_pwhash_OPSLIMIT_INTERACTIVE,
+            /* memlimit= */ crypto_pwhash_MEMLIMIT_INTERACTIVE,
+            /* alg= */ crypto_pwhash_ALG_DEFAULT) != 0) {
         throw std::runtime_error{"out of memory"};
     }
-    return key;
+
+    return generated_key;
 }
 
-/**
- * We allow ourselves to assume that the input plaintext can fit entirely
- * in memory. However, the encryption/decryption methods are written to
- * handle 4KB pages in a stream. Thus, we can easily transition if we encounter
- * inputs which do not fit into memory in the future.
- */
-void encrypt(const std::string& file_name, const std::string& plaintext,
-             const std::string& password) {
-    std::ofstream output_file{file_name, std::ios_base::binary};
+}  // namespace
+
+void EncryptDataToFile(const std::string& output_path, const std::string& data,
+                       const std::string& password) {
+    throwIfEmpty("output_path", output_path);
+    throwIfEmpty("data", data);
+    throwIfEmpty("password", password);
+
+    static SodiumInitializer init;
+
+    std::ofstream output_file{output_path, std::ios_base::binary};
     if (!output_file) {
         throw std::runtime_error{"Could not open output file"};
     }
@@ -56,7 +81,7 @@ void encrypt(const std::string& file_name, const std::string& plaintext,
     const auto key = keyDerivation(salted_pwd);
 
     // Write salt to the front of file.
-    output_file.write((char*)key.salt.data(), key.salt.size());
+    output_file.write((char*)salted_pwd.salt.data(), salted_pwd.salt.size());
 
     // Allocate buffers for io, headers.
     unsigned char buf_in[CHUNK_SIZE];
@@ -71,7 +96,7 @@ void encrypt(const std::string& file_name, const std::string& plaintext,
     output_file.write((char*)header, sizeof(header));
 
     // Encrypt the plaintext as a stream
-    std::istringstream input_stream{plaintext};
+    std::istringstream input_stream{data};
     while (input_stream) {
         input_stream.read((char*)buf_in, sizeof(buf_in));
         unsigned long long out_len = 0;
@@ -87,20 +112,27 @@ void encrypt(const std::string& file_name, const std::string& plaintext,
     }
 }
 
-std::string decrypt(const std::string& file_name, const std::string& password) {
-    std::ifstream input_file{file_name, std::ios_base::binary};
+std::string DecryptFromFile(const std::string input_path,
+                            const std::string& password) {
+    throwIfEmpty("input_path", input_path);
+    throwIfEmpty("password", password);
+
+    static SodiumInitializer init;
+
+    std::ifstream input_file{input_path, std::ios_base::binary};
     if (!input_file) {
         throw std::runtime_error{"Could not open input file"};
     }
 
-    SaltedPassword salted;
+    SaltedPassword salted_pwd;
     // Extract the salt at front of the file.
-    if (!input_file.read((char*)salted.salt.data(), salted.salt.size())) {
+    if (!input_file.read((char*)salted_pwd.salt.data(),
+                         salted_pwd.salt.size())) {
         throw std::runtime_error{"Could not extract salt!"};
     }
-    salted.password = password;
+    salted_pwd.password = password;
     // Re-derive the key from the password.
-    const auto key = keyDerivation(salted);
+    const auto key = keyDerivation(salted_pwd);
 
     // Allocate buffers.
     unsigned char
@@ -137,18 +169,5 @@ std::string decrypt(const std::string& file_name, const std::string& password) {
     return decrypted_bytes;
 }
 
-}  // namespace
-
-int main() {
-    if (sodium_init() != 0) {
-        return 1;
-    }
-
-    std::string plain_text = "This is some plaintext. blah blah!";
-    encrypt("outfile.txt", plain_text, "password123");
-
-    std::string decrypted = decrypt("outfile.txt", "password123");
-    std::cout << decrypted << std::endl;
-
-    return 0;
-}
+}  // namespace encryption
+}  // namespace subtitler

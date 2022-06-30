@@ -30,7 +30,7 @@ const char *BURN_SUBTITLE_MESSAGE =
 
 ExportWindow::ExportWindow(Inputs inputs, QWidget *parent)
     : QDialog{parent},
-      inputs_{std::move(inputs)},
+      inputs_{inputs},
       can_close_{true},
       export_type_{REMUX_SUBTITLE} {
     setWindowTitle(tr("Export Video"));

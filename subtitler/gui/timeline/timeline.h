@@ -64,6 +64,7 @@ class Timeline : public QScrollArea {
     void onChangeSubtitleStartEndTimeFinished(
         SubtitleIntervalContainer* container, SubtitleInterval* subtitle);
     void onSubtitleFileLoaded(std::size_t num_loaded);
+    void onSubtitleFileReload(const QString& new_subtitle_file);
 
   private:
     Ruler* ruler_;

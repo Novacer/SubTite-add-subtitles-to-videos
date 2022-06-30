@@ -15,6 +15,7 @@
 #include <chrono>
 #include <stdexcept>
 
+#include "subtitler/gui/auto_transcribe/auto_transcribe_window.h"
 #include "subtitler/gui/exporting/export_dialog.h"
 #include "subtitler/gui/player_controls/play_button.h"
 #include "subtitler/gui/player_controls/step_button.h"
@@ -56,8 +57,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
         throw std::runtime_error{"Invalid video file path"};
     }
 
-    QMenu *menu = menuBar()->addMenu(tr("&File"));
-    QAction *export_video_action = menu->addAction(tr("Export Video"));
+    QMenu *file_menu = menuBar()->addMenu(tr("&File"));
+    QAction *export_video_action = file_menu->addAction(tr("Export Video"));
+    QMenu *subtitle_menu = menuBar()->addMenu(tr("&Subtitle"));
+    QAction *auto_transcribe_action =
+        subtitle_menu->addAction(tr("Auto Transcribe"));
 
     video_renderer_ = new video_renderer::OpenGLRenderer(placeholder);
 
@@ -102,6 +106,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     addDockWidget(Qt::RightDockWidgetArea, editor_);
 
     export_dialog_ = Q_NULLPTR;
+    auto_transcribe_window_ = Q_NULLPTR;
 
     // Play/Pause/Step connections
     connect(play_button, &player_controls::PlayButton::play, player_.get(),
@@ -139,24 +144,31 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
             &subtitle_editor::SubtitleEditor::onSubtitleChangeStartEndTime);
     connect(timeline, &timeline::Timeline::changeSubtitleStartEndTimeFinished,
             editor_, &subtitle_editor::SubtitleEditor::onSave);
+    connect(this, &MainWindow::subtitleFileReload, editor_,
+            &subtitle_editor::SubtitleEditor::onSubtitleFileReload);
 
     // Handles changes to subtitle file.
     connect(editor_, &subtitle_editor::SubtitleEditor::saved, this,
             &MainWindow::onSubtitleFileChanged);
     connect(timeline, &timeline::Timeline::subtitleFileLoaded, this,
             &MainWindow::onSubtitleFileChanged);
+    connect(this, &MainWindow::subtitleFileReload, timeline,
+            &timeline::Timeline::onSubtitleFileReload);
 
     // Handles top menu bar actions
+    auto pause_player = [play_button](bool checked) {
+        // If player is playing at export, then emulate pausing the
+        // player.
+        if (play_button->is_playing()) {
+            play_button->onClick();
+        }
+    };
     connect(export_video_action, &QAction::triggered, this,
             &MainWindow::onExport);
-    connect(export_video_action, &QAction::triggered, this,
-            [play_button](bool checked) {
-                // If player is playing at export, then emulate pausing the
-                // player.
-                if (play_button->is_playing()) {
-                    play_button->onClick();
-                }
-            });
+    connect(export_video_action, &QAction::triggered, this, pause_player);
+    connect(auto_transcribe_action, &QAction::triggered, this,
+            &MainWindow::onAutoTranscribe);
+    connect(auto_transcribe_action, &QAction::triggered, this, pause_player);
 
     if (!subtitle_file_.isEmpty()) {
         timeline->LoadSubtitles();
@@ -219,6 +231,32 @@ void MainWindow::onExport(bool checked) {
     export_dialog_->open();
     connect(export_dialog_, &QDialog::finished,
             [this](int result) { export_dialog_ = Q_NULLPTR; });
+}
+
+void MainWindow::onSubtitleFileReload(const QString &new_subtitle_file) {
+    subtitle_file_ = new_subtitle_file;
+    emit subtitleFileReload(subtitle_file_);
+}
+
+void MainWindow::onAutoTranscribe(bool checked) {
+    if (auto_transcribe_window_) {
+        return;
+    }
+    auto_transcribe::Inputs inputs;
+    inputs.video_file = video_file_->fileName();
+    inputs.current_subtitle_file = subtitle_file_;
+    auto_transcribe_window_ =
+        new auto_transcribe::AutoTranscribeWindow{std::move(inputs), this};
+    auto_transcribe_window_->open();
+    connect(auto_transcribe_window_, &QDialog::finished, [this](int result) {
+        if (result == QDialog::Accepted) {
+            QString new_file = auto_transcribe_window_->OutputFile();
+            qDebug() << new_file;
+            onSubtitleFileReload(new_file);
+        }
+        delete auto_transcribe_window_;
+        auto_transcribe_window_ = Q_NULLPTR;
+    });
 }
 
 }  // namespace gui

@@ -24,6 +24,13 @@ namespace video_renderer {
 QT_FORWARD_DECLARE_CLASS(OpenGLRenderer)
 
 }  // namespace video_renderer
+
+namespace auto_transcribe {
+
+QT_FORWARD_DECLARE_CLASS(AutoTranscribeWindow)
+
+}
+
 }  // namespace subtitler::gui
 
 namespace subtitler {
@@ -40,6 +47,7 @@ class MainWindow : public QMainWindow {
 
   signals:
     void playerChangedTime(std::chrono::milliseconds ms);
+    void subtitleFileReload(const QString& new_subtitle_file);
 
   public slots:
     void onRulerChangedTime(std::chrono::milliseconds ms);
@@ -47,6 +55,8 @@ class MainWindow : public QMainWindow {
     void onVideoFrameDecoded(const QAVVideoFrame &video_frame);
     void onSubtitleFileChanged(std::size_t num_loaded);
     void onExport(bool checked);
+    void onAutoTranscribe(bool checked);
+    void onSubtitleFileReload(const QString &new_subtitle_file);
 
   private:
     std::unique_ptr<QAVPlayer> player_;
@@ -59,6 +69,7 @@ class MainWindow : public QMainWindow {
     bool user_seeked_;
     QString subtitle_file_;
     QDialog *export_dialog_;
+    auto_transcribe::AutoTranscribeWindow *auto_transcribe_window_;
 };
 
 }  // namespace gui

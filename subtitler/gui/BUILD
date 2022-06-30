@@ -22,6 +22,7 @@ qt_cc_library(
     }),
     deps = [
         ":settings_window",
+        "//subtitler/gui/auto_transcribe:auto_transcribe_window",
         "//subtitler/gui/exporting:export_dialog",
         "//subtitler/gui/player_controls:play_button",
         "//subtitler/gui/player_controls:step_button",

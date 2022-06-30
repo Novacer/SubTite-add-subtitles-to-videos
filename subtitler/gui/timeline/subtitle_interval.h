@@ -58,6 +58,7 @@ class SubtitleIntervalContainer : public QWidget {
     std::pair<bool, std::size_t> LoadSubripFile(qreal interval_width,
                                                 quint32 ms_per_interval,
                                                 int y_coord);
+    void ChangeSubripFile(const QString& new_subrip_file);
 
   public slots:
     void SaveSubripFile();

@@ -162,6 +162,14 @@ void SubtitleEditor::onPositionSelected(const std::string& position_id) {
     onSave();
 }
 
+void SubtitleEditor::onSubtitleFileReload(const QString& new_subtitle_file) {
+    currently_editing_ = Q_NULLPTR;
+    container_ = Q_NULLPTR;
+    text_edit_->setPlainText("");
+    begin_end_time_->setText("");
+    setVisible(false);
+}
+
 }  // namespace subtitle_editor
 }  // namespace gui
 }  // namespace subtitler

@@ -86,6 +86,10 @@ void Timeline::onSubtitleFileLoaded(std::size_t num_loaded) {
     emit subtitleFileLoaded(num_loaded);
 }
 
+void Timeline::onSubtitleFileReload(const QString& new_subtitle_file) {
+    ruler_->ReloadSubtitles(new_subtitle_file);
+}
+
 }  // namespace timeline
 }  // namespace gui
 }  // namespace subtitler

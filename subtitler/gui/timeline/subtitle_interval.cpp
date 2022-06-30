@@ -75,9 +75,9 @@ void SubtitleIntervalContainer::DeleteAll() {
     rect_to_interval_map_.clear();
 
     // In SubtitleInterval, each member (begin_marker, end_marker) etc has
-    // the same parent as SubtitleIntervalContainer. Recall this was done to get
-    // a flat hiearchy. Consequently, deleting SIC does not automatically
-    // delete the markers. So, we have to CleanupWithoutParentAsking() here.
+    // the same parent as SubtitleIntervalContainer. Consequently, deleting the
+    // interval does not automatically delete the markers. So, we have to
+    // CleanupWithoutParentAsking() here.
     for (auto& interval : intervals_) {
         interval->CleanupWithoutParentAsking();
     }

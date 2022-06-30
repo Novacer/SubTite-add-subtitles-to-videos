@@ -74,9 +74,10 @@ void SubtitleIntervalContainer::DeleteAll() {
     marker_to_interval_map_.clear();
     rect_to_interval_map_.clear();
 
-    // Since the elements begin marker, end marker etc are not children of
-    // the interval but rather of the grandparent, we need to use
-    // CleanupWithoutParentAsking() here.
+    // In SubtitleInterval, each member (begin_marker, end_marker) etc has
+    // the same parent as SubtitleIntervalContainer. Recall this was done to get
+    // a flat hiearchy. Consequently, deleting SIC does not automatically
+    // delete the markers. So, we have to CleanupWithoutParentAsking() here.
     for (auto& interval : intervals_) {
         interval->CleanupWithoutParentAsking();
     }
@@ -153,7 +154,8 @@ std::pair<bool, std::size_t> SubtitleIntervalContainer::LoadSubripFile(
     return std::make_pair(true, srt_file.NumItems());
 }
 
-void SubtitleIntervalContainer::ChangeSubripFile(const QString& new_subrip_file) {
+void SubtitleIntervalContainer::ChangeSubripFile(
+    const QString& new_subrip_file) {
     DeleteAll();
     output_srt_file_ = fs::u8path(new_subrip_file.toStdString());
 }

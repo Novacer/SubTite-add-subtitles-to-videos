@@ -157,8 +157,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     // Handles top menu bar actions
     auto pause_player = [play_button](bool checked) {
-        // If player is playing at export, then emulate pausing the
-        // player.
+        // If the player is playing, then automatically click the pause button.
         if (play_button->is_playing()) {
             play_button->onClick();
         }

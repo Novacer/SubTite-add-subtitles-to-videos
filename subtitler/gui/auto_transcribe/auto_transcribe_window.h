@@ -3,7 +3,6 @@
 
 #include <QDialog>
 #include <QString>
-#include <chrono>
 
 QT_FORWARD_DECLARE_CLASS(QLabel)
 QT_FORWARD_DECLARE_CLASS(QPushButton)

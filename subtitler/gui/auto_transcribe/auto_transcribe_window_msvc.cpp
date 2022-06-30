@@ -1,13 +1,14 @@
-#include "subtitler/gui/auto_transcribe/auto_transcribe_window.h"
-
-#include <QComboBox>
-#include <QDebug>
 #include <QFileDialog>
 #include <QGridLayout>
 #include <QLabel>
 #include <QPushButton>
 #include <QThreadPool>
 #include <stdexcept>
+
+#include "subtitler/gui/auto_transcribe/auto_transcribe_window.h"
+#include "subtitler/speech_recognition/auto_transcriber.h"
+#include "subtitler/speech_recognition/cloud_service/microsoft_cognitive_service.h"
+#include "subtitler/speech_recognition/languages/english_us.h"
 
 namespace subtitler {
 namespace gui {

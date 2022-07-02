@@ -23,7 +23,7 @@ class LoginMicrosoftCognitiveServicesWindow : public QDialog {
     ~LoginMicrosoftCognitiveServicesWindow() = default;
 
     QString GetLoginData() const;
-  
+
   public slots:
     // User enters API information.
     void onRegister();

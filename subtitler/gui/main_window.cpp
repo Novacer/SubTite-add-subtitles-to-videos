@@ -16,6 +16,7 @@
 #include <stdexcept>
 
 #include "subtitler/gui/auto_transcribe/auto_transcribe_window.h"
+#include "subtitler/gui/auto_transcribe/login/login_msc.h"
 #include "subtitler/gui/exporting/export_dialog.h"
 #include "subtitler/gui/player_controls/play_button.h"
 #include "subtitler/gui/player_controls/step_button.h"
@@ -107,6 +108,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 
     export_dialog_ = Q_NULLPTR;
     auto_transcribe_window_ = Q_NULLPTR;
+    login_window_ = Q_NULLPTR;
 
     // Play/Pause/Step connections
     connect(play_button, &player_controls::PlayButton::play, player_.get(),
@@ -238,23 +240,41 @@ void MainWindow::onSubtitleFileReload(const QString &new_subtitle_file) {
 }
 
 void MainWindow::onAutoTranscribe(bool checked) {
-    if (auto_transcribe_window_) {
+    if (login_window_ || auto_transcribe_window_) {
         return;
     }
-    auto_transcribe::Inputs inputs;
-    inputs.video_file = video_file_->fileName();
-    inputs.current_subtitle_file = subtitle_file_;
-    auto_transcribe_window_ =
-        new auto_transcribe::AutoTranscribeWindow{std::move(inputs), this};
-    auto_transcribe_window_->open();
-    connect(auto_transcribe_window_, &QDialog::finished, [this](int result) {
+
+    login_window_ =
+        new auto_transcribe::login::LoginMicrosoftCognitiveServicesWindow{this};
+    login_window_->open();
+
+    connect(login_window_, &QDialog::finished, [this](int result) {
         if (result == QDialog::Accepted) {
-            QString new_file = auto_transcribe_window_->OutputFile();
-            qDebug() << new_file;
-            onSubtitleFileReload(new_file);
+            QString login_data = login_window_->GetLoginData();
+
+            auto_transcribe::Inputs inputs;
+            inputs.video_file = video_file_->fileName();
+            inputs.current_subtitle_file = subtitle_file_;
+            inputs.login_data = login_data;
+
+            auto_transcribe_window_ = new auto_transcribe::AutoTranscribeWindow{
+                std::move(inputs), this};
+            auto_transcribe_window_->open();
+
+            connect(auto_transcribe_window_, &QDialog::finished,
+                    [this](int result) {
+                        if (result == QDialog::Accepted) {
+                            QString new_file =
+                                auto_transcribe_window_->OutputFile();
+                            qDebug() << new_file;
+                            onSubtitleFileReload(new_file);
+                        }
+                        delete auto_transcribe_window_;
+                        auto_transcribe_window_ = Q_NULLPTR;
+                    });
         }
-        delete auto_transcribe_window_;
-        auto_transcribe_window_ = Q_NULLPTR;
+        delete login_window_;
+        login_window_ = Q_NULLPTR;
     });
 }
 

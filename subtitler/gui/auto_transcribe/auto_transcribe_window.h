@@ -17,6 +17,7 @@ namespace auto_transcribe {
 struct Inputs {
     QString video_file;
     QString current_subtitle_file;
+    QString login_data;
 };
 
 /**
@@ -44,7 +45,6 @@ class AutoTranscribeWindow : public QDialog {
     QLabel* output_choice_;
     QLabel* progress_;
     QPushButton* transcribe_button_;
-    std::chrono::microseconds video_duration_;
     // Disables dialog from being closed during transcribe job.
     bool can_close_;
     QLabel* transcribe_service_explanation_;

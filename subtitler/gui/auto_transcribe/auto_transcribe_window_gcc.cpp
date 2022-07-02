@@ -27,8 +27,13 @@ AutoTranscribeWindow::AutoTranscribeWindow(Inputs inputs, QWidget *parent)
     setWindowFlags(windowFlags() | Qt::CustomizeWindowHint);
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
+    QGridLayout *layout = new QGridLayout{this};
+    layout->setVerticalSpacing(10);
+
     transcribe_service_explanation_ =
         new QLabel{tr(TRANSCRIBE_SERVICE_EXPLANATION), this};
+    transcribe_service_explanation_->setWordWrap(true);
+    layout->addWidget(transcribe_service_explanation_, 0, 0, 3, 3);
 }
 
 AutoTranscribeWindow::~AutoTranscribeWindow() = default;

@@ -29,7 +29,13 @@ namespace auto_transcribe {
 
 QT_FORWARD_DECLARE_CLASS(AutoTranscribeWindow)
 
-}
+}  // namespace auto_transcribe
+
+namespace auto_transcribe::login {
+
+QT_FORWARD_DECLARE_CLASS(LoginMicrosoftCognitiveServicesWindow)
+
+}  // namespace auto_transcribe::login
 
 }  // namespace subtitler::gui
 
@@ -47,7 +53,7 @@ class MainWindow : public QMainWindow {
 
   signals:
     void playerChangedTime(std::chrono::milliseconds ms);
-    void subtitleFileReload(const QString& new_subtitle_file);
+    void subtitleFileReload(const QString &new_subtitle_file);
 
   public slots:
     void onRulerChangedTime(std::chrono::milliseconds ms);
@@ -70,6 +76,8 @@ class MainWindow : public QMainWindow {
     QString subtitle_file_;
     QDialog *export_dialog_;
     auto_transcribe::AutoTranscribeWindow *auto_transcribe_window_;
+    auto_transcribe::login::LoginMicrosoftCognitiveServicesWindow
+        *login_window_;
 };
 
 }  // namespace gui

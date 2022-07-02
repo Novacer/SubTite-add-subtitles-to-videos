@@ -249,7 +249,8 @@ void MainWindow::onAutoTranscribe(bool checked) {
     login_window_->open();
 
     connect(login_window_, &QDialog::finished, [this](int result) {
-        if (result == QDialog::Accepted) {
+        if (result == QDialog::Accepted &&
+            !login_window_->GetLoginData().isEmpty()) {
             QString login_data = login_window_->GetLoginData();
 
             auto_transcribe::Inputs inputs;
@@ -266,7 +267,6 @@ void MainWindow::onAutoTranscribe(bool checked) {
                         if (result == QDialog::Accepted) {
                             QString new_file =
                                 auto_transcribe_window_->OutputFile();
-                            qDebug() << new_file;
                             onSubtitleFileReload(new_file);
                         }
                         delete auto_transcribe_window_;

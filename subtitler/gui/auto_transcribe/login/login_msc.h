@@ -23,6 +23,14 @@ class LoginMicrosoftCognitiveServicesWindow : public QDialog {
     ~LoginMicrosoftCognitiveServicesWindow() = default;
 
     QString GetLoginData() const;
+  
+  public slots:
+    // User enters API information.
+    void onRegister();
+    // User enters password to retrieve API information
+    void onLogin();
+    // User sets up API again.
+    void onSetupAgain();
 
   private:
     QLabel* explanation_;
@@ -36,6 +44,7 @@ class LoginMicrosoftCognitiveServicesWindow : public QDialog {
     QPushButton* setup_again_button_;
 
     QString login_data_;
+    int num_times_failed_;
 };
 
 }  // namespace login

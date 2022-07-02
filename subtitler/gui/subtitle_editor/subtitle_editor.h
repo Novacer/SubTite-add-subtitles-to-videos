@@ -54,6 +54,7 @@ class SubtitleEditor : public QDockWidget {
     void onDelete();
     void onVisibilityChanged(bool visible);
     void onPositionSelected(const std::string& position_id);
+    void onSubtitleFileReload(const QString& new_subtitle_file);
 
   protected:
     virtual bool eventFilter(QObject* watched, QEvent* event) override;

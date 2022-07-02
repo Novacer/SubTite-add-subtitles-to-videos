@@ -29,9 +29,14 @@ class Ruler : public QWidget {
                    const QString& output_srt_file, int zoom_level = 1);
     ~Ruler();
 
-    // Loads internal state from the external output_srt_file.
+    // Loads internal state from the external output_srt_file member.
     // Emits subtitleFileLoaded() signal if successful.
     void LoadSubtitles();
+
+    // Use this to reload subtitles again, if the subtitle file has been
+    // changed. (Change to a new file, or if the original file was modified
+    // outside of this application).
+    void ReloadSubtitles(const QString& new_subtitle_file);
 
     void setHeaderColor(const QColor& color) { header_bgrnd_ = color; }
 

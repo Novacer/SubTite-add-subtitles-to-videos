@@ -44,6 +44,8 @@ if [[ ${machine} == "MinGw" || ${machine} == "CYGWIN" ]]; then
     mkdir -p ${SUBTITE_RELEASE_PATH}/plugins
     cp -r ${QT5_INSTALL_PATH}/plugins/audio ${SUBTITE_RELEASE_PATH}/plugins/audio
     cp -r ${QT5_INSTALL_PATH}/plugins/platforms ${SUBTITE_RELEASE_PATH}/plugins/platforms
+    MCS_INSTALL_LOCATION="C:/Program Files/PackageManagement/NuGet/Packages/Microsoft.CognitiveServices.Speech.1.22.0"
+    cp "${MCS_INSTALL_LOCATION}/runtimes/win-x64/native/Microsoft.CognitiveServices.Speech.extension".* ${SUBTITE_RELEASE_PATH}
     ResourceHacker \
         -open ${SUBTITE_RELEASE_PATH}/subtite.exe \
         -save ${SUBTITE_RELEASE_PATH}/subtite-icon.exe \

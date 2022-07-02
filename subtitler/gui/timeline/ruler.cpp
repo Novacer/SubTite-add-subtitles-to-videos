@@ -94,6 +94,12 @@ void Ruler::LoadSubtitles() {
     }
 }
 
+void Ruler::ReloadSubtitles(const QString& new_subtitle_file) {
+    subtitle_intervals_->ChangeSubripFile(new_subtitle_file);
+    LoadSubtitles();
+    updateChildren();
+}
+
 void Ruler::onMoveIndicator(std::chrono::milliseconds frame_time) {
     if (frame_time < 0ms || frame_time > duration_) {
         return;

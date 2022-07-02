@@ -71,9 +71,18 @@ void SubtitleIntervalContainer::RemoveInterval(SubtitleInterval* interval) {
 }
 
 void SubtitleIntervalContainer::DeleteAll() {
-    intervals_.clear();
     marker_to_interval_map_.clear();
     rect_to_interval_map_.clear();
+
+    // In SubtitleInterval, each member (begin_marker, end_marker) etc has
+    // the same parent as SubtitleIntervalContainer. Consequently, deleting the
+    // interval does not automatically delete the markers. So, we have to
+    // CleanupWithoutParentAsking() here.
+    for (auto& interval : intervals_) {
+        interval->CleanupWithoutParentAsking();
+    }
+
+    intervals_.clear();
 }
 
 SubtitleInterval* SubtitleIntervalContainer::GetIntervalFromMarker(
@@ -143,6 +152,12 @@ std::pair<bool, std::size_t> SubtitleIntervalContainer::LoadSubripFile(
         return std::make_pair(false, 0);
     }
     return std::make_pair(true, srt_file.NumItems());
+}
+
+void SubtitleIntervalContainer::ChangeSubripFile(
+    const QString& new_subrip_file) {
+    DeleteAll();
+    output_srt_file_ = fs::u8path(new_subrip_file.toStdString());
 }
 
 void SubtitleInterval::initializeChildren(QWidget* parent) {

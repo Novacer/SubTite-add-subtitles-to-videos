@@ -58,6 +58,7 @@ class SubtitleIntervalContainer : public QWidget {
     std::pair<bool, std::size_t> LoadSubripFile(qreal interval_width,
                                                 quint32 ms_per_interval,
                                                 int y_coord);
+    void ChangeSubripFile(const QString& new_subrip_file);
 
   public slots:
     void SaveSubripFile();
@@ -126,8 +127,8 @@ class SubtitleInterval {
 
     // Cleans up child widgets. Should only be used if SubtitleInterval
     // is going to be destroyed from a context where it is NOT the parent
-    // widget destroying it's children. (Parent refers to the parent of
-    // SubtitleIntervalContainer as well).
+    // widget cleaning up its children. (Parent refers to the parent widget
+    // containing SubtitleIntervalContainer).
     void CleanupWithoutParentAsking();
 
   private:

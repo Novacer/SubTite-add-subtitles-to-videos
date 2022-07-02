@@ -69,6 +69,9 @@ LoginMicrosoftCognitiveServicesWindow::LoginMicrosoftCognitiveServicesWindow(
                 &LoginMicrosoftCognitiveServicesWindow::onSetupAgain);
         connect(submit_button_, &QPushButton::clicked, this,
                 &LoginMicrosoftCognitiveServicesWindow::onLogin);
+        // So that pressing enter submits.
+        setup_again_button_->setDefault(false);
+        submit_button_->setDefault(true);
     } else {
         // Register flow
         explanation_ = new QLabel{

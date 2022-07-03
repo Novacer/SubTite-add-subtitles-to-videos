@@ -2,9 +2,9 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QGridLayout>
+#include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
-#include <Qlabel>
 #include <nlohmann/json.hpp>
 #include <stdexcept>
 

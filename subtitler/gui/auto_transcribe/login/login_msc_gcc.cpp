@@ -2,9 +2,9 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QGridLayout>
+#include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
-#include <Qlabel>
 
 #include "subtitler/gui/auto_transcribe/login/login_msc.h"
 

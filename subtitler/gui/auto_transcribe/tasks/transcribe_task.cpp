@@ -60,6 +60,7 @@ void TranscribeTask::run() {
         auto auto_transcriber = std::make_unique<AutoTranscriber>(
             std::move(mcs_cloud_service), std::move(english_us));
 
+        // Upload audio for auto transcription.
         QMetaObject::invokeMethod(parent_, "onProgressUpdate",
                                   Q_ARG(QString, "Uploading audio"));
         auto srt = auto_transcriber->Transcribe(
@@ -69,6 +70,7 @@ void TranscribeTask::run() {
                     Q_ARG(QString, QString::fromStdString(msg)));
             });
 
+        // Write results to srt file.
         QMetaObject::invokeMethod(parent_, "onProgressUpdate",
                                   Q_ARG(QString, "Writing result"));
         std::ofstream output_file{

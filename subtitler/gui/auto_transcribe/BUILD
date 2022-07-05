@@ -21,6 +21,7 @@ qt_cc_library(
         "//subtitler/util:temp_file",
         "//subtitler/subprocess:subprocess_executor",
         "//subtitler/video/processing:ffmpeg",
+        "@com_github_nlohmann_json//:json",
         "@qt//:qt_widgets",
     ] + select({
         "@bazel_tools//src/conditions:windows": [

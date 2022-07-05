@@ -5,7 +5,6 @@
 #include <QDir>
 #include <QFileInfo>
 #include <QMetaObject>
-#include <QMetaType>
 #include <QTemporaryFile>
 #include <filesystem>
 #include <fstream>
@@ -16,7 +15,6 @@
 #include "subtitler/speech_recognition/languages/english_us.h"
 #include "subtitler/srt/subrip_file.h"
 #include "subtitler/subprocess/subprocess_executor.h"
-#include "subtitler/util/unicode.h"
 #include "subtitler/video/processing/ffmpeg.h"
 
 namespace subtitler {

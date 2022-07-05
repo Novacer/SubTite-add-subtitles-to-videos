@@ -90,6 +90,7 @@ AutoTranscribeWindow::~AutoTranscribeWindow() = default;
 void AutoTranscribeWindow::onTranscribe() {
     if (output_file_.isEmpty()) {
         progress_->setText(tr("Please select output file!"));
+        return;
     }
 
     nlohmann::json login_json =

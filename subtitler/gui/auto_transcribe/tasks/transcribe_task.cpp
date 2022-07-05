@@ -83,7 +83,6 @@ void TranscribeTask::run() {
                                   Q_ARG(QString, e.what()));
         return;
     } catch (...) {
-        qDebug() << "idk";
         QMetaObject::invokeMethod(parent_, "onTranscribeComplete",
                                   Q_ARG(QString, "unknown error"));
         return;

@@ -116,6 +116,9 @@ void AutoTranscribeWindow::onTranscribeComplete(QString error) {
         accept();
     } else {
         progress_->setText(error);
+        choose_output_file_btn_->setEnabled(true);
+        transcribe_button_->setEnabled(true);
+        transcribe_button_->setVisible(true);
     }
 }
 

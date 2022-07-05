@@ -8,7 +8,6 @@
 
 #include "subtitler/gui/auto_transcribe/auto_transcribe_window.h"
 #include "subtitler/gui/auto_transcribe/tasks/transcribe_task.h"
-#include "subtitler/speech_recognition/auto_transcriber.h"
 
 namespace subtitler {
 namespace gui {

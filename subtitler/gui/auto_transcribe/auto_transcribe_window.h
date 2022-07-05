@@ -36,12 +36,13 @@ class AutoTranscribeWindow : public QDialog {
 
   public slots:
     void onTranscribe();
-    void onProgressUpdate(const std::string progress);
+    void onProgressUpdate(const QString progress);
     void onTranscribeComplete(QString error);
 
   private:
     Inputs inputs_;
     QString output_file_;
+    QPushButton* choose_output_file_btn_;
     QLabel* output_choice_;
     QLabel* progress_;
     QPushButton* transcribe_button_;

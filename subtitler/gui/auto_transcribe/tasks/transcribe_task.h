@@ -8,7 +8,7 @@ namespace subtitler::gui::auto_transcribe {
 
 class AutoTranscribeWindow;
 
-}
+}  // namespace subtitler::gui::auto_transcribe
 
 namespace subtitler {
 namespace gui {

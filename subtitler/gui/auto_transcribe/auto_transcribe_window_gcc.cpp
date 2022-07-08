@@ -43,7 +43,7 @@ void AutoTranscribeWindow::onTranscribe() {
     onTranscribeComplete("");
 }
 
-void AutoTranscribeWindow::onProgressUpdate(const std::string progress) {
+void AutoTranscribeWindow::onProgressUpdate(const QString progress) {
     // TODO
 }
 

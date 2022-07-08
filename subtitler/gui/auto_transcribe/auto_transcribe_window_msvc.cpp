@@ -3,12 +3,11 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QThreadPool>
+#include <nlohmann/json.hpp>
 #include <stdexcept>
 
 #include "subtitler/gui/auto_transcribe/auto_transcribe_window.h"
-#include "subtitler/speech_recognition/auto_transcriber.h"
-#include "subtitler/speech_recognition/cloud_service/microsoft_cognitive_service.h"
-#include "subtitler/speech_recognition/languages/english_us.h"
+#include "subtitler/gui/auto_transcribe/tasks/transcribe_task.h"
 
 namespace subtitler {
 namespace gui {
@@ -39,7 +38,7 @@ AutoTranscribeWindow::AutoTranscribeWindow(Inputs inputs, QWidget *parent)
     transcribe_service_explanation_->setWordWrap(true);
 
     output_file_ = inputs_.current_subtitle_file;
-    QPushButton *choose_output_file =
+    choose_output_file_btn_ =
         new QPushButton{tr("Choose Output Location"), this};
     output_choice_ = new QLabel{this};
     output_choice_->setMinimumWidth(300);
@@ -47,18 +46,19 @@ AutoTranscribeWindow::AutoTranscribeWindow(Inputs inputs, QWidget *parent)
 
     transcribe_button_ = new QPushButton{tr("Transcribe"), this};
     progress_ = new QLabel{this};
+    progress_->setMaximumWidth(300);
 
     QGridLayout *layout = new QGridLayout{this};
     layout->addWidget(input_video_name, 0, 0, 1, 2);
     layout->addWidget(transcribe_service_explanation_, 2, 0, 1, 2);
-    layout->addWidget(choose_output_file, 4, 0);
+    layout->addWidget(choose_output_file_btn_, 4, 0);
     layout->addWidget(output_choice_, 4, 1);
     layout->addWidget(progress_, 5, 0);
     layout->addWidget(transcribe_button_, 5, 1, Qt::AlignRight);
 
     layout->setVerticalSpacing(10);
 
-    connect(choose_output_file, &QPushButton::clicked, this, [this]() {
+    connect(choose_output_file_btn_, &QPushButton::clicked, this, [this]() {
         std::string filter = "SRT Files (*.srt)";
         QString required_suffix = ".srt";
 
@@ -87,19 +87,39 @@ AutoTranscribeWindow::AutoTranscribeWindow(Inputs inputs, QWidget *parent)
 AutoTranscribeWindow::~AutoTranscribeWindow() = default;
 
 void AutoTranscribeWindow::onTranscribe() {
-    // TODO
-    // ...
-    onTranscribeComplete("");
+    if (output_file_.isEmpty()) {
+        progress_->setText(tr("Please select output file!"));
+        return;
+    }
+
+    nlohmann::json login_json =
+        nlohmann::json::parse(inputs_.login_data.toStdString());
+    QString api_key = QString::fromStdString(login_json.at("api-key"));
+    QString api_region = QString::fromStdString(login_json.at("api-region"));
+
+    QThreadPool::globalInstance()->start(new tasks::TranscribeTask{
+        api_key, api_region, inputs_.video_file, output_file_, this});
+
+    transcribe_button_->setEnabled(false);
+    transcribe_button_->setVisible(false);
+    choose_output_file_btn_->setEnabled(false);
+    can_close_ = false;
 }
 
-void AutoTranscribeWindow::onProgressUpdate(const std::string progress) {
-    // TODO
+void AutoTranscribeWindow::onProgressUpdate(const QString progress) {
+    progress_->setText(progress);
 }
 
 void AutoTranscribeWindow::onTranscribeComplete(QString error) {
-    // TODO something with error
     can_close_ = true;
-    accept();
+    if (error.isEmpty()) {
+        accept();
+    } else {
+        progress_->setText(error);
+        choose_output_file_btn_->setEnabled(true);
+        transcribe_button_->setEnabled(true);
+        transcribe_button_->setVisible(true);
+    }
 }
 
 void AutoTranscribeWindow::accept() {

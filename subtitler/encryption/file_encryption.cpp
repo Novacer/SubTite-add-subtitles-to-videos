@@ -1,5 +1,9 @@
 #include "subtitler/encryption/file_encryption.h"
 
+#ifdef _MSC_VER
+#define SODIUM_STATIC 1
+#endif
+
 extern "C" {
 #include <sodium.h>
 }

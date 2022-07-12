@@ -2,17 +2,16 @@
 
 ![Latest Build Status](https://github.com/Novacer/SubTite-add-subtitles-to-videos/actions/workflows/main.yml/badge.svg?branch=master)
 
-**TLDR:** SubTite allows you to add subtitles and preview it immediately in the video player. The subtitles can be output as a separate SRT file, or combined with the video. Existing SRT files can be imported and edited effortlessly. The subtitles can be positioned in 9 different locations along the video. Support for trimming video, adding images, and other video editing features coming soon!
+**TLDR:** SubTite allows you to create subtitles using auto-transcription and edit them seamlessly in a video editor. The subtitles can be output as a separate SRT file, or combined with the video. Existing SRT files can be imported and edited effortlessly. The subtitles can be positioned in 9 different locations along the video. Support for trimming video, adding images, and other video editing features coming soon!
 
 ## GUI Demo
 ![gui demo](https://user-images.githubusercontent.com/29148427/160031296-c35a7ef8-9d46-416b-850c-59f65d9b075c.gif)
 
-## CLI Demo
-![cli demo](https://user-images.githubusercontent.com/29148427/151613092-e7dcf2c3-80dd-4f72-a3c9-8bdd220594b8.gif)
 
-## Feature Overview (Current v1.0.0)
+## Feature Overview (Current v1.0.1)
 * Supports Windows and Linux
 * GUI + CLI for adding subtitles
+* Subtitle Auto-transcription through MS Cognitive Services (windows only for now)
 * Intuitive interface to make subtitling as fast and pain-free as possible
 * Full UTF-8 Unicode support on Windows and Linux
 * Subtitles can be positioned in 9 different locations: top right, middle center, bottom left etc.
@@ -26,26 +25,11 @@
 Download the appropriate binaries from the [releases section](https://github.com/Novacer/SubTite-add-subtitles-to-videos/releases)
 
 ### To use the CLI
-The CLI edition of SubTite is the Keep-It-Simple solution to quickly add subtitles without being bogged down by UI elements.
-
-### Linux
-1. `sudo apt install ffmpeg`. Ensure the following works:
-   * `ffmpeg -version`
-   * `ffplay -version`
-   * `ffprobe -version`
-2. Obtain SubTite cli binary from releases section or build the code yourself (see building section below)
-
-### Windows
-1. Install the ffmpeg essential binaries from this link: https://www.gyan.dev/ffmpeg/builds/
-2. Extract the binaries to a location of your choice, making sure that **the folder is added to your PATH!!!**. After adding the folder containing the ffmpeg binaries to your PATH, you should be able to run the following in cmd, powershell, or some windows bash shell:
-   * `ffmpeg -version`
-   * `ffplay -version`
-   * `ffprobe -version`
-3. Obtain SubTite cli binary from releases section or build the code yourself (see building section below)
+Please refer to the [CLI docs](subtitler/cli/README.md)
 
 ## Usage
 
-### GUI
+### Subtitle Editing
 1. Select the video from the file dialog.
 2. Select the subtitle file from the next file dialog. You can create a new subtitle file to start from scratch, or use an existing (.srt) file.
 3. Position the yellow indicator at the subtitle's start position.
@@ -55,102 +39,14 @@ The CLI edition of SubTite is the Keep-It-Simple solution to quickly add subtitl
 7. Use mouse to adjust the subtitle's start and end time. Any changes are saved automatically.
 8. Select `File > Export` if you want to combine the video and subtitles!
 
-
-### CLI
-The following are usage instructions for the CLI. Let `subtite` be the name of the binary.
-
-### Paths setup
-
-On Windows, launching subtite binary will immediately open up 2 file dialogs: the first is to select the video you want to subtitle, and second is to save the output subtitle file path. Selecting an existing subtitle means this subtitle will be loaded and can be edited.
-
-On Linux, file paths can be provided by `--video_path` and `--output_subtitle_path` flags respectively.
-```bash
-$ subtite --video_path "path/to/video.mp4" --output_subtitle_path "path/to/video.srt"
-```
-
-The binary will attempt to auto detect the ffmpeg, ffplay, and ffprobe you installed. This should work as long as you have placed the folder containing these binaries in your `PATH`. Alternatively, you can use flags `--ffmpeg_path`, `--ffprobe_path`, `--ffplay_path` to overwrite these paths. This works for both Windows and Linux.
-
-### Interactive subtitle mode
-You are ready to add subtitles when you see the following output.
-```
-Initialized with start=00:00:00.000 duration=00:00:05.000
-Starting interactive mode. Type help for instructions.
-```
-
-Use command `help` to see an overview of all available commands. We go over some examples here.
-
-Typing `play` will open a video player to play from 0s to 5s. If you want to adjust this play interval use command `play start {start} duration {duration}` or short form `play s {start} d {duration}`. The syntax for `{start}` and `{duration}` can be seen from following examples.
-
-```
-play s 5 d 3.5 means play from 5s to 8.5s
-play s 1:23.456 means play from 1min 23.456s up to previous duration
-play d 2:1:45 means play from previous start point for duration of 2h 1m 45s.
-play next or play n means play the next 5 seconds of video
-```
-
-The seconds field in the time syntax supports up to 5 sig figs. That means `1:23:45.678` is OK but `45.6789` is not.
-
-You can print any existing subtitles which will be displayed at the current position.
-```
-printsubs
-1
-00:00:01,000 --> 00:00:05,000
-test
-```
-
-You can add subtitles which will show up at the same start and end time you set using `play`.
-Note that the opened player may play a few seconds before your selected time, but your subtitles
-should show up precisely at the selected time.
-
-```
-add
-Enter the subtitles, multiple lines allowed. A blank line (enter) represents end of input.
-Use /play to replay the video, /cancel to discard all input. Or, add blank line (enter) immediately to exit out of this mode.
-Hello this is a
-test using two lines of subtitles
-
-Enter next command:
-printsubs
-1
-00:00:00,000 --> 00:00:05,000
-Hello this is a
-test using two lines of subtitles
-
-2
-00:00:01,000 --> 00:00:05,000
-test
-```
-
-While adding subtitles, you can enter a single line containing `/play` to replay the current position, or
-`/cancel` to discard the input. Entering an empty line (pressing enter) will commit the input.
-UTF-8 encoded input is supported.
-
-Subtitle position can be set using `add position {position}` or shortform `add p {position}`. The possible values for position are
-```
-top-left    top-center    top-right
-middle-left middle-center middle-right
-bottom-left bottom-center bottom-right
-```
-Or in short form:
-```
-tl tc tr
-ml mc mr
-bl bc br
-```
-
-Ex:
-```
-add p tc
-Enter the subtitles, multiple lines allowed. A blank line (enter) represents end of input.
-Use /play to replay the video, /cancel to discard all input. Or, add blank line (enter) immediately to exit out of this mode.
-top of the world
-
-```
-Will cause text `top of the world` to show up in the top-center of the video.
-
-There are a number of remaning commands available. This includes, but not limited to
-`delete`-ing existing subtitles, `edit`-ing previously committed subtitles, `save` and `quit`. Again use command `help` to see overview of all these commands. More examples are also available from [reading the unit tests](https://github.com/Novacer/SubTite-add-subtitles-to-videos/blob/master/subtitler/cli/commands_test.cpp).
-
+### Auto Transcription (Windows only for now)
+1. Create a free [Microsoft Azure Account](https://azure.microsoft.com/en-us/free/cognitive-services/) (although it is free, they will require a credit card).
+2. Create a [free speech resource](https://ms.portal.azure.com/#create/Microsoft.CognitiveServicesSpeechServices) in the Azure portal. Make sure to pick the free (F0) pricing tier! As of time of writing, this should give you 5 hours of free subtitle transcription per month.
+3. Now you should have 2 API keys under "Keys and Endpoint" on the Azure portal. Copy one of them.
+4. In subtite, select `Subtitle > Auto Transcribe`. Copy in your keys and also the Region of your speech instance. (For example, westus)
+5. Enter a password to remember this information for next time. The password is used to encrypt the API keys to store on your local disk, and it is never passed anywhere else except to the Microsoft servers.
+6. Choose the output location where the auto-transcribed subtitles will be saved.
+7. Wait for your audio to be processed for auto-transcription!
 
 ## Building from source
 SubTite uses bazel as the main build system. Setup bazel on your environment following this link: https://docs.bazel.build/versions/main/install.html.
@@ -169,7 +65,13 @@ Building the GUI requires QT 5 to be installed on your machine. On windows speci
 C:\Qt\5.15.2\msvc2019_64\... etc
 ```
 
-Then SubTite can be built with
+We also require the Microsoft Speech Services SDK to be installed. You may install it following the
+[microsoft documentation](https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/quickstarts/setup-platform?tabs=windows%2Cubuntu%2Cdotnet%2Cjre%2Cmaven%2Cnodejs%2Cmac%2Cpypi&pivots=programming-language-cpp). We expect the SDK to be installed at a path similar to
+```
+C:\\Program Files\\PackageManagement\\NuGet\\Packages\\Microsoft.CognitiveServices.Speech.1.22.0
+```
+
+Assuming you have the same paths as above, subtite can be easily built with
 
 ```bash
 ./build_gui_dev.sh
@@ -185,6 +87,11 @@ First `bazel build --config=vs2019-prod //subtitler/gui:main`
 
 The binaries and dynamic libraries are contained in `bazel-bin/subtitler/gui/`. In order to have audio played in the integrated player on windows, you need to copy the QT audio plugins into this folder. In particular, you need to create the folder `bazel-bin/subtitler/gui/plugins`. Then, copy the audio folder from `C:\Qt\5.15.2\msvc2019_64\plugins\` into `bazel-bin/subtitler/gui/plugins`.
 
+Next, you need to copy the Microsoft Speech Service runtime dlls into `bazel-bin/subtitler/gui/`. For example, this is locationed somewhere like
+```
+C:/Program Files/PackageManagement/NuGet/Packages/Microsoft.CognitiveServices.Speech.1.22.0/runtimes/win-x64/native/
+```
+
 Finally, you want to copy ffmpeg.exe into `bazel-bin/subtitler/gui/`. When you ran bazel build, a copy of ffmpeg.exe is already downloaded to `bazel-subtitler/external/ffmpeg_windows/bin/ffmpeg.exe`. You may copy that or any other ffmpeg binary you obtain elsewhere.
 
 ### Linux
@@ -196,10 +103,10 @@ With bazel setup, here are some sample commands for building the CLI.
 $ bazel build --config=gcc-prod //subttiler/cli:cli    # Build CLI in release mode using GCC
 ```
 
-To compile the GUI, you will need to install QT5.
+To compile the GUI, you will need to install various dependencies. 
 
 ```bash
-sudo apt-get install -y qt5-default qttools5-dev-tools qtmultimedia5-dev libva-dev
+sudo apt-get install -y qt5-default qttools5-dev-tools qtmultimedia5-dev libva-dev libsodium-dev
 ```
 
 This should install QT 5 to one of the following locations.
@@ -314,3 +221,5 @@ SubTite is available under [The Prosperity Public License 3.0.0](https://prosper
 ### Other
 * [glog](https://github.com/google/glog/blob/master/COPYING)
 * [bazel rules qt](https://github.com/Novacer/bazel_rules_qt/blob/master/LICENSE)
+* [libsodium](https://github.com/jedisct1/libsodium/blob/master/LICENSE)
+* [MS Speech Service SDK](https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/)

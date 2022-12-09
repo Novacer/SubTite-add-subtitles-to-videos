@@ -272,8 +272,7 @@ void Ruler::paintEvent(QPaintEvent* event) {
     QFont font = painter.font();
     font.setPointSize(8);
     painter.setFont(font);
-    painter.setRenderHints(QPainter::TextAntialiasing |
-                           QPainter::HighQualityAntialiasing);
+    painter.setRenderHints(QPainter::TextAntialiasing | QPainter::Antialiasing);
 
     QRectF rulerRect = this->rect();
     // paint header background color

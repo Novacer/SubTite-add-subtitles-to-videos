@@ -93,7 +93,9 @@ jobs:
           shell: bash
 
         - name: Install QT 5
-          run: sudo apt-get install -y qt5-default
+          # Ubuntu 22 does not have qt5-default. 
+          # So have to manually install the deps
+          run: sudo apt-get install -y qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools
           shell: bash
         
         - name: Install QT Dev Tools

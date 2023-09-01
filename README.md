@@ -5,7 +5,7 @@
 **TLDR:** SubTite allows you to create subtitles using auto-transcription and edit them seamlessly in a video editor. The subtitles can be output as a separate SRT file, or combined with the video. Existing SRT files can be imported and edited effortlessly. The subtitles can be positioned in 9 different locations along the video. Support for trimming video, adding images, and other video editing features coming soon!
 
 ## GUI Demo
-![gui demo](https://user-images.githubusercontent.com/29148427/179058887-a6737181-8dcd-466a-9240-ebd78ff4f3e0.gif)
+![gif demo](https://github.com/Novacer/SubTite-add-subtitles-to-videos/assets/29148427/d2aa6976-aa3e-4a5f-abf6-0cbc05072a8e)
 
 
 ## Feature Overview (Current v1.0.1)

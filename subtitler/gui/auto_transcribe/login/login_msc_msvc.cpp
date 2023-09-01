@@ -55,6 +55,7 @@ LoginMicrosoftCognitiveServicesWindow::LoginMicrosoftCognitiveServicesWindow(
         // Login flow
         password_label_ = new QLabel{tr("Password: "), this};
         password_edit_ = new QLineEdit{this};
+        password_edit_->setEchoMode(QLineEdit::Password);
 
         setup_again_button_ = new QPushButton{tr("Setup Again"), this};
         submit_button_ = new QPushButton{tr("Submit"), this};
@@ -89,6 +90,7 @@ LoginMicrosoftCognitiveServicesWindow::LoginMicrosoftCognitiveServicesWindow(
 
         password_label_ = new QLabel{tr("Password: "), this};
         password_edit_ = new QLineEdit{this};
+        password_edit_->setEchoMode(QLineEdit::Password);
 
         submit_button_ = new QPushButton{tr("Submit"), this};
 

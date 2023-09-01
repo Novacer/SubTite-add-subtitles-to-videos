@@ -17,7 +17,7 @@ qt_cc_library(
     srcs = ["main_window.cpp"],
     hdrs = ["main_window.h"],
     copts = select({
-        "@bazel_tools//src/conditions:windows": ["/DQT_BUILD_QTAVPLAYER_LIB"],
+        "@platforms//os:windows": ["/DQT_BUILD_QTAVPLAYER_LIB"],
         "//conditions:default": ["-DQT_BUILD_QTAVPLAYER_LIB"],
     }),
     deps = [
@@ -36,10 +36,10 @@ qt_cc_library(
         "@qt//:qt_multimedia",
         "@qt//:qt_multimediawidgets",
     ] + select({
-        "@bazel_tools//src/conditions:windows": ["@qt_av_player_windows//:qt_av_player"],
+        "@platforms//os:windows": ["@qt_av_player_windows//:qt_av_player"],
         "//conditions:default": ["@qt_av_player_linux//:qt_av_player"],
     }) + select({
-        "@bazel_tools//src/conditions:windows": ["@ffmpeg_windows//:ffmpeg_libavformat"],
+        "@platforms//os:windows": ["@ffmpeg_windows//:ffmpeg_libavformat"],
         "//conditions:default": ["@ffmpeg_linux//:ffmpeg_libavformat"],
     }),
 )
@@ -48,7 +48,7 @@ cc_binary(
     name = "main",
     srcs = ["main.cpp"],
     copts = select({
-        "@bazel_tools//src/conditions:windows": ["/DQT_BUILD_QTAVPLAYER_LIB"],
+        "@platforms//os:windows": ["/DQT_BUILD_QTAVPLAYER_LIB"],
         "//conditions:default": ["-DQT_BUILD_QTAVPLAYER_LIB"],
     }),
     deps = [
@@ -58,7 +58,7 @@ cc_binary(
         "@qt//:qt_widgets",
         "@qt//:qt_network",
     ] + select({
-        "@bazel_tools//src/conditions:windows": ["@ffmpeg_windows//:ffmpeg_libavutil"],
+        "@platforms//os:windows": ["@ffmpeg_windows//:ffmpeg_libavutil"],
         "//conditions:default": ["@ffmpeg_linux//:ffmpeg_libavutil"],
     }),
 )

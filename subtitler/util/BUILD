@@ -24,7 +24,7 @@ cc_test(
 cc_library(
     name = "font_config",
     srcs = select({
-        "@bazel_tools//src/conditions:windows": ["font_config_msvc.cpp"],
+        "@platforms//os:windows": ["font_config_msvc.cpp"],
         "//conditions:default": ["font_config_gcc.cpp"],
     }),
     hdrs = ["font_config.h"],
@@ -54,7 +54,7 @@ cc_test(
 cc_library(
     name = "unicode",
     srcs = select({
-        "@bazel_tools//src/conditions:windows": ["unicode.cpp"],
+        "@platforms//os:windows": ["unicode.cpp"],
         "//conditions:default": [],
     }),
     hdrs = ["unicode.h"],

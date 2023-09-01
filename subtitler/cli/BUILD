@@ -3,7 +3,7 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 cc_binary(
     name = "cli",
     srcs = select({
-        "@bazel_tools//src/conditions:windows": ["main_msvc.cpp"],
+        "@platforms//os:windows": ["main_msvc.cpp"],
         "//conditions:default": ["main_gcc.cpp"],
     }),
     deps = [

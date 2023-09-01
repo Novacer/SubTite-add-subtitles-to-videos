@@ -7,7 +7,7 @@ cc_library(
     srcs = ["video_utils.cpp"],
     hdrs = ["video_utils.h"],
     deps = [] + select({
-        "@bazel_tools//src/conditions:windows": [
+        "@platforms//os:windows": [
             "@ffmpeg_windows//:ffmpeg_libavcodec",
             "@ffmpeg_windows//:ffmpeg_libavdevice",
             "@ffmpeg_windows//:ffmpeg_libavfilter",

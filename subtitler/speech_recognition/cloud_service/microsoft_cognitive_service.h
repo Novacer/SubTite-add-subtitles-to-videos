@@ -3,6 +3,7 @@
 
 #include <nlohmann/json.hpp>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "subtitler/speech_recognition/cloud_service/cloud_service_base.h"
@@ -17,8 +18,8 @@ namespace cloud_service {
  */
 class MicrosoftCognitiveService : public STTCloudServiceBase {
   public:
-    MicrosoftCognitiveService(const std::string& api_key,
-                              const std::string& api_region);
+    MicrosoftCognitiveService(std::string_view api_key,
+                              std::string_view api_region);
     virtual ~MicrosoftCognitiveService() = default;
 
   protected:

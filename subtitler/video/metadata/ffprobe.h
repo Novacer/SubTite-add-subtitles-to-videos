@@ -5,6 +5,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <vector>
 
 // Forward declaration
@@ -46,11 +47,11 @@ struct Metadata {
 
 class FFProbe {
   public:
-    FFProbe(const std::string &ffprobe_path,
+    FFProbe(std::string_view ffprobe_path,
             std::unique_ptr<subprocess::SubprocessExecutor> executor);
     ~FFProbe();
 
-    std::unique_ptr<Metadata> GetVideoMetadata(const std::string &video_path);
+    std::unique_ptr<Metadata> GetVideoMetadata(std::string_view video_path);
 
   private:
     std::string ffprobe_path_;

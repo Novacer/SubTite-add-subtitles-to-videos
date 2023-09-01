@@ -3,6 +3,7 @@
 #include <speechapi_cxx.h>
 
 #include <stdexcept>
+#include <string_view>
 
 namespace subtitler {
 namespace speech_recognition {
@@ -19,7 +20,7 @@ std::chrono::milliseconds ticksToMs(int64_t ticks) {
 }  // namespace
 
 MicrosoftCognitiveService::MicrosoftCognitiveService(
-    const std::string& api_key, const std::string& api_region)
+    const std::string_view api_key, const std::string_view api_region)
     : STTCloudServiceBase{}, api_key_{api_key}, api_region_{api_region} {
     if (api_key_.empty()) {
         throw std::invalid_argument{"API Key cannot be empty!"};

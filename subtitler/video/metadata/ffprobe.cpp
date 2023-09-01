@@ -3,6 +3,7 @@
 #include <nlohmann/json.hpp>
 #include <sstream>
 #include <stdexcept>
+#include <string_view>
 
 #include "subtitler/subprocess/subprocess_executor.h"
 
@@ -15,13 +16,14 @@ namespace metadata {
 namespace {
 
 std::chrono::milliseconds StringSecondsToMilliseconds(
-    const std::string &seconds) {
+    const std::string& seconds) {
     double to_double = std::stod(seconds);
     std::chrono::duration<double> d{to_double};
     return std::chrono::duration_cast<std::chrono::milliseconds>(d);
 }
 
-std::unique_ptr<Metadata> ParseVideoMetadata(const std::string &json_output) {
+std::unique_ptr<Metadata> ParseVideoMetadata(
+    const std::string_view json_output) {
     auto parsed = json::parse(json_output);
     if (!parsed.contains("streams")) {
         throw std::runtime_error("FFProbe could not read streams info");
@@ -76,7 +78,7 @@ std::unique_ptr<Metadata> ParseVideoMetadata(const std::string &json_output) {
 
 }  // namespace
 
-FFProbe::FFProbe(const std::string &ffprobe_path,
+FFProbe::FFProbe(const std::string_view ffprobe_path,
                  std::unique_ptr<subprocess::SubprocessExecutor> executor)
     : ffprobe_path_{ffprobe_path}, executor_{std::move(executor)} {
     if (ffprobe_path_.empty()) {
@@ -91,7 +93,7 @@ FFProbe::FFProbe(const std::string &ffprobe_path,
 FFProbe::~FFProbe() = default;
 
 std::unique_ptr<Metadata> FFProbe::GetVideoMetadata(
-    const std::string &video_path) {
+    const std::string_view video_path) {
     if (video_path.empty()) {
         throw std::invalid_argument("Video path is empty");
     }

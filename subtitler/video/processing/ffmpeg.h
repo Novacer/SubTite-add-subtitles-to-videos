@@ -5,6 +5,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <string_view>
 
 // Forward declaration
 namespace subtitler::subprocess {
@@ -29,7 +30,7 @@ namespace processing {
  */
 class FFMpeg {
   public:
-    FFMpeg(const std::string& ffmpeg_path,
+    FFMpeg(std::string_view ffmpeg_path,
            std::unique_ptr<subprocess::SubprocessExecutor> executor);
     ~FFMpeg();
 
@@ -47,8 +48,8 @@ class FFMpeg {
      * @param input_video_path the input mp4 file.
      * @param output_wav_path the wav file path to write the output.
      */
-    void ExtractUncompressedAudio(const std::string& input_video_path,
-                                  const std::string& output_wav_path);
+    void ExtractUncompressedAudio(std::string_view input_video_path,
+                                  std::string_view output_wav_path);
 
     /**
      * Starts async task to remux subtitles with video, writing to output.
@@ -64,8 +65,8 @@ class FFMpeg {
      * @param progress_callback The callback method to handle progress updates.
      */
     void RemuxSubtitlesAsync(
-        const std::string& video, const std::string& subtitles,
-        const std::string& output,
+        std::string_view video, std::string_view subtitles,
+        std::string_view output,
         std::function<void(const Progress&)> progress_callback);
 
     /**
@@ -82,8 +83,8 @@ class FFMpeg {
      * @param progress_callback The callback method to handle progress updates.
      */
     void BurnSubtitlesAsync(
-        const std::string& video, const std::string& subtitles,
-        const std::string& output,
+        std::string_view video, std::string_view subtitles,
+        std::string_view output,
         std::function<void(const Progress&)> progress_callback);
 
     /**

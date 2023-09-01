@@ -96,7 +96,7 @@ SubprocessExecutor::SubprocessExecutor()
       callback_{},
       fields{std::make_unique<PlatformDependentFields>()} {}
 
-SubprocessExecutor::SubprocessExecutor(const std::string &command,
+SubprocessExecutor::SubprocessExecutor(const std::string_view command,
                                        bool capture_output)
     : command_{command},
       capture_output_{capture_output},
@@ -124,7 +124,7 @@ SubprocessExecutor::~SubprocessExecutor() {
     }
 }
 
-void SubprocessExecutor::SetCommand(const std::string &command) {
+void SubprocessExecutor::SetCommand(const std::string_view command) {
     command_ = command;
 }
 

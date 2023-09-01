@@ -5,6 +5,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <string_view>
 
 namespace subtitler {
 namespace subprocess {
@@ -26,11 +27,11 @@ namespace subprocess {
 class SubprocessExecutor {
   public:
     SubprocessExecutor();
-    SubprocessExecutor(const std::string &command, bool capture_output);
+    SubprocessExecutor(std::string_view command, bool capture_output);
     virtual ~SubprocessExecutor();
 
     // Sets the command to be used upon Start().
-    virtual void SetCommand(const std::string &command);
+    virtual void SetCommand(std::string_view command);
 
     // Sets the callback to be called as repeatedly as data is read from stdout.
     // Allows live processing of stdout.

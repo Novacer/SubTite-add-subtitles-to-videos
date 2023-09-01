@@ -7,6 +7,7 @@
 ## GUI Demo
 ![gif demo](https://github.com/Novacer/SubTite-add-subtitles-to-videos/assets/29148427/d2aa6976-aa3e-4a5f-abf6-0cbc05072a8e)
 
+
 ## Feature Overview (Current v1.0.1)
 * Supports Windows and Linux
 * GUI + CLI for adding subtitles

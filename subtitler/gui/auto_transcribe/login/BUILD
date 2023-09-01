@@ -5,7 +5,7 @@ package(default_visibility = ["//subtitler/gui:__subpackages__"])
 qt_cc_library(
     name = "login_msc",
     srcs = select({
-        "@bazel_tools//src/conditions:windows": ["login_msc_msvc.cpp"],
+        "@platforms//os:windows": ["login_msc_msvc.cpp"],
         "//conditions:default": ["login_msc_gcc.cpp"],
     }),
     hdrs = [

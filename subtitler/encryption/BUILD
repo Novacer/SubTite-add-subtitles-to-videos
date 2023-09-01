@@ -7,11 +7,11 @@ cc_library(
     srcs = ["file_encryption.cpp"],
     hdrs = ["file_encryption.h"],
     linkopts = select({
-        "@bazel_tools//src/conditions:windows": [""],
+        "@platforms//os:windows": [""],
         "//conditions:default": ["-lsodium"],
     }),
     deps = select({
-        "@bazel_tools//src/conditions:windows": ["@libsodium_windows//:libsodium"],
+        "@platforms//os:windows": ["@libsodium_windows//:libsodium"],
         "//conditions:default": [],
     }),
 )

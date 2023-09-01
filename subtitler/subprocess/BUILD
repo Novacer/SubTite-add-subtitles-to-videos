@@ -5,7 +5,7 @@ package(default_visibility = ["//subtitler:__subpackages__"])
 cc_library(
     name = "subprocess_executor",
     srcs = select({
-        "@bazel_tools//src/conditions:windows": ["subprocess_executor_msvc.cpp"],
+        "@platforms//os:windows": ["subprocess_executor_msvc.cpp"],
         "//conditions:default": ["subprocess_executor_gcc.cpp"],
     }),
     hdrs = ["subprocess_executor.h"],
@@ -18,7 +18,7 @@ cc_test(
     name = "subprocess_executor_test",
     timeout = "short",
     srcs = select({
-        "@bazel_tools//src/conditions:windows": ["subprocess_executor_msvc_test.cpp"],
+        "@platforms//os:windows": ["subprocess_executor_msvc_test.cpp"],
         "//conditions:default": ["subprocess_executor_gcc_test.cpp"],
     }),
     deps = [

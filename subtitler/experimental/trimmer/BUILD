@@ -3,7 +3,7 @@ load("@rules_cc//cc:defs.bzl", "cc_binary")
 cc_binary(
     name = "trimmer",
     srcs = select({
-        "@bazel_tools//src/conditions:windows": ["trimmer_msvc.cpp"],
+        "@platforms//os:windows": ["trimmer_msvc.cpp"],
         "//conditions:default": ["trimmer_gcc.cpp"],
     }),
     deps = [

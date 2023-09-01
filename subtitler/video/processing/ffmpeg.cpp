@@ -15,7 +15,7 @@ namespace subtitler {
 namespace video {
 namespace processing {
 
-FFMpeg::FFMpeg(const std::string& ffmpeg_path,
+FFMpeg::FFMpeg(const std::string_view ffmpeg_path,
                std::unique_ptr<subprocess::SubprocessExecutor> executor)
     : ffmpeg_path_{ffmpeg_path},
       executor_{std::move(executor)},
@@ -53,8 +53,8 @@ std::string FFMpeg::GetVersionInfo() {
     return output.subproc_stdout;
 }
 
-void FFMpeg::ExtractUncompressedAudio(const std::string& input_video_path,
-                                      const std::string& output_wav_path) {
+void FFMpeg::ExtractUncompressedAudio(const std::string_view input_video_path,
+                                      const std::string_view output_wav_path) {
     throwIfRunning();
 
     std::ostringstream stream;
@@ -76,8 +76,8 @@ void FFMpeg::ExtractUncompressedAudio(const std::string& input_video_path,
 }
 
 void FFMpeg::RemuxSubtitlesAsync(
-    const std::string& video, const std::string& subtitles,
-    const std::string& output,
+    const std::string_view video, const std::string_view subtitles,
+    const std::string_view output,
     std::function<void(const Progress&)> progress_callback) {
     throwIfRunning();
 
@@ -105,8 +105,8 @@ void FFMpeg::RemuxSubtitlesAsync(
 }
 
 void FFMpeg::BurnSubtitlesAsync(
-    const std::string& video, const std::string& subtitles,
-    const std::string& output,
+    const std::string_view video, const std::string_view subtitles,
+    const std::string_view output,
     std::function<void(const Progress&)> progress_callback) {
     throwIfRunning();
 

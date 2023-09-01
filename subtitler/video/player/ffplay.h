@@ -6,6 +6,7 @@
 #include <optional>
 #include <string>
 #include <vector>
+#include <string_view>
 
 // Forward declaration
 namespace subtitler::subprocess {
@@ -30,12 +31,12 @@ namespace player {
  */
 class FFPlay {
   public:
-    FFPlay(const std::string& ffplay_path,
+    FFPlay(std::string_view,
            std::unique_ptr<subprocess::SubprocessExecutor> executor);
     ~FFPlay();
 
     // Opens a video player in a separate process. Does not block.
-    void OpenPlayer(const std::string& video_path);
+    void OpenPlayer(std::string_view video_path);
 
     // Close the video player. Returns any output caught from stderr.
     // Video will be allowed to play for at most timeout_ms before it is closed.

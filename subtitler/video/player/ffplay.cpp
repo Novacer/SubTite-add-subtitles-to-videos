@@ -23,7 +23,7 @@ std::string FormatChrono(const std::chrono::milliseconds &chrono) {
 
 }  // namespace
 
-FFPlay::FFPlay(const std::string &ffplay_path,
+FFPlay::FFPlay(const std::string_view ffplay_path,
                std::unique_ptr<subprocess::SubprocessExecutor> executor)
     : ffplay_path_{ffplay_path},
       executor_{std::move(executor)},
@@ -116,7 +116,7 @@ std::vector<std::string> FFPlay::BuildArgs() {
     return args;
 }
 
-void FFPlay::OpenPlayer(const std::string &video_path) {
+void FFPlay::OpenPlayer(const std::string_view video_path) {
     if (video_path.empty()) {
         throw std::invalid_argument("Cannot play empty video path!");
     }

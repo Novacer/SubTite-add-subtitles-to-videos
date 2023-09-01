@@ -1,5 +1,7 @@
 #include "subtitler/video/util/video_utils.h"
 
+#include <string_view>
+
 extern "C" {
 #include <libavformat/avformat.h>
 }
@@ -10,7 +12,7 @@ namespace subtitler {
 namespace video {
 namespace util {
 
-std::string FixPathForFilters(const std::string &path) {
+std::string FixPathForFilters(const std::string_view path) {
     std::ostringstream output;
     for (const auto &c : path) {
         if (c == '\\') {

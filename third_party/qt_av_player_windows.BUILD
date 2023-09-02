@@ -24,7 +24,6 @@ qt_cc_library(
     copts = [
         "/DQT_BUILD_QTAVPLAYER_LIB",
         "/DQT_AVPLAYER_MULTIMEDIA",
-
     ],
     strip_include_prefix = "src/",
     target_compatible_with = ["@platforms//os:windows"],

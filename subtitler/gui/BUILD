@@ -17,8 +17,14 @@ qt_cc_library(
     srcs = ["main_window.cpp"],
     hdrs = ["main_window.h"],
     copts = select({
-        "@platforms//os:windows": ["/DQT_BUILD_QTAVPLAYER_LIB"],
-        "//conditions:default": ["-DQT_BUILD_QTAVPLAYER_LIB"],
+        "@platforms//os:windows": [
+            "/DQT_BUILD_QTAVPLAYER_LIB",
+            "/DQT_AVPLAYER_MULTIMEDIA",
+        ],
+        "//conditions:default": [
+            "-DQT_BUILD_QTAVPLAYER_LIB",
+            "-DQT_AVPLAYER_MULTIMEDIA",
+        ],
     }),
     deps = [
         ":settings_window",
@@ -48,8 +54,14 @@ cc_binary(
     name = "main",
     srcs = ["main.cpp"],
     copts = select({
-        "@platforms//os:windows": ["/DQT_BUILD_QTAVPLAYER_LIB"],
-        "//conditions:default": ["-DQT_BUILD_QTAVPLAYER_LIB"],
+        "@platforms//os:windows": [
+            "/DQT_BUILD_QTAVPLAYER_LIB",
+            "/DQT_AVPLAYER_MULTIMEDIA",
+        ],
+        "//conditions:default": [
+            "-DQT_BUILD_QTAVPLAYER_LIB",
+            "-DQT_AVPLAYER_MULTIMEDIA",
+        ],
     }),
     deps = [
         ":main_window",

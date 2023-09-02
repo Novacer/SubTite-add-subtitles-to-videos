@@ -8,6 +8,7 @@ LINUX_EXCLUDE_LIST = [
     "**/qavhwdevice_mediacodec*",
     "**/qavhwdevice_videotoolbox*",
     "**/qavhwdevice_vdpau*",
+    "**/qavandroidsurfacetexture*",
 ]
 
 qt_cc_library(
@@ -22,6 +23,7 @@ qt_cc_library(
     ),
     copts = [
         "-DQT_BUILD_QTAVPLAYER_LIB",
+        "-DQT_AVPLAYER_MULTIMEDIA",
     ],
     linkopts = [
         "-lGL",

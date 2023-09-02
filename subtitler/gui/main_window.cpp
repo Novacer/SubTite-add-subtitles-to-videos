@@ -216,7 +216,9 @@ void MainWindow::onSubtitleFileChanged(std::size_t num_loaded) {
     }
     QString escaped_path = subtitle_file_;
     escaped_path.replace(":", "\\:");
-    player_->setFilter("subtitles='" + escaped_path + "'");
+
+    QList<QString> filters{"subtitles='" + escaped_path + "'", "acopy"};
+    player_->setFilters(std::move(filters));
 }
 
 void MainWindow::onExport(bool checked) {

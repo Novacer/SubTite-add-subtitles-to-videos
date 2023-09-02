@@ -8,6 +8,7 @@ LINUX_EXCLUDE_LIST = [
     "**/qavhwdevice_mediacodec*",
     "**/qavhwdevice_videotoolbox*",
     "**/qavhwdevice_vdpau*",
+    "**/qavandroidsurfacetexture*",
 ]
 
 qt_cc_library(

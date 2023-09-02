@@ -5,8 +5,7 @@
 **TLDR:** SubTite allows you to create subtitles using auto-transcription and edit them seamlessly in a video editor. The subtitles can be output as a separate SRT file, or combined with the video. Existing SRT files can be imported and edited effortlessly. The subtitles can be positioned in 9 different locations along the video. Support for trimming video, adding images, and other video editing features coming soon!
 
 ## GUI Demo
-![gif demo](https://github.com/Novacer/SubTite-add-subtitles-to-videos/assets/29148427/d2aa6976-aa3e-4a5f-abf6-0cbc05072a8e)
-
+![gif demo](https://github.com/Novacer/SubTite-add-subtitles-to-videos/assets/29148427/c2afaac0-5111-4f7e-ad38-69b7f9757ad3)
 
 ## Feature Overview (Current v1.0.1)
 * Supports Windows and Linux
@@ -106,7 +105,9 @@ $ bazel build --config=gcc-prod //subttiler/cli:cli    # Build CLI in release mo
 To compile the GUI, you will need to install various dependencies. 
 
 ```bash
-sudo apt-get install -y qt5-default qttools5-dev-tools qtmultimedia5-dev libva-dev libsodium-dev
+sudo apt-get install -y qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools \
+  qtmultimedia5-dev qttools5-dev-tools \
+  libva-dev libsodium-dev
 ```
 
 This should install QT 5 to one of the following locations.
@@ -120,7 +121,7 @@ or
 Now SubTite can be built all from one command:
 
 ```bash
-./build_gui_dev.sh
+bazel clean --expunge && ./build_gui_dev.sh
 ```
 It is recommended to use the build script instead of compiling manually, since the build script ensures the correct runtime dependencies are copied to the right places. If the script doesn't work for you, here's how to compile manually.
 

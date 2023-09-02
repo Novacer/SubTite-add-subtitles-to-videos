@@ -81,7 +81,7 @@ http_archive(
 http_archive(
     name = "qt_av_player_windows",
     build_file = "//third_party:qt_av_player_windows.BUILD",
-    sha256 = "081a991b20049d908664d0cf081c5f994d28256f33a89b12243bf5c3befaf858",
+    sha256 = "b92af312493bd54de86bfdd968e914ff3c1c5621aa16406eae8addbb87f55f5d",
     strip_prefix = "QtAVPlayer-master",
     urls = ["https://github.com/Novacer/QtAVPlayer/archive/refs/heads/master.zip"],
 )
@@ -89,7 +89,7 @@ http_archive(
 http_archive(
     name = "qt_av_player_linux",
     build_file = "//third_party:qt_av_player_linux.BUILD",
-    sha256 = "081a991b20049d908664d0cf081c5f994d28256f33a89b12243bf5c3befaf858",
+    sha256 = "b92af312493bd54de86bfdd968e914ff3c1c5621aa16406eae8addbb87f55f5d",
     strip_prefix = "QtAVPlayer-master",
     urls = ["https://github.com/Novacer/QtAVPlayer/archive/refs/heads/master.zip"],
 )

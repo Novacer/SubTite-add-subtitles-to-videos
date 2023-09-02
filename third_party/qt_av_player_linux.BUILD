@@ -22,6 +22,7 @@ qt_cc_library(
     ),
     copts = [
         "-DQT_BUILD_QTAVPLAYER_LIB",
+        "-DQT_AVPLAYER_MULTIMEDIA",
     ],
     linkopts = [
         "-lGL",

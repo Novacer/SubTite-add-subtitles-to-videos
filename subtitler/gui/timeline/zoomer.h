@@ -19,7 +19,7 @@ class Zoomer : public QWidget {
     Zoomer(QWidget* parent, std::chrono::milliseconds duration);
     ~Zoomer() = default;
 
-    int GetMaxZoomLevel() const { return max_zoom_level_; };
+    int GetCurrentZoomLevel() const { return current_level_; }
 
   signals:
     void zoomIn(int level);

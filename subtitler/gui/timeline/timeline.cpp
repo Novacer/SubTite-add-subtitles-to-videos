@@ -14,7 +14,7 @@ namespace timeline {
 Timeline::Timeline(std::chrono::milliseconds duration,
                    const QString& output_srt_file, QWidget* parent)
     : QScrollArea(parent) {
-    setMinimumSize(1280, 150);
+    setMinimumSize(1280, 300);
 
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
@@ -22,8 +22,8 @@ Timeline::Timeline(std::chrono::milliseconds duration,
     zoomer_->setMinimumWidth(300);
     addScrollBarWidget(zoomer_, Qt::AlignLeft);
 
-    ruler_ =
-        new Ruler(this, duration, output_srt_file, zoomer_->GetMaxZoomLevel());
+    ruler_ = new Ruler(this, duration, output_srt_file,
+                       zoomer_->GetCurrentZoomLevel());
     setWidget(ruler_);
 
     connect(zoomer_, &Zoomer::zoomIn, ruler_, &Ruler::onZoomIn);

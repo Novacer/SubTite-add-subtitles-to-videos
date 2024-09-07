@@ -7,34 +7,11 @@ namespace subtitler {
 namespace gui {
 namespace video_renderer {
 
-OpenGLRenderer::OpenGLRenderer(QWidget *parent) : QOpenGLWidget(parent) {}
+OpenGLRenderer::OpenGLRenderer(QWidget *parent)
+    : QOpenGLWidget(parent), img_{} {}
 
-// Reference
-// https://github.com/qt/qtmultimedia/blob/5.12.2/src/multimedia/video/qvideoframe.cpp#L1094
 void OpenGLRenderer::displayFrame(const QVideoFrame &orig_frame) {
-    // Since calling QVideoFrame::map is not const,
-    // we remove the const here. I know it's hacky, but the alternative
-    // is to copy the entire frame which is worse on performance.
-    QVideoFrame &frame = const_cast<QVideoFrame &>(orig_frame);
-    if (!frame.isValid() || !frame.map(QAbstractVideoBuffer::ReadOnly)) {
-        return;
-    }
-    QImage::Format imageFormat =
-        QVideoFrame::imageFormatFromPixelFormat(frame.pixelFormat());
-
-    if (imageFormat != QImage::Format_Invalid) {
-        img_ = QImage{frame.bits(), frame.width(), frame.height(),
-                      frame.bytesPerLine(), imageFormat}
-                   .copy();
-    } else if (frame.pixelFormat() == QVideoFrame::Format_Jpeg) {
-        img_.loadFromData(frame.bits(), frame.mappedBytes(), "JPG");
-    } else {
-        frame.unmap();
-        throw std::runtime_error{
-            "Cannot handle this format without more help from Qt internals"};
-    }
-
-    frame.unmap();
+    img_ = orig_frame.image();
     update();
 }
 
@@ -42,7 +19,7 @@ void OpenGLRenderer::displayFrame(const QVideoFrame &orig_frame) {
  * Given a rectangle with of width and height, return a smaller rectangle which
  * has the same aspect ratio as the image. The returned rectangle will be
  * centered within the outside one.
- * 
+ *
  * @param width the width of the outside rectangle.
  * @param height the height of the outside rectangle.
  * @return QRect the centered rectangle with the same aspect ratio as the image.
@@ -66,8 +43,9 @@ QRect OpenGLRenderer::centeredViewport(int width, int height) {
 void OpenGLRenderer::paintEvent(QPaintEvent *) {
     QPainter p(this);
     p.setViewport(centeredViewport(width(), height()));
-    // Set the painter to use a smooth scaling algorithm.
-    p.setRenderHint(QPainter::SmoothPixmapTransform, 1);
+    // Disable scaling (mostly to help with performance).
+    p.setRenderHint(QPainter::Antialiasing, false);
+    p.setRenderHint(QPainter::SmoothPixmapTransform, false);
     p.drawImage(QRect(QPoint(0, 0), size()), img_);
 }
 

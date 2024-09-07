@@ -38,6 +38,7 @@ qt_cc_library(
         "//subtitler/gui/timeline:timeline_window",
         "//subtitler/gui/video_renderer:opengl_renderer",
         "//subtitler/video/util:video_utils",
+        "//subtitler/video/processing:downscaling",
         "@qt//:qt_widgets",
         "@qt//:qt_multimedia",
         "@qt//:qt_multimediawidgets",

@@ -13,6 +13,7 @@
 #include <QMenuBar>
 #include <QVBoxLayout>
 #include <chrono>
+#include <optional>
 #include <stdexcept>
 
 #include "subtitler/gui/auto_transcribe/auto_transcribe_window.h"
@@ -25,6 +26,7 @@
 #include "subtitler/gui/timeline/timeline.h"
 #include "subtitler/gui/timeline/timer.h"
 #include "subtitler/gui/video_renderer/opengl_renderer.h"
+#include "subtitler/video/processing/downscaling.h"
 #include "subtitler/video/util/video_utils.h"
 
 namespace subtitler {
@@ -196,8 +198,8 @@ void MainWindow::onVideoFrameDecoded(const QAVVideoFrame &video_frame) {
     if (video_renderer_ == nullptr) {
         return;
     }
-    QVideoFrame videoFrame = video_frame.convertTo(AV_PIX_FMT_RGB32);
-    video_renderer_->displayFrame(videoFrame);
+    QVideoFrame rgb_video_frame = video_frame.convertTo(AV_PIX_FMT_RGB32);
+    video_renderer_->displayFrame(rgb_video_frame);
 
     std::chrono::milliseconds ms{(quint64)(video_frame.pts() * 1000)};
     if (!user_seeked_) {
@@ -206,6 +208,25 @@ void MainWindow::onVideoFrameDecoded(const QAVVideoFrame &video_frame) {
         emit this->playerChangedTime(ms);
     } else {
         user_seeked_ = false;
+    }
+
+    // This is the first decoded frame.
+    if (!downscale_filter_.has_value()) {
+        struct video::processing::InputVideoScalingInfo input_scaling_info {
+            rgb_video_frame.height(), rgb_video_frame.width(),
+                /*fps=*/1 / player_->videoFrameRate()
+        };
+        qDebug() << "Video height:" << input_scaling_info.height
+                 << "width:" << input_scaling_info.width
+                 << "fps:" << input_scaling_info.fps;
+
+        downscale_filter_ = QString::fromStdString(
+            video::processing::GetFFMpegScaleFilterRecommendation(
+                input_scaling_info));
+        if (!downscale_filter_->isEmpty()) {
+            QList<QString> filters{*downscale_filter_, "acopy"};
+            player_->setFilters(std::move(filters));
+        }
     }
 }
 
@@ -217,7 +238,15 @@ void MainWindow::onSubtitleFileChanged(std::size_t num_loaded) {
     QString escaped_path = subtitle_file_;
     escaped_path.replace(":", "\\:");
 
-    QList<QString> filters{"subtitles='" + escaped_path + "'", "acopy"};
+    QString video_filter;
+    if (downscale_filter_.has_value() && !downscale_filter_->isEmpty()) {
+        video_filter =
+            QString("%1,subtitles='%2'").arg(*downscale_filter_, escaped_path);
+    } else {
+        video_filter = QString("subtitles='%1'").arg(escaped_path);
+    }
+
+    QList<QString> filters{std::move(video_filter), "acopy"};
     player_->setFilters(std::move(filters));
 }
 

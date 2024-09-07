@@ -2,13 +2,13 @@ load("@rules_cc//cc:defs.bzl", "cc_import", "cc_library")
 
 FFMPEG_LIBRARIES = [
     # name, library (.lib) name, dll name, deps
-    ("libavutil", "avutil", "avutil-56", []),
-    ("libswscale", "swscale", "swscale-5", []),
-    ("libswresample", "swresample", "swresample-3", []),
-    ("libavcodec", "avcodec", "avcodec-58", []),
-    ("libavformat", "avformat", "avformat-58", []),
-    ("libavdevice", "avdevice", "avdevice-58", []),
-    ("libavfilter", "avfilter", "avfilter-7", []),
+    ("libavutil", "avutil", "avutil-58", []),
+    ("libswscale", "swscale", "swscale-7", []),
+    ("libswresample", "swresample", "swresample-4", []),
+    ("libavcodec", "avcodec", "avcodec-60", []),
+    ("libavformat", "avformat", "avformat-60", []),
+    ("libavdevice", "avdevice", "avdevice-60", []),
+    ("libavfilter", "avfilter", "avfilter-9", []),
 ]
 
 [

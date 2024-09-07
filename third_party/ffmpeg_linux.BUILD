@@ -8,13 +8,13 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 # If cc_import instead gets libavutil.so.56 then bazel uses the correct lib.
 FFMPEG_LIBRARIES = [
     # name, soname (libavutil.so.56 etc), deps
-    ("libavutil", "libavutil.so.56", []),
-    ("libswscale", "libswscale.so.5", []),
-    ("libswresample", "libswresample.so.3", []),
-    ("libavcodec", "libavcodec.so.58", []),
-    ("libavformat", "libavformat.so.58", []),
-    ("libavdevice", "libavdevice.so.58", []),
-    ("libavfilter", "libavfilter.so.7", []),
+    ("libavutil", "libavutil.so.58", []),
+    ("libswscale", "libswscale.so.7", []),
+    ("libswresample", "libswresample.so.4", []),
+    ("libavcodec", "libavcodec.so.60", []),
+    ("libavformat", "libavformat.so.60", []),
+    ("libavdevice", "libavdevice.so.60", []),
+    ("libavfilter", "libavfilter.so.9", []),
 ]
 
 [

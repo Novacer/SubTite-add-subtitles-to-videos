@@ -5,9 +5,9 @@
 #include <functional>
 #include <memory>
 #include <sstream>
+#include <string_view>
 #include <unordered_map>
 #include <vector>
-#include <string_view>
 
 namespace subtitler {
 namespace srt {
@@ -68,7 +68,11 @@ class SubRipFile {
 
   private:
     // SRT items should be ordered by start time to allow for overlapping
-    // subtitles.
+    // subtitles. A shared_ptr is used because the subtitle state is shared with
+    // SubtitleInterval and SubtitleEditor. For example, it is possible for a
+    // SubRipFile to be deleted but the subtitle is still being referenced in an
+    // open editor. Thus, we use reference counting to ensure that subtitles
+    // always have valid lifetimes.
     std::vector<std::shared_ptr<SubRipItem>> items_;
 
     // Find all intervals with non-empty intersection with [start, start +

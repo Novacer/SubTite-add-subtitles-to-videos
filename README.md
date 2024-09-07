@@ -7,7 +7,7 @@
 ## GUI Demo
 ![gif demo](https://github.com/Novacer/SubTite-add-subtitles-to-videos/assets/29148427/c2afaac0-5111-4f7e-ad38-69b7f9757ad3)
 
-## Feature Overview (Current v1.0.1)
+## Feature Overview (Current v1.0.4)
 * Supports Windows and Linux
 * GUI + CLI for adding subtitles
 * Subtitle Auto-transcription through MS Cognitive Services (windows only for now)
@@ -198,6 +198,7 @@ $ bazel build --config=vs2019 //subtitler/experimental/sub_burner:sub_burner
 * Support for subtitles of various fonts and colours
 * Support simple video editing, such as cropping/trimming
 * Support adding static images on top of the video between certain timestamps.
+* Support for displaying audio waveforms along the timeline (similar to Audacity etc).
 
 # Licensing
 SubTite is available under [The Prosperity Public License 3.0.0](https://prosperitylicense.com/versions/3.0.0)

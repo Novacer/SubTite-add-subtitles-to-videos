@@ -40,3 +40,20 @@ cc_test(
         "@com_google_googletest//:gtest_main",
     ],
 )
+
+cc_library(
+    name = "downscaling",
+    srcs = ["downscaling.cpp"],
+    hdrs = ["downscaling.h"],
+    deps = [],
+)
+
+cc_test(
+    name = "downscaling_test",
+    size = "small",
+    srcs = ["downscaling_test.cpp"],
+    deps = [
+        ":downscaling",
+        "@com_google_googletest//:gtest_main",
+    ],
+)

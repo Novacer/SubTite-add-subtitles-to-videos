@@ -12,6 +12,7 @@ OpenGLRenderer::OpenGLRenderer(QWidget *parent)
     : QOpenGLWidget(parent), img_{} {}
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
+// Implementation for older platforms that don't support QVideoFrame::image().
 // Reference
 // https://github.com/qt/qtmultimedia/blob/5.12.2/src/multimedia/video/qvideoframe.cpp#L1094
 void OpenGLRenderer::displayFrame(const QVideoFrame &orig_frame) {

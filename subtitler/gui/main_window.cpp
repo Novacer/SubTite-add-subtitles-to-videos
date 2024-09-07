@@ -36,7 +36,7 @@ MainWindow::~MainWindow() = default;
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     setWindowTitle("SubTite");
-    setMinimumSize(1280, 500);
+    setMinimumSize(1280, 720);
     QWidget *placeholder = new QWidget{this};
     QVBoxLayout *layout = new QVBoxLayout(placeholder);
 
@@ -71,7 +71,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     player_ = std::make_unique<QAVPlayer>();
     player_->setSource(video_file_->fileName(), video_file_.get());
 
-    QWidget *player_controls_placeholder = new QWidget{this};
+    QWidget *interactive_elements_placeholder = new QWidget{this};
+    QWidget *player_controls_placeholder =
+        new QWidget{interactive_elements_placeholder};
     QHBoxLayout *player_controls_layout =
         new QHBoxLayout{player_controls_placeholder};
 
@@ -86,20 +88,25 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     player_controls_layout->addWidget(play_button);
     player_controls_layout->addWidget(step_forwards);
 
-    timeline::Timer *timer = new timeline::Timer{placeholder};
+    timeline::Timer *timer =
+        new timeline::Timer{interactive_elements_placeholder};
 
     auto duration_us =
         video::util::GetVideoDuration(video_file_->fileName().toStdString());
 
     std::chrono::milliseconds duration =
         std::chrono::duration_cast<std::chrono::milliseconds>(duration_us);
-    timeline::Timeline *timeline =
-        new timeline::Timeline{duration, subtitle_file_, placeholder};
+    timeline::Timeline *timeline = new timeline::Timeline{
+        duration, subtitle_file_, interactive_elements_placeholder};
+
+    QVBoxLayout *interactive_elements_layout =
+        new QVBoxLayout{interactive_elements_placeholder};
+    interactive_elements_layout->addWidget(player_controls_placeholder);
+    interactive_elements_layout->addWidget(timer);
+    interactive_elements_layout->addWidget(timeline);
 
     layout->addWidget(video_renderer_, 60);
-    layout->addWidget(player_controls_placeholder);
-    layout->addWidget(timer);
-    layout->addWidget(timeline);
+    layout->addWidget(interactive_elements_placeholder, 40, Qt::AlignBottom);
 
     setCentralWidget(placeholder);
 

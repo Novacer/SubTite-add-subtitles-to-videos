@@ -14,7 +14,7 @@
 #include "subtitler/util/duration_format.h"
 
 #define HEADER_HEIGHT 40
-#define BODY_HEIGHT 80
+#define BODY_HEIGHT 200
 #define START_END_PADDING 60
 #define CUT_MARKER_WIDTH 10
 #define TIME_LABEL_OFFSET 10
@@ -60,7 +60,7 @@ Ruler::Ruler(QWidget* parent, std::chrono::milliseconds duration,
     connect(add_subtitle_before_, &QAction::triggered, this,
             &Ruler::onAddSubtitleIntervalBefore);
 
-    resize(rect_width_ + START_END_PADDING, 120);
+    resize(rect_width_ + START_END_PADDING, 220);
 }
 
 Ruler::~Ruler() = default;
@@ -77,7 +77,8 @@ int Ruler::millisecondsToPosition(const std::chrono::milliseconds& ms) {
 
 void Ruler::resetChildren(std::chrono::milliseconds duration) {
     duration_ = duration;
-
+    zoom_level_ = 1;
+    interval_width_ = 130;
     rect_width_ = duration_.count() * interval_width_ / msPerInterval();
     indicator_->move(0, 0);
 
@@ -88,7 +89,7 @@ void Ruler::resetChildren(std::chrono::milliseconds duration) {
 
 void Ruler::LoadSubtitles() {
     const auto [loaded, num_loaded] = subtitle_intervals_->LoadSubripFile(
-        interval_width_, msPerInterval(), HEADER_HEIGHT);
+        interval_width_, msPerInterval(), BODY_HEIGHT / 2);
     if (loaded) {
         emit subtitleFileLoaded(num_loaded);
     }

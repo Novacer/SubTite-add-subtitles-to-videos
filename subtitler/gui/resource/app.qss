@@ -3,7 +3,7 @@
     background: rgb(35, 35, 35);
     color: rgb(145, 145, 145);
     font-family: "Microsoft Yahei";
-    font-size: 15px;
+    font-size: 10pt;
 }
 
 /* QSlider styles */ 

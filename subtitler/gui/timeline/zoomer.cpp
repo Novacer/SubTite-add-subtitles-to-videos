@@ -2,6 +2,7 @@
 
 #include <QHBoxLayout>
 #include <cmath>
+#include <QDebug>
 
 namespace subtitler {
 namespace gui {
@@ -48,9 +49,10 @@ void Zoomer::initializeControls(std::chrono::milliseconds duration) {
     // Double the width
     min_zoom_level_ = 1;
     max_zoom_level_ = computeZoomRange(duration);
+    current_level_ = min_zoom_level_;
 
     zoom_slider_->setRange(min_zoom_level_, max_zoom_level_);
-    zoom_slider_->setSliderPosition(max_zoom_level_);
+    zoom_slider_->setSliderPosition(min_zoom_level_);
 
     zoom_in_ = new QToolButton(this);
     zoom_in_->setIcon(QIcon(":/images/zoomin"));
@@ -69,6 +71,7 @@ void Zoomer::onZoomInClicked(bool checked) {
     int currentValue = zoom_slider_->value();
     if (currentValue > min_zoom_level_) {
         zoom_slider_->setSliderPosition(--currentValue);
+        qDebug() << "zoom: " << currentValue;
         emit zoomIn(currentValue);
     }
 }
@@ -77,6 +80,7 @@ void Zoomer::onZoomOutClicked(bool checked) {
     int currentValue = zoom_slider_->value();
     if (currentValue < max_zoom_level_) {
         zoom_slider_->setSliderPosition(++currentValue);
+        qDebug() << "zoom: " << currentValue;
         emit zoomOut(currentValue);
     }
 }

@@ -9,7 +9,7 @@
 #include "subtitler/srt/subrip_file.h"
 
 #define CUT_MARKER_WIDTH 10
-#define CUT_MARKER_HEIGHT 86
+#define CUT_MARKER_HEIGHT 80
 #define BODY_HEIGHT 80
 
 using namespace std::chrono_literals;

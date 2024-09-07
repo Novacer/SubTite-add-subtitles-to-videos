@@ -68,9 +68,9 @@ class SubRipFile {
 
   private:
     // SRT items should be ordered by start time to allow for overlapping
-    // subtitles. A shared_ptr is used because the subtitle can be shared with
+    // subtitles. A shared_ptr is used because subtitles can be shared with
     // SubtitleInterval and SubtitleEditor. For example, it is possible for a
-    // SubRipFile to be deleted but the subtitle still has a reference in an
+    // SubRipFile to be deleted when the subtitle still has a reference in an
     // open editor. Thus, we use reference counting to ensure that subtitles
     // always have valid lifetimes.
     std::vector<std::shared_ptr<SubRipItem>> items_;

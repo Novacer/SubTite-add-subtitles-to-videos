@@ -10,3 +10,5 @@ build:gcc-asan --cxxopt='-fsanitize=address' --linkopt='-fsanitize=address'
 build:gcc-asan --linkopt='-pthread' --linkopt='-lpthread'
 build:gcc-prod --cxxopt='-std=c++17' --cxxopt='-DQT_NO_DEBUG_OUTPUT' --cxxopt='-fPIC' -c opt
 build:gcc-prod --linkopt='-pthread' --linkopt='-lpthread'
+
+test --test_output=errors

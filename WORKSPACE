@@ -66,22 +66,22 @@ register_qt_toolchains()
 http_archive(
     name = "ffmpeg_windows",
     build_file = "//third_party:ffmpeg_windows.BUILD",
-    strip_prefix = "ffmpeg-n4.4-latest-win64-lgpl-shared-4.4",
-    urls = ["https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n4.4-latest-win64-lgpl-shared-4.4.zip"],
+    strip_prefix = "ffmpeg-n6.1-latest-win64-lgpl-shared-6.1",
+    urls = ["https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n6.1-latest-win64-lgpl-shared-6.1.zip"],
 )
 
 http_archive(
     name = "ffmpeg_linux",
     build_file = "//third_party:ffmpeg_linux.BUILD",
-    strip_prefix = "ffmpeg-n4.4-latest-linux64-lgpl-shared-4.4",
-    urls = ["https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n4.4-latest-linux64-lgpl-shared-4.4.tar.xz"],
+    strip_prefix = "ffmpeg-n6.1-latest-linux64-lgpl-shared-6.1",
+    urls = ["https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n6.1-latest-linux64-lgpl-shared-6.1.tar.xz"],
 )
 
 # Need qt_av_player twice to work around genrule issue between Windows and Linux.
 http_archive(
     name = "qt_av_player_windows",
     build_file = "//third_party:qt_av_player_windows.BUILD",
-    sha256 = "065616f1180b02b3ffaa7e6f08b211f6d39a6ef22ffe19dbfbb0e0dbbdddac53",
+    sha256 = "16640f9131d7a9a9cb65f8fc69f617f42b69535787833133eb48bd18424bf93e",
     strip_prefix = "QtAVPlayer-master",
     urls = ["https://github.com/Novacer/QtAVPlayer/archive/refs/heads/master.zip"],
 )
@@ -89,7 +89,7 @@ http_archive(
 http_archive(
     name = "qt_av_player_linux",
     build_file = "//third_party:qt_av_player_linux.BUILD",
-    sha256 = "065616f1180b02b3ffaa7e6f08b211f6d39a6ef22ffe19dbfbb0e0dbbdddac53",
+    sha256 = "16640f9131d7a9a9cb65f8fc69f617f42b69535787833133eb48bd18424bf93e",
     strip_prefix = "QtAVPlayer-master",
     urls = ["https://github.com/Novacer/QtAVPlayer/archive/refs/heads/master.zip"],
 )

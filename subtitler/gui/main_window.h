@@ -2,8 +2,10 @@
 #define SUBTITLER_GUI_MAIN_WINDOW_H
 
 #include <QMainWindow>
+#include <QString>
 #include <chrono>
 #include <memory>
+#include <optional>
 
 QT_FORWARD_DECLARE_CLASS(QAVPlayer)
 QT_FORWARD_DECLARE_CLASS(QAVAudioOutput)
@@ -78,6 +80,11 @@ class MainWindow : public QMainWindow {
     auto_transcribe::AutoTranscribeWindow *auto_transcribe_window_;
     auto_transcribe::login::LoginMicrosoftCognitiveServicesWindow
         *login_window_;
+
+    // Initially nullopt. Value will be set after the first frame is decoded.
+    // Note that the filter value may be empty string, if no downscaling is
+    // needed.
+    std::optional<QString> downscale_filter_;
 };
 
 }  // namespace gui

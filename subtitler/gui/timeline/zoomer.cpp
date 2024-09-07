@@ -2,7 +2,6 @@
 
 #include <QHBoxLayout>
 #include <cmath>
-#include <QDebug>
 
 namespace subtitler {
 namespace gui {
@@ -71,7 +70,6 @@ void Zoomer::onZoomInClicked(bool checked) {
     int currentValue = zoom_slider_->value();
     if (currentValue > min_zoom_level_) {
         zoom_slider_->setSliderPosition(--currentValue);
-        qDebug() << "zoom: " << currentValue;
         emit zoomIn(currentValue);
     }
 }
@@ -80,7 +78,6 @@ void Zoomer::onZoomOutClicked(bool checked) {
     int currentValue = zoom_slider_->value();
     if (currentValue < max_zoom_level_) {
         zoom_slider_->setSliderPosition(++currentValue);
-        qDebug() << "zoom: " << currentValue;
         emit zoomOut(currentValue);
     }
 }

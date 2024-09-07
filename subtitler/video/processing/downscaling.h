@@ -23,6 +23,8 @@ struct InputVideoScalingInfo {
     double fps;
 };
 
+// Given a video's dimensions and fps, this returns the recommended filters to
+// pass to libav for downscaling.
 std::string GetFFMpegScaleFilterRecommendation(
     const InputVideoScalingInfo input);
 

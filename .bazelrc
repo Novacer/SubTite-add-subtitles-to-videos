@@ -1,3 +1,5 @@
+common --noenable_bzlmod
+
 build:vs2019 --cxxopt='/std:c++17' --cxxopt='/WX'
 build:vs2019-asan --cxxopt='/std:c++17' --cxxopt='/WX' --cxxopt='/fsanitize=address' -c dbg
 build:vs2019-prod --cxxopt='/std:c++17' --cxxopt='/DQT_NO_DEBUG_OUTPUT' -c opt

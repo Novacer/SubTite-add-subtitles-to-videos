@@ -47,7 +47,7 @@ jobs:
           key: ${{ runner.os }}-QtCache
 
       - name: Install Qt
-        uses: jurplel/install-qt-action@v2
+        uses: jurplel/install-qt-action@v4
         with:
           version: '5.15.2'
           host: 'windows'
@@ -61,14 +61,15 @@ jobs:
         run: ls $Qt5_Dir
         shell: bash
 
-      - name: Setup Bazelisk
-        uses: bazelbuild/setup-bazelisk@v1.0.1
-        
-      - name: Mount bazel cache  # Optional
-        uses: actions/cache@v4
+      - name: "Setup Bazel"
+        uses: bazel-contrib/setup-bazel@0.15.0
         with:
-          path: "~/.cache/bazel"
-          key: bazel
+          # Avoid downloading Bazel every time.
+          bazelisk-cache: true
+          # Store build cache per workflow.
+          disk-cache: ${{ github.workflow }}
+          # Share repository cache between workflows.
+          repository-cache: true
 
       # Runs a set of commands using the runners shell
       - name: Bazel build all targets
@@ -110,14 +111,15 @@ jobs:
           run: sudo apt-get install -y libsodium-dev
           shell: bash
 
-        - name: Setup Bazelisk
-          uses: bazelbuild/setup-bazelisk@v1.0.1
-          
-        - name: Mount bazel cache  # Optional
-          uses: actions/cache@v4
+        - name: "Setup Bazel"
+          uses: bazel-contrib/setup-bazel@0.15.0
           with:
-            path: "~/.cache/bazel"
-            key: bazel
+            # Avoid downloading Bazel every time.
+            bazelisk-cache: true
+            # Store build cache per workflow.
+            disk-cache: ${{ github.workflow }}
+            # Share repository cache between workflows.
+            repository-cache: true
 
         # Runs a set of commands using the runners shell
         - name: Bazel build all targets

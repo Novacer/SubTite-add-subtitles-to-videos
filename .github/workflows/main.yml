@@ -58,7 +58,7 @@ jobs:
           cached: ${{ steps.cache-qt.outputs.cache-hit }}
 
       - name: Debug print contents
-        run: ls $Qt5_Dir
+        run: ls $QT_ROOT_DIR
         shell: bash
 
       - name: "Setup Bazel"

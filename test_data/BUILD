@@ -7,7 +7,7 @@ cc_library(
     testonly = True,
     srcs = ["bazel_utils.cpp"],
     hdrs = ["bazel_utils.h"],
-    deps = ["@bazel_tools//tools/cpp/runfiles"],
+    deps = ["@bazel_tools//tools/cpp:runfiles_lib"],
 )
 
 filegroup(

@@ -121,7 +121,7 @@ Compiling for linux requires GCC.
 With bazel setup, here are some sample commands for building the CLI.
 
 ```bash
-$ bazel build --config=gcc-prod //subttiler/cli:cli    # Build CLI in release mode using GCC
+$ bazel build --config=gcc-prod //subtitler/cli:cli    # Build CLI in release mode using GCC
 ```
 
 To compile the GUI, you will need to install various dependencies. 
@@ -191,7 +191,7 @@ These contain some methods which are not ready to use in production but are inte
 `subtitler/experimental/trimmer_msvc.cpp` implements trimming of a video on windows.
 You select a video, a timestamp file, and an output video path.
 
-The timestamp file is of the syntax:
+The timestamp file is of the syntax:u
 
 ```
 00:00:00 - 00:01:00

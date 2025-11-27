@@ -121,7 +121,7 @@ Compiling for linux requires GCC.
 With bazel setup, here are some sample commands for building the CLI.
 
 ```bash
-$ bazel build --config=gcc-prod //subttiler/cli:cli    # Build CLI in release mode using GCC
+$ bazel build --config=gcc-prod //subtitler/cli:cli    # Build CLI in release mode using GCC
 ```
 
 To compile the GUI, you will need to install various dependencies. 

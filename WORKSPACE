@@ -40,7 +40,7 @@ http_archive(
 # Configure QT Toolchains
 http_archive(
     name = "com_justbuchanan_rules_qt",
-    sha256 = "f0effb5da5ae00c62c73ed00e25794e79ab6291fc4aaec51120eded94c6b6d8a",
+    integrity = "sha256-j1X8ZfACIldxr+JRwcbY8kCbTIQqRRdkGtBNispxZOg=",
     strip_prefix = "bazel_rules_qt-master",
     # Use custom fork which includes some fixes
     urls = ["https://github.com/Novacer/bazel_rules_qt/archive/refs/heads/master.zip"],
@@ -66,22 +66,22 @@ register_qt_toolchains()
 http_archive(
     name = "ffmpeg_windows",
     build_file = "//third_party:ffmpeg_windows.BUILD",
-    strip_prefix = "ffmpeg-n6.1-latest-win64-lgpl-shared-6.1",
-    urls = ["https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n6.1-latest-win64-lgpl-shared-6.1.zip"],
+    strip_prefix = "ffmpeg-n7.1-latest-win64-lgpl-shared-7.1",
+    urls = ["https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n7.1-latest-win64-lgpl-shared-7.1.zip"],
 )
 
 http_archive(
     name = "ffmpeg_linux",
     build_file = "//third_party:ffmpeg_linux.BUILD",
-    strip_prefix = "ffmpeg-n6.1-latest-linux64-lgpl-shared-6.1",
-    urls = ["https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n6.1-latest-linux64-lgpl-shared-6.1.tar.xz"],
+    strip_prefix = "ffmpeg-n7.1-latest-linux64-lgpl-shared-7.1",
+    urls = ["https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n7.1-latest-linux64-lgpl-shared-7.1.tar.xz"],
 )
 
 # Need qt_av_player twice to work around genrule issue between Windows and Linux.
 http_archive(
     name = "qt_av_player_windows",
     build_file = "//third_party:qt_av_player_windows.BUILD",
-    sha256 = "16640f9131d7a9a9cb65f8fc69f617f42b69535787833133eb48bd18424bf93e",
+    integrity = "sha256-W7DHBS44ztiL8EFGUkRJeHP2F7jGjPpO9lLvyFj7gQQ=",
     strip_prefix = "QtAVPlayer-master",
     urls = ["https://github.com/Novacer/QtAVPlayer/archive/refs/heads/master.zip"],
 )
@@ -89,7 +89,7 @@ http_archive(
 http_archive(
     name = "qt_av_player_linux",
     build_file = "//third_party:qt_av_player_linux.BUILD",
-    sha256 = "16640f9131d7a9a9cb65f8fc69f617f42b69535787833133eb48bd18424bf93e",
+    integrity = "sha256-W7DHBS44ztiL8EFGUkRJeHP2F7jGjPpO9lLvyFj7gQQ=",
     strip_prefix = "QtAVPlayer-master",
     urls = ["https://github.com/Novacer/QtAVPlayer/archive/refs/heads/master.zip"],
 )
@@ -97,7 +97,7 @@ http_archive(
 new_local_repository(
     name = "microsoft_cognitive_speech",
     build_file = "//third_party:speech.BUILD",
-    path = "C:\\Program Files\\PackageManagement\\NuGet\\Packages\\Microsoft.CognitiveServices.Speech.1.22.0",
+    path = "C:\\Program Files\\PackageManagement\\NuGet\\Packages\\Microsoft.CognitiveServices.Speech.1.47.0",
 )
 
 http_archive(

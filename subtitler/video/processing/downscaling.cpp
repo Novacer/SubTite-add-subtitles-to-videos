@@ -1,5 +1,7 @@
 #include "subtitler/video/processing/downscaling.h"
 
+#include <cstdint>
+
 namespace subtitler {
 namespace video {
 namespace processing {

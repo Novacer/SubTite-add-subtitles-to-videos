@@ -28,11 +28,15 @@ jobs:
         id: cache-speech-sdk
         uses: actions/cache@v4
         with:
-          path: "C:\\Program Files\\PackageManagement\\NuGet\\Packages\\Microsoft.CognitiveServices.Speech.1.22.0"
+          path: "C:\\Program Files\\PackageManagement\\NuGet\\Packages\\Microsoft.CognitiveServices.Speech.1.47.0"
           key: ${{ runner.os }}-MS-Speech-SDK-Cache
       
+      - name: "Register NuGet Package Source"
+        run: Register-PackageSource -Name nuget.org -Location https://www.nuget.org/api/v2 -ProviderName NuGet -Force
+        shell: pwsh
+      
       - name: Install MS Speech SDK
-        run: Install-Package Microsoft.CognitiveServices.Speech -RequiredVersion 1.22.0 -Force
+        run: Install-Package Microsoft.CognitiveServices.Speech -ProviderName NuGet -RequiredVersion 1.47.0 -Force
         shell: pwsh
       
       - name: Debug MS Speech SDK Install
@@ -47,7 +51,7 @@ jobs:
           key: ${{ runner.os }}-QtCache
 
       - name: Install Qt
-        uses: jurplel/install-qt-action@v2
+        uses: jurplel/install-qt-action@v4
         with:
           version: '5.15.2'
           host: 'windows'
@@ -55,20 +59,21 @@ jobs:
           arch: 'win64_msvc2019_64'
           dir: '${{ github.workspace }}/Qt/'
           install-deps: 'true'
-          cached: ${{ steps.cache-qt.outputs.cache-hit }}
+          cache: ${{ steps.cache-qt.outputs.cache-hit }}
 
       - name: Debug print contents
-        run: ls $Qt5_Dir
+        run: ls $QT_ROOT_DIR
         shell: bash
 
-      - name: Setup Bazelisk
-        uses: bazelbuild/setup-bazelisk@v1.0.1
-        
-      - name: Mount bazel cache  # Optional
-        uses: actions/cache@v4
+      - name: "Setup Bazel"
+        uses: bazel-contrib/setup-bazel@0.15.0
         with:
-          path: "~/.cache/bazel"
-          key: bazel
+          # Avoid downloading Bazel every time.
+          bazelisk-cache: true
+          # Store build cache per workflow.
+          disk-cache: ${{ github.workflow }}
+          # Share repository cache between workflows.
+          repository-cache: true
 
       # Runs a set of commands using the runners shell
       - name: Bazel build all targets
@@ -110,14 +115,15 @@ jobs:
           run: sudo apt-get install -y libsodium-dev
           shell: bash
 
-        - name: Setup Bazelisk
-          uses: bazelbuild/setup-bazelisk@v1.0.1
-          
-        - name: Mount bazel cache  # Optional
-          uses: actions/cache@v4
+        - name: "Setup Bazel"
+          uses: bazel-contrib/setup-bazel@0.15.0
           with:
-            path: "~/.cache/bazel"
-            key: bazel
+            # Avoid downloading Bazel every time.
+            bazelisk-cache: true
+            # Store build cache per workflow.
+            disk-cache: ${{ github.workflow }}
+            # Share repository cache between workflows.
+            repository-cache: true
 
         # Runs a set of commands using the runners shell
         - name: Bazel build all targets

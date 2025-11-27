@@ -114,7 +114,7 @@ void Commands::MainLoop() {
   // Load existing subtitles if any.
   if (fs::exists(fs::u8path(paths_.output_subtitle_path))) {
     try {
-      srt_file_.LoadState(paths_.output_subtitle_path);
+      srt_file_.LoadState(fs::u8path(paths_.output_subtitle_path));
       if (srt_file_.NumItems() > 0) {
         output_ << "Loaded existing subtitles!" << std::endl;
       }

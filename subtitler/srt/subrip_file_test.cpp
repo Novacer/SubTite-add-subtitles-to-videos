@@ -169,7 +169,7 @@ TEST_F(SubRipFileTest, OverwritesPreviousState) {
   file.RemoveItem(4);
   file.RemoveItem(3);
   // Now load it back
-  file.LoadState(path_wrapper.string());
+  file.LoadState(path_wrapper);
 
   std::ostringstream output;
   file.ToStream(output);
@@ -210,7 +210,7 @@ TEST_F(SubRipFileTest, FailureToLoadRetainsPreviousState) {
 
   // Attempt to load
   try {
-    file.LoadState(path_wrapper.string());
+    file.LoadState(path_wrapper);
     FAIL() << "Expected std::runtime_error";
   } catch (const std::runtime_error& e) {
     ASSERT_STREQ("Could not parse timestamp values: abc --> efg", e.what());

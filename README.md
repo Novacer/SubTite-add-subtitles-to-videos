@@ -58,7 +58,7 @@ Compiling for windows requires MSVC. You can download ["Build Tools for Visual S
 With bazel setup, here are some sample commands for building the CLI.
 
 ```bash
-$ bazel build --config=msvc-prod //subtitler/cli:cli # Build CLI in release mode using MSVC2019
+$ bazel build --config=msvc-prod //subtitler/cli:cli # Build CLI in release mode using MSVC
 ```
 
 #### QT
@@ -111,7 +111,7 @@ to set the icon for our binary. Download the ResourceHacker.exe and add it to yo
 Now you can compile the release binary via:
 
 ```bash
-SUBTITE_RELEASE_PATH=/path/to/output/folder; ./deploy/deploy.sh
+env SUBTITE_RELEASE_PATH=/path/to/output/folder ./deploy/deploy.sh
 ```
 
 ### Linux
@@ -179,7 +179,7 @@ On both Windows and Linux, the script requires setting `SUBTITE_RELEASE_PATH` wh
 Example run:
 
 ```bash
-SUBTITE_RELEASE_PATH=/path/to/output/folder; ./deploy/deploy.sh
+env SUBTITE_RELEASE_PATH=/path/to/output/folder ./deploy/deploy.sh
 ```
 
 ## Experimental

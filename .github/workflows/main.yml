@@ -139,5 +139,5 @@ jobs:
           shell: bash
 
         - name: Build GUI
-          run: QT5_INSTALL_PATH=/usr/include/x86_64-linux-gnu/qt5; ./build_gui_dev.sh
+          run: env QT5_INSTALL_PATH=/usr/include/x86_64-linux-gnu/qt5 ./build_gui_dev.sh
           shell: bash

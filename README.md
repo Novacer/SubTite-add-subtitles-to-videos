@@ -7,7 +7,7 @@
 ## GUI Demo
 ![gif demo](https://github.com/Novacer/SubTite-add-subtitles-to-videos/assets/29148427/c2afaac0-5111-4f7e-ad38-69b7f9757ad3)
 
-## Feature Overview (Current v1.0.4)
+## Feature Overview (Current v1.0.5)
 * Supports Windows and Linux
 * GUI + CLI for adding subtitles
 * Subtitle Auto-transcription through MS Cognitive Services (windows only for now)
@@ -43,15 +43,17 @@ Please refer to the [CLI docs](subtitler/cli/README.md)
 2. Create a [free speech resource](https://ms.portal.azure.com/#create/Microsoft.CognitiveServicesSpeechServices) in the Azure portal. Make sure to pick the free (F0) pricing tier! As of time of writing, this should give you 5 hours of free subtitle transcription per month.
 3. Now you should have 2 API keys under "Keys and Endpoint" on the Azure portal. Copy one of them.
 4. In subtite, select `Subtitle > Auto Transcribe`. Copy in your keys and also the Region of your speech instance. (For example, westus)
-5. Enter a password to remember this information for next time. The password is used to encrypt the API keys to store on your local disk, and it is never passed anywhere else except to the Microsoft servers.
+5. Enter a password to remember this information for next time. The password is ~~used~~ to encrypt the API keys to store on your local disk, and it is never passed anywhere else except to the Microsoft servers.
 6. Choose the output location where the auto-transcribed subtitles will be saved.
 7. Wait for your audio to be processed for auto-transcription!
 
 ## Building from source
-SubTite uses bazel as the main build system. Setup bazel on your environment following this link: https://docs.bazel.build/versions/main/install.html.
+SubTite uses Bazel v7.4.1 as the main build system. Setup your environment by [installing Bazelisk](https://bazel.build/install/bazelisk), which will use our [.bazelversion](https://github.com/Novacer/SubTite-add-subtitles-to-videos/blob/master/.bazelversion) file to pick the right version of Bazel.
 
 ### Windows
-Compiling for windows requires MSVC 2019.
+
+#### Dependency installation
+Compiling for windows requires MSVC 2019. You can download ["Build Tools for Visual Studio"](https://visualstudio.microsoft.com/downloads/) to get the 2019 compiler.
 
 With bazel setup, here are some sample commands for building the CLI.
 
@@ -59,45 +61,65 @@ With bazel setup, here are some sample commands for building the CLI.
 $ bazel build --config=vs2019-prod //subtitler/cli:cli # Build CLI in release mode using MSVC2019
 ```
 
-Building the GUI requires QT 5 to be installed on your machine. On windows specifically, we expect the path to be somewhat similar to
-```
-C:\Qt\5.15.2\msvc2019_64\... etc
+#### QT
+Building the GUI requires QT 5.15.2 to be installed on your machine. We recommend using [aqtinstall](https://github.com/miurahr/aqtinstall) to make this easier. Run the following commands:
+
+```bash
+# Install aqt via pip
+python -m pip install aqtinstall
+
+# Confirm that win64_msvc2019_64 is available
+python -m aqt list-qt windows desktop --arch 5.15.2 
+
+# Install qt and all modules
+python -m aqt install-qt windows desktop 5.15.2 win64_msvc2019_64 -m all
 ```
 
-We also require the Microsoft Speech Services SDK to be installed. You may install it following the
-[microsoft documentation](https://docs.microsoft.com/en-us/azure/cognitive-services/speech-service/quickstarts/setup-platform?tabs=windows%2Cubuntu%2Cdotnet%2Cjre%2Cmaven%2Cnodejs%2Cmac%2Cpypi&pivots=programming-language-cpp). We expect the SDK to be installed at a path similar to
-```
-C:\\Program Files\\PackageManagement\\NuGet\\Packages\\Microsoft.CognitiveServices.Speech.1.22.0
+Next, find the directory where the directory `Qt\5.15.2\msvc2019_64\...` is installed. 
+
+* Add `QT5_INSTALL_PATH` to your env variables, pointed at the `msvc2019_64` directory.
+* Also add `QT_ROOT_DIR` to your env variables, pointed at the same directory.
+
+#### Microsoft Speech Services SDK
+We also require the Microsoft Speech Services SDK v1.47 to be installed. Use NuGet to install it in Powershell.
+
+```pwsh
+Register-PackageSource -Name nuget.org -Location https://www.nuget.org/api/v2 -ProviderName NuGet -Force
+
+Install-Package Microsoft.CognitiveServices.Speech -ProviderName NuGet -RequiredVersion 1.47.0 -Force
 ```
 
-Assuming you have the same paths as above, subtite can be easily built with
+Now you should see the files available at:
+
+```
+C:\\Program Files\\PackageManagement\\NuGet\\Packages\\Microsoft.CognitiveServices.Speech.1.47.0
+```
+
+Now you should be able to build the dev version of the GUI by running:
 
 ```bash
 ./build_gui_dev.sh
 ```
 
-It is recommended to use the build script instead of building with `bazel build ...`, as the build script copies in additional runtime dependencies (qt audio plugins etc.) which are required to run SubTite. You may need to set `QT5_INSTALL_PATH` env variable to be something like `C:\\Qt\\5.15.2\\msvc2019_64\\`
+If you want to build the production version of the GUI, you'll also need to install ResourceHacker (details below).
 
-If for some reason the build script doesn't work for you, here's how to build manually on Windows.
+#### Resource Hacker
 
----
+Note that production builds will require one more depedency: [ResourceHacker](https://www.angusj.com/resourcehacker/). We use ResourceHacker
+to set the icon for our binary. Download the ResourceHacker.exe and add it to your PATH variable.
 
-First `bazel build --config=vs2019-prod //subtitler/gui:main`
+Now you can compile the release binary via:
 
-The binaries and dynamic libraries are contained in `bazel-bin/subtitler/gui/`. In order to have audio played in the integrated player on windows, you need to copy the QT audio plugins into this folder. In particular, you need to create the folder `bazel-bin/subtitler/gui/plugins`. Then, copy the audio folder from `C:\Qt\5.15.2\msvc2019_64\plugins\` into `bazel-bin/subtitler/gui/plugins`.
-
-Next, you need to copy the Microsoft Speech Service runtime dlls into `bazel-bin/subtitler/gui/`. For example, this is locationed somewhere like
+```bash
+SUBTITE_RELEASE_PATH=/path/to/output/folder; ./deploy/deploy.sh
 ```
-C:/Program Files/PackageManagement/NuGet/Packages/Microsoft.CognitiveServices.Speech.1.22.0/runtimes/win-x64/native/
-```
-
-Finally, you want to copy ffmpeg.exe into `bazel-bin/subtitler/gui/`. When you ran bazel build, a copy of ffmpeg.exe is already downloaded to `bazel-subtitler/external/ffmpeg_windows/bin/ffmpeg.exe`. You may copy that or any other ffmpeg binary you obtain elsewhere.
 
 ### Linux
 
 Compiling for linux requires GCC.
 
 With bazel setup, here are some sample commands for building the CLI.
+
 ```bash
 $ bazel build --config=gcc-prod //subttiler/cli:cli    # Build CLI in release mode using GCC
 ```
@@ -145,7 +167,7 @@ $ bazel test --config=vs2019-asan ... # used for running on windows
 $ bazel test --config=gcc-asan ...    # used for running on linux
 ```
 
-## Deploying - Packaging Subtite with it's dependencies.
+## Deploying - Packaging Subtite with its dependencies.
 Since Subtite uses Dynamic Linking with QT and FFMPEG (so it can remain LGPL compliant with those projects), there is a need to package the dependencies of Subtite when deploying. A deploy script can be run `./deploy/deploy.sh` (IMPORTANT: script has to be run from the project root) which will package the dependecies automatically.
 
 In addition to the dependencies required to build Subtite, deploying also requires [Resource Hacker](http://www.angusj.com/resourcehacker/) on Windows, and [linuxdeployqt](https://github.com/probonopd/linuxdeployqt) on Linux.
@@ -153,6 +175,12 @@ In addition to the dependencies required to build Subtite, deploying also requir
 On Windows only, the script requires setting `QT5_INSTALL_PATH` env variable to the directory where QT 5 is installed. This should look something like `C:\\Qt\\5.15.2\\msvc2019_64\\`.
 
 On both Windows and Linux, the script requires setting `SUBTITE_RELEASE_PATH` which is the path to the output directory that you want to write the deployed binaries to.
+
+Example run:
+
+```bash
+SUBTITE_RELEASE_PATH=/path/to/output/folder; ./deploy/deploy.sh
+```
 
 ## Experimental
 Some experimental binaries are also placed in the `subtitler/experimental` folder.

@@ -191,7 +191,7 @@ These contain some methods which are not ready to use in production but are inte
 `subtitler/experimental/trimmer_msvc.cpp` implements trimming of a video on windows.
 You select a video, a timestamp file, and an output video path.
 
-The timestamp file is of the syntax:u
+The timestamp file is of the syntax:
 
 ```
 00:00:00 - 00:01:00

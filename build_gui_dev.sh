@@ -23,12 +23,6 @@ if [[ ${machine} == "MinGw" || ${machine} == "CYGWIN" ]]; then
     else
         echo "Using QT5 Path: ${QT5_INSTALL_PATH}"
     fi
-    if [[ -z ${MCS_INSTALL_LOCATION} ]]; then
-        echo "Please set MCS_INSTALL_LOCATION env variable to be the MicrosoftCognitiveSpeech path containing lib, runtime folders etc."
-        exit 1
-    else
-        echo "Using MicrosoftCognitiveSpeech package at: ${MCS_INSTALL_LOCATION}"
-    fi
 
     bazel build --config=vs2019 //subtitler/gui:main
     # Copy audio plugins to bazel-bin
@@ -42,6 +36,7 @@ if [[ ${machine} == "MinGw" || ${machine} == "CYGWIN" ]]; then
         cp bazel-$(basename $(pwd))/external/ffmpeg_windows/bin/ffmpeg.exe ${BAZEL_BUILD_DIR}/ffmpeg.exe
     fi
     # Copy MicrosoftCognitiveServices runtime extensions
+    MCS_INSTALL_LOCATION="C:/Program Files/PackageManagement/NuGet/Packages/Microsoft.CognitiveServices.Speech.1.22.0"
     cp "${MCS_INSTALL_LOCATION}/runtimes/win-x64/native/Microsoft.CognitiveServices.Speech.extension".* ${BAZEL_BUILD_DIR}
 
 elif [[ ${machine} == "Linux" ]]; then

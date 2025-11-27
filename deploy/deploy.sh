@@ -31,12 +31,6 @@ if [[ ${machine} == "MinGw" || ${machine} == "CYGWIN" ]]; then
     else
         echo "Using QT5 Path: ${QT5_INSTALL_PATH}"
     fi
-    if [[ -z ${MCS_INSTALL_LOCATION} ]]; then
-        echo "Please set MCS_INSTALL_LOCATION env variable to be the MicrosoftCognitiveSpeech path containing lib, runtime folders etc."
-        exit 1
-    else
-        echo "Using MicrosoftCognitiveSpeech package at: ${MCS_INSTALL_LOCATION}"
-    fi
 
     bazel build --config=vs2019-prod //subtitler/gui:main
 
@@ -50,6 +44,7 @@ if [[ ${machine} == "MinGw" || ${machine} == "CYGWIN" ]]; then
     mkdir -p ${SUBTITE_RELEASE_PATH}/plugins
     cp -r ${QT5_INSTALL_PATH}/plugins/audio ${SUBTITE_RELEASE_PATH}/plugins/audio
     cp -r ${QT5_INSTALL_PATH}/plugins/platforms ${SUBTITE_RELEASE_PATH}/plugins/platforms
+    MCS_INSTALL_LOCATION="C:/Program Files/PackageManagement/NuGet/Packages/Microsoft.CognitiveServices.Speech.1.22.0"
     cp "${MCS_INSTALL_LOCATION}/runtimes/win-x64/native/Microsoft.CognitiveServices.Speech.extension".* ${SUBTITE_RELEASE_PATH}
     ResourceHacker \
         -open ${SUBTITE_RELEASE_PATH}/subtite.exe \

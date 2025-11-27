@@ -40,7 +40,7 @@ http_archive(
 # Configure QT Toolchains
 http_archive(
     name = "com_justbuchanan_rules_qt",
-    integrity = "sha256-vtE2GG052VJpoJCasJlPkXALqXeFvwTp5+e5PKoKaxk=",
+    integrity = "sha256-j1X8ZfACIldxr+JRwcbY8kCbTIQqRRdkGtBNispxZOg=",
     strip_prefix = "bazel_rules_qt-master",
     # Use custom fork which includes some fixes
     urls = ["https://github.com/Novacer/bazel_rules_qt/archive/refs/heads/master.zip"],

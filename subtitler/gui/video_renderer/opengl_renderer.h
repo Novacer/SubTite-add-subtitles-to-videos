@@ -15,19 +15,19 @@ namespace video_renderer {
  * Will use hardware acceleration through OpenGL if possible.
  */
 class OpenGLRenderer : public QOpenGLWidget {
-    Q_OBJECT
-  public:
-    OpenGLRenderer(QWidget *parent = NULL);
-    ~OpenGLRenderer() = default;
+  Q_OBJECT
+ public:
+  OpenGLRenderer(QWidget* parent = NULL);
+  ~OpenGLRenderer() = default;
 
-    void displayFrame(const QVideoFrame &frame);
+  void displayFrame(const QVideoFrame& frame);
 
-  protected:
-    void paintEvent(QPaintEvent *event) override;
+ protected:
+  void paintEvent(QPaintEvent* event) override;
 
-  private:
-    QImage img_;
-    QRect centeredViewport(int width, int height);
+ private:
+  QImage img_;
+  QRect centeredViewport(int width, int height);
 };
 
 }  // namespace video_renderer

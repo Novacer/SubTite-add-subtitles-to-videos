@@ -4,11 +4,7 @@
 #include <QRunnable>
 #include <QString>
 
-namespace subtitler::gui::exporting {
-
-class ExportWindow;
-
-}
+#include "subtitler/gui/exporting/export_dialog.h"
 
 namespace subtitler {
 namespace gui {
@@ -16,17 +12,17 @@ namespace exporting {
 namespace tasks {
 
 class BurnSubtitleTask : public QRunnable {
-  public:
-    BurnSubtitleTask(QString video, QString subtitle, QString output,
-                     ExportWindow *parent);
+ public:
+  BurnSubtitleTask(QString video, QString subtitle, QString output,
+                   ExportWindow* parent);
 
-    void run() override;
+  void run() override;
 
-  private:
-    QString video_;
-    QString subtitle_;
-    QString output_;
-    ExportWindow *parent_;
+ private:
+  QString video_;
+  QString subtitle_;
+  QString output_;
+  ExportWindow* parent_;
 };
 
 }  // namespace tasks

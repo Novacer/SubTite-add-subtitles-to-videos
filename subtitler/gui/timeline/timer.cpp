@@ -9,11 +9,11 @@ namespace gui {
 namespace timeline {
 
 Timer::Timer(QWidget* parent) : QLabel{parent} {
-    setText(QString::fromStdString(subtitler::FormatDuration(0ms)));
+  setText(QString::fromStdString(subtitler::FormatDuration(0ms)));
 }
 
 void Timer::onTimerChanged(std::chrono::milliseconds ms) {
-    setText(QString::fromStdString(subtitler::FormatDuration(ms)));
+  setText(QString::fromStdString(subtitler::FormatDuration(ms)));
 }
 
 }  // namespace timeline

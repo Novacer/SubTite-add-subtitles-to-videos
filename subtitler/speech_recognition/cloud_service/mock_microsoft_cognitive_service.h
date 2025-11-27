@@ -15,13 +15,13 @@ namespace cloud_service {
  * Mock class used to test MCS Speech-to-Text service
  */
 class MockMicrosoftCognitiveService : public MicrosoftCognitiveService {
-  public:
-    MockMicrosoftCognitiveService()
-        : MicrosoftCognitiveService{"api-key", "api-region"} {};
+ public:
+  MockMicrosoftCognitiveService()
+      : MicrosoftCognitiveService{"api-key", "api-region"} {};
 
-    MOCK_METHOD(std::vector<nlohmann::json>, getTranscriptionJson,
-                (const std::string&, std::function<void(const std::string&)>),
-                (override));
+  MOCK_METHOD(std::vector<nlohmann::json>, getTranscriptionJson,
+              (const std::string&, std::function<void(const std::string&)>),
+              (override));
 };
 
 }  // namespace cloud_service

@@ -32,41 +32,41 @@ namespace subtitle_editor {
  * the subtitle text.
  */
 class SubtitleEditor : public QDockWidget {
-    Q_OBJECT
-  public:
-    SubtitleEditor(QWidget* parent = Q_NULLPTR);
-    ~SubtitleEditor() = default;
+  Q_OBJECT
+ public:
+  SubtitleEditor(QWidget* parent = Q_NULLPTR);
+  ~SubtitleEditor() = default;
 
-    std::size_t GetNumSubtitles() const;
+  std::size_t GetNumSubtitles() const;
 
-  signals:
-    void saved(std::size_t num_subtitles);
+ signals:
+  void saved(std::size_t num_subtitles);
 
-  public slots:
-    void onOpenSubtitle(timeline::SubtitleIntervalContainer* container,
-                        timeline::SubtitleInterval* subtitle);
-    void onSubtitleTextChanged();
-    void onSubtitleChangeStartEndTime(timeline::SubtitleInterval* subtitle);
+ public slots:
+  void onOpenSubtitle(timeline::SubtitleIntervalContainer* container,
+                      timeline::SubtitleInterval* subtitle);
+  void onSubtitleTextChanged();
+  void onSubtitleChangeStartEndTime(timeline::SubtitleInterval* subtitle);
 
-    // Pass a container pointer to use this new container for successive calls.
-    // Pass null container to keep using the last container.
-    void onSave(timeline::SubtitleIntervalContainer* container = Q_NULLPTR);
-    void onDelete();
-    void onVisibilityChanged(bool visible);
-    void onPositionSelected(const std::string& position_id);
-    void onSubtitleFileReload(const QString& new_subtitle_file);
+  // Pass a container pointer to use this new container for successive calls.
+  // Pass null container to keep using the last container.
+  void onSave(timeline::SubtitleIntervalContainer* container = Q_NULLPTR);
+  void onDelete();
+  void onVisibilityChanged(bool visible);
+  void onPositionSelected(const std::string& position_id);
+  void onSubtitleFileReload(const QString& new_subtitle_file);
 
-  protected:
-    virtual bool eventFilter(QObject* watched, QEvent* event) override;
+ protected:
+  virtual bool eventFilter(QObject* watched, QEvent* event) override;
 
-  private:
-    QLabel* begin_end_time_;
-    QPlainTextEdit* text_edit_;
-    PositionButtons* position_buttons_;
+ private:
+  QLabel* begin_end_time_;
+  QPlainTextEdit* text_edit_;
+  PositionButtons* position_buttons_;
 
-    timeline::SubtitleInterval* currently_editing_;
-    timeline::SubtitleIntervalContainer* container_;
-    bool prev_visibility_;
+  timeline::SubtitleInterval* currently_editing_;
+  timeline::SubtitleIntervalContainer* container_;
+  bool prev_visibility_;
 };
 
 }  // namespace subtitle_editor

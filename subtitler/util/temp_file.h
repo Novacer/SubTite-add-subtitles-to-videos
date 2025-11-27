@@ -14,24 +14,24 @@ namespace subtitler {
  * platform specific APIs to restrict file access.
  */
 class TempFile {
-  public:
-    // Constructor takes in the string data to write, and handles creating a
-    // temp file with this data. Throws std::runtime_error if something goes.
-    explicit TempFile(const std::string& data,
-                      const std::filesystem::path& parent_path,
-                      const std::string& extension);
+ public:
+  // Constructor takes in the string data to write, and handles creating a
+  // temp file with this data. Throws std::runtime_error if something goes.
+  explicit TempFile(const std::string& data,
+                    const std::filesystem::path& parent_path,
+                    const std::string& extension);
 
-    // When this object is destroyed, the temp file will be deleted.
-    ~TempFile();
+  // When this object is destroyed, the temp file will be deleted.
+  ~TempFile();
 
-    TempFile(const TempFile& other) = delete;
-    TempFile& operator=(const TempFile& other) = delete;
+  TempFile(const TempFile& other) = delete;
+  TempFile& operator=(const TempFile& other) = delete;
 
-    // Returns the temporary file name.
-    std::string FileName() const { return temp_file_name_; }
+  // Returns the temporary file name.
+  std::string FileName() const { return temp_file_name_; }
 
-  private:
-    std::string temp_file_name_;
+ private:
+  std::string temp_file_name_;
 };
 
 }  // namespace subtitler

@@ -26,20 +26,20 @@ const char* EXPLANATION =
 LoginMicrosoftCognitiveServicesWindow::LoginMicrosoftCognitiveServicesWindow(
     QWidget* parent)
     : QDialog{parent}, num_times_failed_{0} {
-    setWindowTitle(tr("Login to Microsoft Cognitive Service"));
-    setWindowFlags(windowFlags() | Qt::CustomizeWindowHint);
-    setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
+  setWindowTitle(tr("Login to Microsoft Cognitive Service"));
+  setWindowFlags(windowFlags() | Qt::CustomizeWindowHint);
+  setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 
-    QGridLayout* layout = new QGridLayout{this};
-    layout->setVerticalSpacing(10);
+  QGridLayout* layout = new QGridLayout{this};
+  layout->setVerticalSpacing(10);
 
-    explanation_ = new QLabel{tr(EXPLANATION), this};
-    explanation_->setWordWrap(true);
-    layout->addWidget(explanation_, 0, 0, 3, 3);
+  explanation_ = new QLabel{tr(EXPLANATION), this};
+  explanation_->setWordWrap(true);
+  layout->addWidget(explanation_, 0, 0, 3, 3);
 }
 
 QString LoginMicrosoftCognitiveServicesWindow::GetLoginData() const {
-    return login_data_;
+  return login_data_;
 }
 
 void LoginMicrosoftCognitiveServicesWindow::onRegister() {}

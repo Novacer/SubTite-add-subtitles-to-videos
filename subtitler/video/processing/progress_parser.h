@@ -13,16 +13,16 @@ namespace processing {
  * Struct containing progress info while running FFMPEG.
  */
 struct Progress {
-    uint32_t frame = 0;
-    double fps = 0.0;
-    // output stream quantizer not included.
-    std::string bitrate;
-    uint64_t total_size = 0;
-    std::chrono::microseconds out_time_us = std::chrono::microseconds::zero();
-    int dup_frames = 0;
-    int drop_frames = 0;
-    std::string speed;
-    std::string progress;
+  uint32_t frame = 0;
+  double fps = 0.0;
+  // output stream quantizer not included.
+  std::string bitrate;
+  uint64_t total_size = 0;
+  std::chrono::microseconds out_time_us = std::chrono::microseconds::zero();
+  int dup_frames = 0;
+  int drop_frames = 0;
+  std::string speed;
+  std::string progress;
 };
 
 /**
@@ -35,21 +35,21 @@ struct Progress {
  * recent update.
  */
 class ProgressParser {
-  public:
-    ProgressParser() = default;
-    ~ProgressParser() = default;
+ public:
+  ProgressParser() = default;
+  ~ProgressParser() = default;
 
-    /**
-     * Receive progress data from FFMPEG and return the most recent update.
-     *
-     * @param input the progress data from FFMPEG.
-     * @return std::optional<Progress> Will be nullopt if not enough data
-     * received to give an update. Otherwise, returns the most recent update.
-     */
-    std::optional<Progress> Receive(const char* input);
+  /**
+   * Receive progress data from FFMPEG and return the most recent update.
+   *
+   * @param input the progress data from FFMPEG.
+   * @return std::optional<Progress> Will be nullopt if not enough data
+   * received to give an update. Otherwise, returns the most recent update.
+   */
+  std::optional<Progress> Receive(const char* input);
 
-  private:
-    std::ostringstream buffer_;
+ private:
+  std::ostringstream buffer_;
 };
 
 }  // namespace processing

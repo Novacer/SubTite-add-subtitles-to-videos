@@ -12,14 +12,14 @@ namespace timeline {
  * Label displaying a timestamp in HH:MM:SS.XXXXX format.
  */
 class Timer : public QLabel {
-    Q_OBJECT
-  public:
-    Timer(QWidget* parent = Q_NULLPTR);
-    ~Timer() = default;
+  Q_OBJECT
+ public:
+  Timer(QWidget* parent = Q_NULLPTR);
+  ~Timer() = default;
 
-  public slots:
-    // Set the new time.
-    void onTimerChanged(std::chrono::milliseconds ms);
+ public slots:
+  // Set the new time.
+  void onTimerChanged(std::chrono::milliseconds ms);
 };
 
 }  // namespace timeline

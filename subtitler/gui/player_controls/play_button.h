@@ -11,22 +11,22 @@ namespace player_controls {
  * Play/pause button for the video player. Part of the video controls.
  */
 class PlayButton : public QPushButton {
-    Q_OBJECT
-  public:
-    PlayButton(QWidget *parent = Q_NULLPTR);
-    ~PlayButton() = default;
+  Q_OBJECT
+ public:
+  PlayButton(QWidget* parent = Q_NULLPTR);
+  ~PlayButton() = default;
 
-    bool is_playing() const { return is_playing_; }
+  bool is_playing() const { return is_playing_; }
 
-  signals:
-    void play();
-    void pause();
+ signals:
+  void play();
+  void pause();
 
-  public slots:
-    void onClick();
+ public slots:
+  void onClick();
 
-  private:
-    bool is_playing_;
+ private:
+  bool is_playing_;
 };
 
 }  // namespace player_controls

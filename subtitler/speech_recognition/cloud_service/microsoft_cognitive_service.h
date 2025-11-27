@@ -17,22 +17,22 @@ namespace cloud_service {
  * https://docs.microsoft.com/en-us/azure/cognitive-services/Speech-Service/
  */
 class MicrosoftCognitiveService : public STTCloudServiceBase {
-  public:
-    MicrosoftCognitiveService(std::string_view api_key,
-                              std::string_view api_region);
-    virtual ~MicrosoftCognitiveService() = default;
+ public:
+  MicrosoftCognitiveService(std::string_view api_key,
+                            std::string_view api_region);
+  virtual ~MicrosoftCognitiveService() = default;
 
-  protected:
-    std::vector<nlohmann::json> getTranscriptionJson(
-        const std::string& input_wav,
-        std::function<void(const std::string&)> progress_msg_callback) override;
+ protected:
+  std::vector<nlohmann::json> getTranscriptionJson(
+      const std::string& input_wav,
+      std::function<void(const std::string&)> progress_msg_callback) override;
 
-    std::vector<TranscriptionResult> parseJson(
-        const std::vector<nlohmann::json>& jsons) override;
+  std::vector<TranscriptionResult> parseJson(
+      const std::vector<nlohmann::json>& jsons) override;
 
-  private:
-    const std::string api_key_;
-    const std::string api_region_;
+ private:
+  const std::string api_key_;
+  const std::string api_region_;
 };
 
 }  // namespace cloud_service

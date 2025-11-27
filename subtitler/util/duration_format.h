@@ -8,14 +8,14 @@
 namespace subtitler {
 
 std::optional<std::chrono::milliseconds> ParseDuration(
-    const std::string &duration);
+    const std::string& duration);
 
-std::string FormatDuration(const std::chrono::milliseconds &duration);
+std::string FormatDuration(const std::chrono::milliseconds& duration);
 
 std::optional<std::chrono::milliseconds> FromSubRipDuration(
     std::string duration);
 
-std::string ToSubRipDuration(const std::chrono::milliseconds &duration);
+std::string ToSubRipDuration(const std::chrono::milliseconds& duration);
 
 }  // namespace subtitler
 

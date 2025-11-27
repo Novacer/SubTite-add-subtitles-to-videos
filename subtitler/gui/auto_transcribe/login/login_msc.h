@@ -17,34 +17,34 @@ namespace login {
  * Dialog for logging in to using Microsoft Cognitive Services.
  */
 class LoginMicrosoftCognitiveServicesWindow : public QDialog {
-    Q_OBJECT
-  public:
-    LoginMicrosoftCognitiveServicesWindow(QWidget* parent = Q_NULLPTR);
-    ~LoginMicrosoftCognitiveServicesWindow() = default;
+  Q_OBJECT
+ public:
+  LoginMicrosoftCognitiveServicesWindow(QWidget* parent = Q_NULLPTR);
+  ~LoginMicrosoftCognitiveServicesWindow() = default;
 
-    QString GetLoginData() const;
+  QString GetLoginData() const;
 
-  public slots:
-    // User enters API information.
-    void onRegister();
-    // User enters password to retrieve API information
-    void onLogin();
-    // User sets up API again.
-    void onSetupAgain();
+ public slots:
+  // User enters API information.
+  void onRegister();
+  // User enters password to retrieve API information
+  void onLogin();
+  // User sets up API again.
+  void onSetupAgain();
 
-  private:
-    QLabel* explanation_;
-    QLabel* api_key_label_;
-    QLabel* api_region_label_;
-    QLabel* password_label_;
-    QLineEdit* api_key_edit_;
-    QLineEdit* api_region_edit_;
-    QLineEdit* password_edit_;
-    QPushButton* submit_button_;
-    QPushButton* setup_again_button_;
+ private:
+  QLabel* explanation_;
+  QLabel* api_key_label_;
+  QLabel* api_region_label_;
+  QLabel* password_label_;
+  QLineEdit* api_key_edit_;
+  QLineEdit* api_region_edit_;
+  QLineEdit* password_edit_;
+  QPushButton* submit_button_;
+  QPushButton* setup_again_button_;
 
-    QString login_data_;
-    int num_times_failed_;
+  QString login_data_;
+  int num_times_failed_;
 };
 
 }  // namespace login

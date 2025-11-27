@@ -48,17 +48,17 @@ Please refer to the [CLI docs](subtitler/cli/README.md)
 7. Wait for your audio to be processed for auto-transcription!
 
 ## Building from source
-SubTite uses Bazel v7.4.1 as the main build system. Setup your environment by [installing Bazelisk](https://bazel.build/install/bazelisk), which will use our [.bazelversion](https://github.com/Novacer/SubTite-add-subtitles-to-videos/blob/master/.bazelversion) file to pick the right version of Bazel.
+SubTite is written in C++20 and uses Bazel v7.4.1 as the main build system. Setup your environment by [installing Bazelisk](https://bazel.build/install/bazelisk), which will use our [.bazelversion](https://github.com/Novacer/SubTite-add-subtitles-to-videos/blob/master/.bazelversion) file to pick the right version of Bazel.
 
 ### Windows
 
 #### Dependency installation
-Compiling for windows requires MSVC 2019. You can download ["Build Tools for Visual Studio"](https://visualstudio.microsoft.com/downloads/) to get the 2019 compiler.
+Compiling for windows requires MSVC. You can download ["Build Tools for Visual Studio"](https://visualstudio.microsoft.com/downloads/) to get the most recent compiler.
 
 With bazel setup, here are some sample commands for building the CLI.
 
 ```bash
-$ bazel build --config=vs2019-prod //subtitler/cli:cli # Build CLI in release mode using MSVC2019
+$ bazel build --config=msvc-prod //subtitler/cli:cli # Build CLI in release mode using MSVC2019
 ```
 
 #### QT
@@ -155,15 +155,15 @@ Next, copy `bazel-subtitler/external/ffmpeg_linux/bin/ffmpeg` into `bazel-bin/su
 ## Build configs
 
 The following build options are configured in [.bazelrc](https://github.com/Novacer/SubTite-add-subtitles-to-videos/blob/master/.bazelrc) of this project:
-1. `--config=vs2019-prod`. MSVC release mode
-2. `--config=vs2019-asan`. MSVC debug mode, with address sanitizer
-3. `--config=vs2019`. MSVC with bazel default settings (fastest build times)
+1. `--config=msvc-prod`. MSVC release mode
+2. `--config=msvc-asan`. MSVC debug mode, with address sanitizer
+3. `--config=msvc`. MSVC with bazel default settings (fastest build times)
 
 `--config=gcc-prod`, `--config=gcc-asan`, and `--config=gcc` are the same as above, except it is for building on Linux using gcc.
 
 Unit tests can be run using
 ```bash
-$ bazel test --config=vs2019-asan ... # used for running on windows
+$ bazel test --config=msvc-asan ... # used for running on windows
 $ bazel test --config=gcc-asan ...    # used for running on linux
 ```
 
@@ -202,7 +202,7 @@ Will produce an output video with **only** the sections from `0s - 1min` and `3m
 
 Trimmer can be built using
 ```
-$ bazel build --config=vs2019 //subtitler/experimental/trimmer:trimmer
+$ bazel build --config=msvc //subtitler/experimental/trimmer:trimmer
 ```
 
 This functionality will eventually be integrated in the SubTite binary.
@@ -218,7 +218,7 @@ This functionality will eventually be integrated in the SubTite binary.
 
 SubBurner can be built using
 ```
-$ bazel build --config=vs2019 //subtitler/experimental/sub_burner:sub_burner
+$ bazel build --config=msvc //subtitler/experimental/sub_burner:sub_burner
 ```
 
 ## Planned Features

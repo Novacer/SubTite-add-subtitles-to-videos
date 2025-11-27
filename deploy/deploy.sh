@@ -32,7 +32,7 @@ if [[ ${machine} == "MinGw" || ${machine} == "CYGWIN" ]]; then
         echo "Using QT5 Path: ${QT5_INSTALL_PATH}"
     fi
 
-    bazel build --config=vs2019-prod //subtitler/gui:main
+    bazel build --config=msvc-prod //subtitler/gui:main
 
     SUBTITE_RELEASE_PATH=${SUBTITE_RELEASE_PATH}/Subtite-win_x86_64
     [ -d ${SUBTITE_RELEASE_PATH} ] && rm -r ${SUBTITE_RELEASE_PATH}

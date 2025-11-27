@@ -24,7 +24,7 @@ if [[ ${machine} == "MinGw" || ${machine} == "CYGWIN" ]]; then
         echo "Using QT5 Path: ${QT5_INSTALL_PATH}"
     fi
 
-    bazel build --config=vs2019 //subtitler/gui:main
+    bazel build --config=msvc //subtitler/gui:main
     # Copy audio plugins to bazel-bin
     if [ ! -d ${BAZEL_BUILD_DIR}/plugins ]; then
         mkdir -p ${BAZEL_BUILD_DIR}/plugins

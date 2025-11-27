@@ -36,7 +36,7 @@ if [[ ${machine} == "MinGw" || ${machine} == "CYGWIN" ]]; then
         cp bazel-$(basename $(pwd))/external/ffmpeg_windows/bin/ffmpeg.exe ${BAZEL_BUILD_DIR}/ffmpeg.exe
     fi
     # Copy MicrosoftCognitiveServices runtime extensions
-    MCS_INSTALL_LOCATION="C:/Program Files/PackageManagement/NuGet/Packages/Microsoft.CognitiveServices.Speech.1.22.0"
+    MCS_INSTALL_LOCATION="C:/Program Files/PackageManagement/NuGet/Packages/Microsoft.CognitiveServices.Speech.1.47.0"
     cp "${MCS_INSTALL_LOCATION}/runtimes/win-x64/native/Microsoft.CognitiveServices.Speech.extension".* ${BAZEL_BUILD_DIR}
 
 elif [[ ${machine} == "Linux" ]]; then

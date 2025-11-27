@@ -9,11 +9,10 @@
 #include <unordered_map>
 #include <vector>
 
+#include "subtitler/srt/subrip_item.h"
+
 namespace subtitler {
 namespace srt {
-
-// Forward declaration
-class SubRipItem;
 
 // Internal representation of an SRT subtitle file.
 class SubRipFile {

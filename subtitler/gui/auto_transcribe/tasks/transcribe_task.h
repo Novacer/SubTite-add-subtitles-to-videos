@@ -4,11 +4,7 @@
 #include <QRunnable>
 #include <QString>
 
-namespace subtitler::gui::auto_transcribe {
-
-class AutoTranscribeWindow;
-
-}  // namespace subtitler::gui::auto_transcribe
+#include "subtitler/gui/auto_transcribe/auto_transcribe_window.h"
 
 namespace subtitler {
 namespace gui {

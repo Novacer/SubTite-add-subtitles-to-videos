@@ -4,11 +4,7 @@
 #include <QRunnable>
 #include <QString>
 
-namespace subtitler::gui::exporting {
-
-class ExportWindow;
-
-}
+#include "subtitler/gui/exporting/export_dialog.h"
 
 namespace subtitler {
 namespace gui {

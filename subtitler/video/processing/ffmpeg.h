@@ -7,19 +7,8 @@
 #include <string>
 #include <string_view>
 
-// Forward declaration
-namespace subtitler::subprocess {
-
-class SubprocessExecutor;
-
-}  // namespace subtitler::subprocess
-
-namespace subtitler::video::processing {
-
-struct Progress;
-class ProgressParser;
-
-}  // namespace subtitler::video::processing
+#include "subtitler/subprocess/subprocess_executor.h"
+#include "subtitler/video/processing/progress_parser.h"
 
 namespace subtitler {
 namespace video {

@@ -7,39 +7,17 @@
 #include <memory>
 #include <optional>
 
+#include "subtitler/gui/auto_transcribe/auto_transcribe_window.h"
+#include "subtitler/gui/auto_transcribe/login/login_msc.h"
+#include "subtitler/gui/subtitle_editor/subtitle_editor.h"
+#include "subtitler/gui/video_renderer/opengl_renderer.h"
+
 QT_FORWARD_DECLARE_CLASS(QAVPlayer)
 QT_FORWARD_DECLARE_CLASS(QAVAudioOutput)
 QT_FORWARD_DECLARE_CLASS(QAVAudioFrame)
 QT_FORWARD_DECLARE_CLASS(QAVVideoFrame)
 QT_FORWARD_DECLARE_CLASS(QFile)
 QT_FORWARD_DECLARE_CLASS(QDialog)
-
-namespace subtitler::gui {
-namespace subtitle_editor {
-
-QT_FORWARD_DECLARE_CLASS(SubtitleEditor)
-
-}  // namespace subtitle_editor
-
-namespace video_renderer {
-
-QT_FORWARD_DECLARE_CLASS(OpenGLRenderer)
-
-}  // namespace video_renderer
-
-namespace auto_transcribe {
-
-QT_FORWARD_DECLARE_CLASS(AutoTranscribeWindow)
-
-}  // namespace auto_transcribe
-
-namespace auto_transcribe::login {
-
-QT_FORWARD_DECLARE_CLASS(LoginMicrosoftCognitiveServicesWindow)
-
-}  // namespace auto_transcribe::login
-
-}  // namespace subtitler::gui
 
 namespace subtitler {
 namespace gui {

@@ -7,16 +7,12 @@
 #include "subtitler/gui/timeline/ruler.h"
 #include "subtitler/gui/timeline/zoomer.h"
 
-namespace subtitler::gui::timeline {
-
-QT_FORWARD_DECLARE_CLASS(SubtitleInterval);
-QT_FORWARD_DECLARE_CLASS(SubtitleIntervalContainer);
-
-}  // namespace subtitler::gui::timeline
-
 namespace subtitler {
 namespace gui {
 namespace timeline {
+
+QT_FORWARD_DECLARE_CLASS(SubtitleInterval);
+QT_FORWARD_DECLARE_CLASS(SubtitleIntervalContainer);
 
 /**
  * Widget containing the scrollable timeline controls below the video player.

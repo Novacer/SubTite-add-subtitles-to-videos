@@ -8,12 +8,7 @@
 #include <string_view>
 #include <vector>
 
-// Forward declaration
-namespace subtitler::subprocess {
-
-class SubprocessExecutor;
-
-}  // namespace subtitler::subprocess
+#include "subtitler/subprocess/subprocess_executor.h"
 
 namespace subtitler {
 namespace video {

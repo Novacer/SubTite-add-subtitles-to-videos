@@ -26,7 +26,7 @@ A simple and fast CLI for editing SRT files. Most users will use the GUI, but th
 Building the CLI is done with bazel.
 
 ```
-bazel build --config=vs2019-prod //subtitler/cli:cli # on windows
+bazel build --config=msvc-prod //subtitler/cli:cli # on windows
 bazel build --config-gcc-prod //subtitler/cli:cli # on linux
 ```
 

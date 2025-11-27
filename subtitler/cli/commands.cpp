@@ -12,6 +12,7 @@
 #include "subtitler/srt/subrip_item.h"
 #include "subtitler/util/duration_format.h"
 #include "subtitler/util/temp_file.h"
+#include "subtitler/util/unicode.h"
 #include "subtitler/video/metadata/ffprobe.h"
 #include "subtitler/video/player/ffplay.h"
 
@@ -112,9 +113,10 @@ void Commands::MainLoop() {
           << std::endl;
 
   // Load existing subtitles if any.
-  if (fs::exists(fs::u8path(paths_.output_subtitle_path))) {
+  auto path = GetFileSystemUtf8Path(paths_.output_subtitle_path);
+  if (fs::exists(path)) {
     try {
-      srt_file_.LoadState(fs::u8path(paths_.output_subtitle_path));
+      srt_file_.LoadState(path);
       if (srt_file_.NumItems() > 0) {
         output_ << "Loaded existing subtitles!" << std::endl;
       }
@@ -421,7 +423,7 @@ void Commands::EditSub(const std::vector<std::string>& tokens) {
 
 void Commands::Save() {
   namespace fs = std::filesystem;
-  auto path_wrapper = fs::u8path(paths_.output_subtitle_path);
+  auto path_wrapper = GetFileSystemUtf8Path(paths_.output_subtitle_path);
   std::ofstream file{path_wrapper, std::ofstream::out | std::ofstream::trunc};
   if (!file) {
     throw std::runtime_error("Could not open file " +
@@ -454,7 +456,7 @@ void Commands::_GeneratePreviewSubs() {
   srt_file_.ToStream(temp_subtitles_stream, start_, duration_);
   std::string temp_subtitles = temp_subtitles_stream.str();
   if (!temp_subtitles.empty()) {
-    auto output_path = fs::u8path(paths_.output_subtitle_path);
+    auto output_path = GetFileSystemUtf8Path(paths_.output_subtitle_path);
     temp_file_ = std::make_unique<TempFile>(temp_subtitles,
                                             output_path.parent_path(), ".srt");
     if (!temp_file_) {

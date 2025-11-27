@@ -1,11 +1,20 @@
 #include "subtitler/util/unicode.h"
 
+#ifdef _MSC_VER
 #include <windows.h>
+#endif
 
+#include <filesystem>
 #include <stdexcept>
 
 namespace subtitler {
 
+std::filesystem::path GetFileSystemUtf8Path(const std::string& utf8_path) {
+  std::u8string u8_path{utf8_path.begin(), utf8_path.end()};
+  return std::filesystem::path{u8_path};
+}
+
+#ifdef _MSC_VER
 std::string ConvertFromWString(const std::wstring& wstr) {
   int num_chars = WideCharToMultiByte(
       /* CodePage= */ CP_UTF8,
@@ -68,5 +77,7 @@ std::wstring ConvertToWString(const std::string& str) {
 
   return result;
 }
+
+#endif  // _MSC_VER
 
 }  // namespace subtitler

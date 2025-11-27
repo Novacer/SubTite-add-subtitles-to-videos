@@ -53,9 +53,16 @@ cc_test(
 
 cc_library(
     name = "unicode",
-    srcs = select({
-        "@platforms//os:windows": ["unicode.cpp"],
-        "//conditions:default": [],
-    }),
+    srcs = ["unicode.cpp"],
     hdrs = ["unicode.h"],
+)
+
+cc_library(
+    name = "qstring_to_utf8_path",
+    srcs = ["qstring_to_utf8_path.cpp"],
+    hdrs = ["qstring_to_utf8_path.h"],
+    deps = [
+        ":unicode",
+        "@qt//:qt_core",
+    ],
 )

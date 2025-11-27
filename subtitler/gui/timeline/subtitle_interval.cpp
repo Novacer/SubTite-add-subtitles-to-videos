@@ -7,6 +7,7 @@
 #include <stdexcept>
 
 #include "subtitler/srt/subrip_file.h"
+#include "subtitler/util/qstring_to_utf8_path.h"
 
 #define CUT_MARKER_WIDTH 10
 #define CUT_MARKER_HEIGHT 80
@@ -19,19 +20,9 @@ namespace subtitler {
 namespace gui {
 namespace timeline {
 
-namespace {
-
-fs::path ConvertQStringToPath(const QString& qstr) {
-  QByteArray qstr_u8 = qstr.toUtf8();
-  return fs::path(std::u8string{qstr_u8.begin(), qstr_u8.end()});
-}
-
-}  // namespace
-
 SubtitleIntervalContainer::SubtitleIntervalContainer(
     const QString& output_srt_file, QWidget* parent)
-    : QWidget{parent},
-      output_srt_file_{ConvertQStringToPath(output_srt_file)} {}
+    : QWidget{parent}, output_srt_file_{QStringToUtf8Path(output_srt_file)} {}
 
 SubtitleIntervalContainer::~SubtitleIntervalContainer() = default;
 
@@ -167,7 +158,7 @@ void SubtitleIntervalContainer::ChangeSubripFile(
     const QString& new_subrip_file) {
   DeleteAll();
   QByteArray new_subrip_file_u8 = new_subrip_file.toUtf8();
-  output_srt_file_ = ConvertQStringToPath(new_subrip_file);
+  output_srt_file_ = QStringToUtf8Path(new_subrip_file);
 }
 
 void SubtitleInterval::initializeChildren(QWidget* parent) {

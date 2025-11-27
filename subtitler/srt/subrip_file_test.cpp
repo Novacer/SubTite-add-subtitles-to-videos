@@ -10,6 +10,7 @@
 
 #include "subtitler/srt/subrip_item.h"
 #include "subtitler/util/temp_file.h"
+#include "subtitler/util/unicode.h"
 
 namespace fs = std::filesystem;
 using namespace std::chrono_literals;
@@ -157,8 +158,8 @@ TEST_F(SubRipFileTest, ChangePosition) {
 
 TEST_F(SubRipFileTest, OverwritesPreviousState) {
   std::string temp_dir = std::getenv("TEST_TMPDIR");
-  TempFile temp_file{"", fs::u8path(temp_dir), ".srt"};
-  auto path_wrapper = fs::u8path(temp_file.FileName());
+  TempFile temp_file{"", GetFileSystemUtf8Path(temp_dir), ".srt"};
+  auto path_wrapper = GetFileSystemUtf8Path(temp_file.FileName());
 
   // First write existing contents to a file
   {
@@ -196,8 +197,8 @@ TEST_F(SubRipFileTest, OverwritesPreviousState) {
 
 TEST_F(SubRipFileTest, FailureToLoadRetainsPreviousState) {
   std::string temp_dir = std::getenv("TEST_TMPDIR");
-  TempFile temp_file{"", fs::u8path(temp_dir), ".srt"};
-  auto path_wrapper = fs::u8path(temp_file.FileName());
+  TempFile temp_file{"", GetFileSystemUtf8Path(temp_dir), ".srt"};
+  auto path_wrapper = GetFileSystemUtf8Path(temp_file.FileName());
 
   // Write incorrect srt file
   {

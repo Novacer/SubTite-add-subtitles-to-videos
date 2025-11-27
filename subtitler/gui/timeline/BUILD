@@ -71,6 +71,7 @@ qt_cc_library(
         "//subtitler/gui/resource:resources",
         "//subtitler/srt:subrip_file",
         "//subtitler/srt:subrip_item",
+        "//subtitler/util:qstring_to_utf8_path",
         "@qt//:qt_core",
         "@qt//:qt_widgets",
     ],

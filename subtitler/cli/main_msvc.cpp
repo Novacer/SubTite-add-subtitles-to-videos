@@ -224,7 +224,7 @@ int main(int argc, char** argv) {
 
   // Sanity test writing to output path beforehand so we know it works.
   {
-    auto path_wrapper = fs::u8path(output_subtitle_path);
+    auto path_wrapper = GetFileSystemUtf8Path(output_subtitle_path);
     // Write empty string in append mode.
     std::ofstream ofs{path_wrapper, std::ios_base::app};
     if (!ofs) {

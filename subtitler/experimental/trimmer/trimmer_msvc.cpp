@@ -228,7 +228,7 @@ int main(int argc, char** argv) {
   LOG(INFO) << output_path;
 
   // IMPORTANT - This must be generated BEFORE the path is fixed with ""
-  auto output_path_wrapper = fs::u8path(output_path);
+  auto output_path_wrapper = GetFileSystemUtf8Path(output_path);
 
   // Make sure input file path is wrapped/unwrapped with quotes as needed.
   // Paths passed to command args should have quotes
@@ -238,7 +238,7 @@ int main(int argc, char** argv) {
   FixInputPath(timestamp_path, /* should_have_quotes= */ false);
   FixInputPath(output_path, /* should_have_quotes= */ true);
 
-  auto path_wrapper = fs::path(fs::u8path(timestamp_path));
+  auto path_wrapper = GetFileSystemUtf8Path(timestamp_path);
 
   std::ifstream stream{path_wrapper};
   std::string read_buffer;
@@ -292,7 +292,8 @@ int main(int argc, char** argv) {
     LOG(ERROR) << e.what();
     return 1;
   }
-  std::ofstream file_names{fs::u8path(file_containing_file_names->FileName())};
+  std::ofstream file_names{
+      GetFileSystemUtf8Path(file_containing_file_names->FileName())};
   LOG(INFO) << "Created the first temp file...";
 
   subtitler::subprocess::SubprocessExecutor executor{};

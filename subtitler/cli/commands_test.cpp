@@ -12,12 +12,14 @@
 #include "subtitler/cli/io/input.h"
 #include "subtitler/subprocess/mock_subprocess_executor.h"
 #include "subtitler/util/font_config.h"
+#include "subtitler/util/unicode.h"
 #include "subtitler/video/metadata/ffprobe.h"
 #include "subtitler/video/player/ffplay.h"
 
 namespace fs = std::filesystem;
 using namespace std::chrono_literals;
 
+using subtitler::GetFileSystemUtf8Path;
 using subtitler::cli::Commands;
 using subtitler::cli::io::NarrowInputGetter;
 using subtitler::subprocess::MockSubprocessExecutor;
@@ -45,7 +47,7 @@ class CommandsTest : public ::testing::Test {
     video_path = "path/to/test.mp4";
     ffplay_path = "path/to/ffplay";
     std::string temp_dir = std::getenv("TEST_TMPDIR");
-    auto fs_srt_path = fs::u8path(temp_dir) / fs::path("test.srt");
+    auto fs_srt_path = GetFileSystemUtf8Path(temp_dir) / fs::path("test.srt");
     srt_path = fs_srt_path.string();
     // Clear the file beforehand.
     std::ofstream file{fs_srt_path, std::ofstream::out | std::ofstream::trunc};

@@ -15,6 +15,7 @@
 #include "subtitler/speech_recognition/languages/english_us.h"
 #include "subtitler/srt/subrip_file.h"
 #include "subtitler/subprocess/subprocess_executor.h"
+#include "subtitler/util/qstring_to_utf8_path.h"
 #include "subtitler/video/processing/ffmpeg.h"
 
 namespace subtitler {
@@ -70,8 +71,7 @@ void TranscribeTask::run() {
     // Write results to srt file.
     QMetaObject::invokeMethod(parent_, "onProgressUpdate",
                               Q_ARG(QString, "Writing result"));
-    std::ofstream output_file{
-        std::filesystem::u8path(output_srt_.toStdString())};
+    std::ofstream output_file{QStringToUtf8Path(output_srt_)};
     if (!output_file) {
       throw std::runtime_error{"Could not open output file for reading"};
     }

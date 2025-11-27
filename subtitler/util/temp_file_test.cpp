@@ -7,7 +7,11 @@
 #include <filesystem>
 #include <fstream>
 
-using namespace subtitler;
+#include "subtitler/util/unicode.h"
+
+namespace subtitler {
+namespace {
+
 namespace fs = std::filesystem;
 
 TEST(TempFileTest, CreateTempFileGetsDeleted) {
@@ -15,7 +19,7 @@ TEST(TempFileTest, CreateTempFileGetsDeleted) {
   std::string file_name;
   std::string temp_dir = std::getenv("TEST_TMPDIR");
   {
-    TempFile file(data, fs::u8path(temp_dir), ".txt");
+    TempFile file(data, GetFileSystemUtf8Path(temp_dir), ".txt");
     file_name = file.FileName();
     std::ifstream ifs{file_name};
     std::string contents((std::istreambuf_iterator<char>(ifs)),
@@ -26,3 +30,6 @@ TEST(TempFileTest, CreateTempFileGetsDeleted) {
   // File goes out of scope, test if it still exists.
   ASSERT_FALSE(std::filesystem::exists(file_name));
 }
+
+}  // namespace
+}  // namespace subtitler

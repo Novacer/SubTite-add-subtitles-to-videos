@@ -14,62 +14,59 @@ namespace {
 
 void groupSentences(srt::SubRipFile& srt_file,
                     const cloud_service::TranscriptionResult& transcription) {
-    std::istringstream tokenizer{transcription.display_text};
+  std::istringstream tokenizer{transcription.display_text};
 
-    std::string sentence_so_far;
-    std::string next_word;
-    unsigned int word_index = 0;
-    std::chrono::milliseconds start;
+  std::string sentence_so_far;
+  std::string next_word;
+  unsigned int word_index = 0;
+  std::chrono::milliseconds start;
 
-    while (tokenizer >> next_word) {
-        if (next_word.empty()) {
-            throw std::runtime_error{"Tokenizer gave unexpected empty word"};
-        }
-        if (transcription.timings.empty()) {
-            throw std::runtime_error{"Transcription did not have word timings"};
-        }
-        if (sentence_so_far.empty()) {
-            start = transcription.timings.at(word_index).offset;
-        } else {
-            sentence_so_far += ' ';
-        }
-
-        sentence_so_far += next_word;
-
-        bool sentence_ends = next_word.back() == '!' ||
-                             next_word.back() == '?' || next_word.back() == '.';
-        bool no_more_word_timings =
-            word_index + 1 >= transcription.timings.size();
-
-        if (sentence_ends || no_more_word_timings) {
-            const auto& timing = transcription.timings.at(word_index);
-            const auto end = timing.offset + timing.duration;
-            srt::SubRipItem item{};
-            item.start(start)
-                ->duration(end - start)
-                ->AppendLine(sentence_so_far);
-            srt_file.AddItem(std::move(item));
-            sentence_so_far.clear();
-
-            if (no_more_word_timings) {
-                break;
-            }
-        }
-        ++word_index;
+  while (tokenizer >> next_word) {
+    if (next_word.empty()) {
+      throw std::runtime_error{"Tokenizer gave unexpected empty word"};
     }
+    if (transcription.timings.empty()) {
+      throw std::runtime_error{"Transcription did not have word timings"};
+    }
+    if (sentence_so_far.empty()) {
+      start = transcription.timings.at(word_index).offset;
+    } else {
+      sentence_so_far += ' ';
+    }
+
+    sentence_so_far += next_word;
+
+    bool sentence_ends = next_word.back() == '!' || next_word.back() == '?' ||
+                         next_word.back() == '.';
+    bool no_more_word_timings = word_index + 1 >= transcription.timings.size();
+
+    if (sentence_ends || no_more_word_timings) {
+      const auto& timing = transcription.timings.at(word_index);
+      const auto end = timing.offset + timing.duration;
+      srt::SubRipItem item{};
+      item.start(start)->duration(end - start)->AppendLine(sentence_so_far);
+      srt_file.AddItem(std::move(item));
+      sentence_so_far.clear();
+
+      if (no_more_word_timings) {
+        break;
+      }
+    }
+    ++word_index;
+  }
 }
 
 }  // namespace
 
 srt::SubRipFile EnglishUS::ConvertToSRT(
     const std::vector<cloud_service::TranscriptionResult>& transcriptions) {
-    srt::SubRipFile srt_file;
+  srt::SubRipFile srt_file;
 
-    for (const auto& transcription : transcriptions) {
-        groupSentences(srt_file, transcription);
-    }
+  for (const auto& transcription : transcriptions) {
+    groupSentences(srt_file, transcription);
+  }
 
-    return srt_file;
+  return srt_file;
 }
 
 }  // namespace languages

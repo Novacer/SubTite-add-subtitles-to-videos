@@ -16,17 +16,17 @@ namespace exporting {
 namespace tasks {
 
 class BurnSubtitleTask : public QRunnable {
-  public:
-    BurnSubtitleTask(QString video, QString subtitle, QString output,
-                     ExportWindow *parent);
+ public:
+  BurnSubtitleTask(QString video, QString subtitle, QString output,
+                   ExportWindow* parent);
 
-    void run() override;
+  void run() override;
 
-  private:
-    QString video_;
-    QString subtitle_;
-    QString output_;
-    ExportWindow *parent_;
+ private:
+  QString video_;
+  QString subtitle_;
+  QString output_;
+  ExportWindow* parent_;
 };
 
 }  // namespace tasks

@@ -11,34 +11,34 @@ extern "C" {
 
 #include "subtitler/gui/main_window.h"
 
-int main(int argc, char *argv[]) {
-    av_log_set_level(AV_LOG_FATAL);
-    QApplication app(argc, argv);
-    app.setWindowIcon(QIcon(":/images/logo"));
+int main(int argc, char* argv[]) {
+  av_log_set_level(AV_LOG_FATAL);
+  QApplication app(argc, argv);
+  app.setWindowIcon(QIcon(":/images/logo"));
 
-    // Force software decoding for now, until I can figure out
-    // how to make hw decoding work...
-    qputenv("QT_AVPLAYER_NO_HWDEVICE", QByteArray("1"));
+  // Force software decoding for now, until I can figure out
+  // how to make hw decoding work...
+  qputenv("QT_AVPLAYER_NO_HWDEVICE", QByteArray("1"));
 
-    Q_INIT_RESOURCE(timeline);
+  Q_INIT_RESOURCE(timeline);
 
-    QFile file(":/style/app");
-    bool ret = file.open(QFile::ReadOnly);
-    if (ret) {
-        qApp->setStyleSheet(file.readAll());
-        file.close();
-    }
+  QFile file(":/style/app");
+  bool ret = file.open(QFile::ReadOnly);
+  if (ret) {
+    qApp->setStyleSheet(file.readAll());
+    file.close();
+  }
 
-    int res = 0;
+  int res = 0;
 
-    try {
-        subtitler::gui::MainWindow main_window;
-        main_window.show();
-        res = app.exec();
-    } catch (const std::exception &e) {
-        // Silence
-    }
+  try {
+    subtitler::gui::MainWindow main_window;
+    main_window.show();
+    res = app.exec();
+  } catch (const std::exception& e) {
+    // Silence
+  }
 
-    qunsetenv("QT_AVPLAYER_NO_HWDEVICE");
-    return res;
+  qunsetenv("QT_AVPLAYER_NO_HWDEVICE");
+  return res;
 }

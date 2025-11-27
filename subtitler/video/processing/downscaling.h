@@ -18,9 +18,9 @@ namespace processing {
 
 // Information about the input video.
 struct InputVideoScalingInfo {
-    int height;
-    int width;
-    double fps;
+  int height;
+  int width;
+  double fps;
 };
 
 // Given a video's dimensions and fps, this returns the recommended filters to

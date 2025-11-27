@@ -10,8 +10,8 @@ namespace subtitler {
 namespace gui {
 
 struct Settings {
-    QString video_file;
-    QString subtitle_file;
+  QString video_file;
+  QString subtitle_file;
 };
 
 /**
@@ -20,20 +20,20 @@ struct Settings {
  * @param current_settings the current settings to populate the dialog.
  * @return Settings the new settings the user has selected.
  */
-Settings GetSettings(const Settings &current_settings);
+Settings GetSettings(const Settings& current_settings);
 
 /**
  * A dialog for changing the settings.
  */
 class SettingsWindow : public QDialog {
-    Q_OBJECT
-  public:
-    SettingsWindow(Settings &settings, QWidget *parent = Q_NULLPTR);
-    ~SettingsWindow() = default;
+  Q_OBJECT
+ public:
+  SettingsWindow(Settings& settings, QWidget* parent = Q_NULLPTR);
+  ~SettingsWindow() = default;
 
-  private:
-    Settings &settings_;
-    QLabel *error_msg_;
+ private:
+  Settings& settings_;
+  QLabel* error_msg_;
 };
 
 }  // namespace gui

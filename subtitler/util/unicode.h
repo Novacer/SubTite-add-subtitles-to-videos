@@ -12,10 +12,10 @@ namespace subtitler {
 // Converts a wide str (utf-16 on windows) to a narrow multi-byte string
 // (utf-8). We don't use wstring everywhere to retain some cross-compatibility
 // with linux. See http://utf8everywhere.org/
-std::string ConvertFromWString(const std::wstring &wstr);
+std::string ConvertFromWString(const std::wstring& wstr);
 
 // Converts narrow string (utf-8) to wide string (utf-16).
-std::wstring ConvertToWString(const std::string &str);
+std::wstring ConvertToWString(const std::string& str);
 
 }  // namespace subtitler
 

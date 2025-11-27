@@ -26,9 +26,9 @@ namespace io {
  * input_getter->getline(something).
  */
 class InputGetter {
-  public:
-    virtual bool getline(std::string &line) = 0;
-    virtual ~InputGetter(){};
+ public:
+  virtual bool getline(std::string& line) = 0;
+  virtual ~InputGetter() {};
 };
 
 /**
@@ -38,15 +38,15 @@ class InputGetter {
  * if (input_getter->getline(input)) { std::cout << input << std::endl; }
  */
 class NarrowInputGetter : public InputGetter {
-  public:
-    NarrowInputGetter(std::istream &stream) : InputGetter{}, stream_{stream} {};
+ public:
+  NarrowInputGetter(std::istream& stream) : InputGetter{}, stream_{stream} {};
 
-    bool getline(std::string &line) override {
-        return static_cast<bool>(std::getline(stream_, line));
-    };
+  bool getline(std::string& line) override {
+    return static_cast<bool>(std::getline(stream_, line));
+  };
 
-  private:
-    std::istream &stream_;
+ private:
+  std::istream& stream_;
 };
 
 /**
@@ -60,16 +60,16 @@ class NarrowInputGetter : public InputGetter {
  * if (input_getter->getline(input)) { std::cout << input << std::endl; }
  */
 class WideInputGetter : public InputGetter {
-  public:
-    // Note: trying to construct this class will throw an exception if you are
-    // not using MSVC. Indeed, on Unix systems you shouldn't be using this
-    // anyways.
-    WideInputGetter(std::wistream &stream);
+ public:
+  // Note: trying to construct this class will throw an exception if you are
+  // not using MSVC. Indeed, on Unix systems you shouldn't be using this
+  // anyways.
+  WideInputGetter(std::wistream& stream);
 
-    bool getline(std::string &line) override;
+  bool getline(std::string& line) override;
 
-  private:
-    std::wistream &stream_;
+ private:
+  std::wistream& stream_;
 };
 
 }  // namespace io

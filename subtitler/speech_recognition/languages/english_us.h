@@ -3,15 +3,9 @@
 
 #include <vector>
 
+#include "subtitler/speech_recognition/cloud_service/cloud_service_base.h"
 #include "subtitler/speech_recognition/languages/language.h"
 #include "subtitler/srt/subrip_file.h"
-
-// Forward declaration
-namespace subtitler::speech_recognition::cloud_service {
-
-struct TranscriptionResult;
-
-}  // namespace subtitler::speech_recognition::cloud_service
 
 namespace subtitler {
 namespace speech_recognition {
@@ -22,13 +16,13 @@ namespace languages {
  * to SRT format.
  */
 class EnglishUS final : public Language {
-  public:
-    EnglishUS() = default;
-    ~EnglishUS() = default;
+ public:
+  EnglishUS() = default;
+  ~EnglishUS() = default;
 
-    srt::SubRipFile ConvertToSRT(
-        const std::vector<cloud_service::TranscriptionResult>& transcriptions)
-        override;
+  srt::SubRipFile ConvertToSRT(
+      const std::vector<cloud_service::TranscriptionResult>& transcriptions)
+      override;
 };
 
 }  // namespace languages

@@ -32,64 +32,63 @@ TranscribeTask::TranscribeTask(QString api_key, QString api_region,
       parent_{parent} {};
 
 void TranscribeTask::run() {
-    using namespace subtitler::speech_recognition;
+  using namespace subtitler::speech_recognition;
 
-    try {
-        // Create a temp wav file.
-        QDir parent_dir = QFileInfo{input_video_}.dir();
-        QTemporaryFile temp(parent_dir.absoluteFilePath("XXXXXX.wav"));
-        temp.open();
+  try {
+    // Create a temp wav file.
+    QDir parent_dir = QFileInfo{input_video_}.dir();
+    QTemporaryFile temp(parent_dir.absoluteFilePath("XXXXXX.wav"));
+    temp.open();
 
-        // Extract Uncompressed audio.
-        QMetaObject::invokeMethod(
-            parent_, "onProgressUpdate",
-            Q_ARG(QString, "Extracting uncompressed audio"));
-        std::string ffmpeg_path =
-            QCoreApplication::applicationDirPath().toStdString() + "/ffmpeg";
-        video::processing::FFMpeg ffmpeg{
-            ffmpeg_path, std::make_unique<subprocess::SubprocessExecutor>()};
-        ffmpeg.ExtractUncompressedAudio(input_video_.toStdString(),
-                                        temp.fileName().toStdString());
+    // Extract Uncompressed audio.
+    QMetaObject::invokeMethod(parent_, "onProgressUpdate",
+                              Q_ARG(QString, "Extracting uncompressed audio"));
+    std::string ffmpeg_path =
+        QCoreApplication::applicationDirPath().toStdString() + "/ffmpeg";
+    video::processing::FFMpeg ffmpeg{
+        ffmpeg_path, std::make_unique<subprocess::SubprocessExecutor>()};
+    ffmpeg.ExtractUncompressedAudio(input_video_.toStdString(),
+                                    temp.fileName().toStdString());
 
-        auto mcs_cloud_service =
-            std::make_unique<cloud_service::MicrosoftCognitiveService>(
-                api_key_.toStdString(), api_region_.toStdString());
-        auto english_us = std::make_unique<languages::EnglishUS>();
-        auto auto_transcriber = std::make_unique<AutoTranscriber>(
-            std::move(mcs_cloud_service), std::move(english_us));
+    auto mcs_cloud_service =
+        std::make_unique<cloud_service::MicrosoftCognitiveService>(
+            api_key_.toStdString(), api_region_.toStdString());
+    auto english_us = std::make_unique<languages::EnglishUS>();
+    auto auto_transcriber = std::make_unique<AutoTranscriber>(
+        std::move(mcs_cloud_service), std::move(english_us));
 
-        // Upload audio for auto transcription.
-        QMetaObject::invokeMethod(parent_, "onProgressUpdate",
-                                  Q_ARG(QString, "Uploading audio"));
-        auto srt = auto_transcriber->Transcribe(
-            temp.fileName().toStdString(), [this](const std::string& msg) {
-                QMetaObject::invokeMethod(
-                    parent_, "onProgressUpdate",
-                    Q_ARG(QString, QString::fromStdString(msg)));
-            });
+    // Upload audio for auto transcription.
+    QMetaObject::invokeMethod(parent_, "onProgressUpdate",
+                              Q_ARG(QString, "Uploading audio"));
+    auto srt = auto_transcriber->Transcribe(
+        temp.fileName().toStdString(), [this](const std::string& msg) {
+          QMetaObject::invokeMethod(
+              parent_, "onProgressUpdate",
+              Q_ARG(QString, QString::fromStdString(msg)));
+        });
 
-        // Write results to srt file.
-        QMetaObject::invokeMethod(parent_, "onProgressUpdate",
-                                  Q_ARG(QString, "Writing result"));
-        std::ofstream output_file{
-            std::filesystem::u8path(output_srt_.toStdString())};
-        if (!output_file) {
-            throw std::runtime_error{"Could not open output file for reading"};
-        }
-        srt.ToStream(output_file);
-
-    } catch (const std::exception& e) {
-        QMetaObject::invokeMethod(parent_, "onTranscribeComplete",
-                                  Q_ARG(QString, e.what()));
-        return;
-    } catch (...) {
-        QMetaObject::invokeMethod(parent_, "onTranscribeComplete",
-                                  Q_ARG(QString, "unknown error"));
-        return;
+    // Write results to srt file.
+    QMetaObject::invokeMethod(parent_, "onProgressUpdate",
+                              Q_ARG(QString, "Writing result"));
+    std::ofstream output_file{
+        std::filesystem::u8path(output_srt_.toStdString())};
+    if (!output_file) {
+      throw std::runtime_error{"Could not open output file for reading"};
     }
+    srt.ToStream(output_file);
 
+  } catch (const std::exception& e) {
     QMetaObject::invokeMethod(parent_, "onTranscribeComplete",
-                              Q_ARG(QString, ""));
+                              Q_ARG(QString, e.what()));
+    return;
+  } catch (...) {
+    QMetaObject::invokeMethod(parent_, "onTranscribeComplete",
+                              Q_ARG(QString, "unknown error"));
+    return;
+  }
+
+  QMetaObject::invokeMethod(parent_, "onTranscribeComplete",
+                            Q_ARG(QString, ""));
 }
 
 }  // namespace tasks

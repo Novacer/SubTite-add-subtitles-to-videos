@@ -13,40 +13,40 @@ namespace player_controls {
  * See below for more specializations.
  */
 class StepButton : public QPushButton {
-    Q_OBJECT
-  public:
-    StepButton(const std::chrono::milliseconds &step_amount,
-               QWidget *parent = Q_NULLPTR);
-    virtual ~StepButton() = default;
+  Q_OBJECT
+ public:
+  StepButton(const std::chrono::milliseconds& step_amount,
+             QWidget* parent = Q_NULLPTR);
+  virtual ~StepButton() = default;
 
-  signals:
-    void stepDelta(std::chrono::milliseconds delta);
+ signals:
+  void stepDelta(std::chrono::milliseconds delta);
 
-  protected slots:
-    virtual void onClicked();
+ protected slots:
+  virtual void onClicked();
 
-  private:
-    std::chrono::milliseconds step_amount;
+ private:
+  std::chrono::milliseconds step_amount;
 };
 
 /**
  * Button for stepping player fowards by 5 seconds.
  */
 class StepForwardsButton : public StepButton {
-    Q_OBJECT
-  public:
-    StepForwardsButton(QWidget *parent = Q_NULLPTR);
-    ~StepForwardsButton() = default;
+  Q_OBJECT
+ public:
+  StepForwardsButton(QWidget* parent = Q_NULLPTR);
+  ~StepForwardsButton() = default;
 };
 
 /**
  * Button for stepping player backwards by 5 seconds.
  */
 class StepBackwardsButton : public StepButton {
-    Q_OBJECT
-  public:
-    StepBackwardsButton(QWidget *parent = Q_NULLPTR);
-    ~StepBackwardsButton() = default;
+  Q_OBJECT
+ public:
+  StepBackwardsButton(QWidget* parent = Q_NULLPTR);
+  ~StepBackwardsButton() = default;
 };
 
 }  // namespace player_controls

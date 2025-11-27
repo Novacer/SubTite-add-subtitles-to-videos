@@ -1,5 +1,5 @@
-load("@rules_cc//cc:defs.bzl", "cc_binary")
 load("@com_justbuchanan_rules_qt//:qt.bzl", "qt_cc_library")
+load("@rules_cc//cc:defs.bzl", "cc_binary")
 
 package(default_visibility = ["//subtitler/gui:__subpackages__"])
 
@@ -33,15 +33,15 @@ qt_cc_library(
         "//subtitler/gui/exporting:export_dialog",
         "//subtitler/gui/player_controls:play_button",
         "//subtitler/gui/player_controls:step_button",
-        "//subtitler/gui/subtitle_editor:subtitle_editor",
-        "//subtitler/gui/timeline:timer",
+        "//subtitler/gui/subtitle_editor",
         "//subtitler/gui/timeline:timeline_window",
+        "//subtitler/gui/timeline:timer",
         "//subtitler/gui/video_renderer:opengl_renderer",
-        "//subtitler/video/util:video_utils",
         "//subtitler/video/processing:downscaling",
-        "@qt//:qt_widgets",
+        "//subtitler/video/util:video_utils",
         "@qt//:qt_multimedia",
         "@qt//:qt_multimediawidgets",
+        "@qt//:qt_widgets",
     ] + select({
         "@platforms//os:windows": ["@qt_av_player_windows//:qt_av_player"],
         "//conditions:default": ["@qt_av_player_linux//:qt_av_player"],
@@ -68,8 +68,8 @@ cc_binary(
         ":main_window",
         "//subtitler/gui/resource:resources",
         "@qt//:qt_core",
-        "@qt//:qt_widgets",
         "@qt//:qt_network",
+        "@qt//:qt_widgets",
     ] + select({
         "@platforms//os:windows": ["@ffmpeg_windows//:ffmpeg_libavutil"],
         "//conditions:default": ["@ffmpeg_linux//:ffmpeg_libavutil"],

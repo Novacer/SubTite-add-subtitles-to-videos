@@ -77,11 +77,11 @@ jobs:
 
       # Runs a set of commands using the runners shell
       - name: Bazel build all targets
-        run: bazel build --config=msvc-asan ...
+        run: bazel build --config=msvc ...
         shell: bash
       
       - name: Bazel test all targets
-        run: bazel test --config=msvc-asan --test_output=errors ...
+        run: bazel test --config=msvc --test_output=errors ...
         shell: bash
 
       - name: Build GUI

@@ -7,6 +7,7 @@
 #include <stdexcept>
 
 #include "subtitler/srt/subrip_file.h"
+#include "subtitler/util/qstring_to_utf8_path.h"
 
 #define CUT_MARKER_WIDTH 10
 #define CUT_MARKER_HEIGHT 80
@@ -21,8 +22,7 @@ namespace timeline {
 
 SubtitleIntervalContainer::SubtitleIntervalContainer(
     const QString& output_srt_file, QWidget* parent)
-    : QWidget{parent},
-      output_srt_file_{fs::u8path(output_srt_file.toStdString())} {}
+    : QWidget{parent}, output_srt_file_{QStringToUtf8Path(output_srt_file)} {}
 
 SubtitleIntervalContainer::~SubtitleIntervalContainer() = default;
 
@@ -118,7 +118,7 @@ void SubtitleIntervalContainer::SaveSubripFile() {
   if (!file) {
     // TODO: maybe open dialog and warn user rather than using debug?
     qDebug() << "Could not open "
-             << QString::fromStdString(output_srt_file_.u8string());
+             << QString::fromStdString(output_srt_file_.string());
     return;
   }
   srt_file.ToStream(file);
@@ -133,7 +133,7 @@ std::pair<bool, std::size_t> SubtitleIntervalContainer::LoadSubripFile(
     return std::make_pair(false, 0);
   }
   try {
-    srt_file.LoadState(output_srt_file_.u8string());
+    srt_file.LoadState(output_srt_file_);
     if (srt_file.NumItems() == 0) {
       qDebug() << "No subtitle items found!";
       return std::make_pair(false, 0);
@@ -157,7 +157,8 @@ std::pair<bool, std::size_t> SubtitleIntervalContainer::LoadSubripFile(
 void SubtitleIntervalContainer::ChangeSubripFile(
     const QString& new_subrip_file) {
   DeleteAll();
-  output_srt_file_ = fs::u8path(new_subrip_file.toStdString());
+  QByteArray new_subrip_file_u8 = new_subrip_file.toUtf8();
+  output_srt_file_ = QStringToUtf8Path(new_subrip_file);
 }
 
 void SubtitleInterval::initializeChildren(QWidget* parent) {

@@ -8,6 +8,7 @@
 #include <string_view>
 #include <unordered_map>
 #include <vector>
+#include <filesystem>
 
 #include "subtitler/srt/subrip_item.h"
 
@@ -23,7 +24,7 @@ class SubRipFile {
   // May throw exception on failure.
   // If success, then all previous state is overwritten.
   // If fail, then prevous state is left untouched.
-  void LoadState(std::string_view file_name);
+  void LoadState(const std::filesystem::path& file_name);
 
   // Prints the entire SubRipFile to the stream.
   void ToStream(std::ostream& output) const;

@@ -19,6 +19,7 @@ qt_cc_library(
         "//subtitler/speech_recognition:auto_transcriber",
         "//subtitler/srt:subrip_file",
         "//subtitler/subprocess:subprocess_executor",
+        "//subtitler/util:qstring_to_utf8_path",
         "//subtitler/video/processing:ffmpeg",
         "@com_github_nlohmann_json//:json",
         "@qt//:qt_widgets",

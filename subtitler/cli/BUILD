@@ -28,6 +28,7 @@ cc_library(
         "//subtitler/srt:subrip_item",
         "//subtitler/util:duration_format",
         "//subtitler/util:temp_file",
+        "//subtitler/util:unicode",
         "//subtitler/video/metadata:ffprobe",
         "//subtitler/video/player:ffplay",
         "@howard_hinnant_date//:date",
@@ -43,6 +44,7 @@ cc_test(
     deps = [
         ":commands",
         "//subtitler/subprocess:mock_subprocess_executor",
+        "//subtitler/util:unicode",
         "//subtitler/video/metadata:ffprobe",
         "//subtitler/video/player:ffplay",
         "@com_google_googletest//:gtest_main",

@@ -113,7 +113,7 @@ void EncryptDataToFile(const std::string& output_path, const std::string& data,
   }
 }
 
-std::string DecryptFromFile(const std::string input_path,
+std::string DecryptFromFile(const std::string& input_path,
                             const std::string& password) {
   throwIfEmpty("input_path", input_path);
   throwIfEmpty("password", password);

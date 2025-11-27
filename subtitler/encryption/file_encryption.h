@@ -33,7 +33,7 @@ void EncryptDataToFile(const std::string& output_path, const std::string& data,
  * @param password the password used to derive the secret key.
  * @return std::string the plaintext data.
  */
-std::string DecryptFromFile(const std::string input_path,
+std::string DecryptFromFile(const std::string& input_path,
                             const std::string& password);
 
 }  // namespace encryption

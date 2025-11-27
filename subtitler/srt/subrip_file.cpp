@@ -38,8 +38,8 @@ void SubRipFile::ToStream(std::ostream& output) const {
   output << std::flush;
 }
 
-void SubRipFile::LoadState(const std::string_view file_name) {
-  auto path = fs::u8path(file_name);
+void SubRipFile::LoadState(const fs::path& file_name) {
+  auto path = file_name;
   std::ifstream stream{path};
 
   std::vector<std::shared_ptr<SubRipItem>> new_items;

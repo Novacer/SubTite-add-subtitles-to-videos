@@ -37,13 +37,13 @@ TEST(SubprocessExecutorTest, SanityCheck) {
 
 TEST(SubprocessExecutor, UTF8StringTest) {
   SubprocessExecutor executor;
-  executor.SetCommand(u8"echo 你好世界");
+  executor.SetCommand("echo 你好世界");
   executor.CaptureOutput(true);
 
   executor.Start();
   auto captured_ouptut = executor.WaitUntilFinished();
 
-  ASSERT_EQ(captured_ouptut.subproc_stdout, u8"你好世界\n");
+  ASSERT_EQ(captured_ouptut.subproc_stdout, "你好世界\n");
   ASSERT_THAT(captured_ouptut.subproc_stderr, IsEmpty());
 }
 

@@ -10,6 +10,7 @@
 
 #include "subtitler/srt/subrip_item.h"
 #include "subtitler/util/temp_file.h"
+#include "subtitler/util/unicode.h"
 
 namespace fs = std::filesystem;
 using namespace std::chrono_literals;
@@ -157,8 +158,8 @@ TEST_F(SubRipFileTest, ChangePosition) {
 
 TEST_F(SubRipFileTest, OverwritesPreviousState) {
   std::string temp_dir = std::getenv("TEST_TMPDIR");
-  TempFile temp_file{"", fs::u8path(temp_dir), ".srt"};
-  auto path_wrapper = fs::u8path(temp_file.FileName());
+  TempFile temp_file{"", GetFileSystemUtf8Path(temp_dir), ".srt"};
+  auto path_wrapper = GetFileSystemUtf8Path(temp_file.FileName());
 
   // First write existing contents to a file
   {
@@ -169,7 +170,7 @@ TEST_F(SubRipFileTest, OverwritesPreviousState) {
   file.RemoveItem(4);
   file.RemoveItem(3);
   // Now load it back
-  file.LoadState(path_wrapper.string());
+  file.LoadState(path_wrapper);
 
   std::ostringstream output;
   file.ToStream(output);
@@ -196,8 +197,8 @@ TEST_F(SubRipFileTest, OverwritesPreviousState) {
 
 TEST_F(SubRipFileTest, FailureToLoadRetainsPreviousState) {
   std::string temp_dir = std::getenv("TEST_TMPDIR");
-  TempFile temp_file{"", fs::u8path(temp_dir), ".srt"};
-  auto path_wrapper = fs::u8path(temp_file.FileName());
+  TempFile temp_file{"", GetFileSystemUtf8Path(temp_dir), ".srt"};
+  auto path_wrapper = GetFileSystemUtf8Path(temp_file.FileName());
 
   // Write incorrect srt file
   {
@@ -210,7 +211,7 @@ TEST_F(SubRipFileTest, FailureToLoadRetainsPreviousState) {
 
   // Attempt to load
   try {
-    file.LoadState(path_wrapper.string());
+    file.LoadState(path_wrapper);
     FAIL() << "Expected std::runtime_error";
   } catch (const std::runtime_error& e) {
     ASSERT_STREQ("Could not parse timestamp values: abc --> efg", e.what());

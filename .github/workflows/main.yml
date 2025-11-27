@@ -84,6 +84,10 @@ jobs:
         run: bazel test --config=msvc --test_output=errors ...
         shell: bash
 
+      - name: Build GUI
+        run: QT5_INSTALL_PATH=${QT_ROOT_DIR}; ./build_gui_dev.sh
+        shell: bash
+
   build_ubuntu:
       # The type of runner that the job will run on
       runs-on: ubuntu-latest
@@ -132,4 +136,8 @@ jobs:
         
         - name: Bazel test all targets
           run: bazel test --config=gcc-asan --test_output=errors ...
+          shell: bash
+
+        - name: Build GUI
+          run: QT5_INSTALL_PATH=/usr/include/x86_64-linux-gnu/qt5; ./build_gui_dev.sh
           shell: bash

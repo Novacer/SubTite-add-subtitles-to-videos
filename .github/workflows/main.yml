@@ -31,8 +31,12 @@ jobs:
           path: "C:\\Program Files\\PackageManagement\\NuGet\\Packages\\Microsoft.CognitiveServices.Speech.1.47.0"
           key: ${{ runner.os }}-MS-Speech-SDK-Cache
       
+      - name: "Register NuGet Package Source"
+        run: Register-PackageSource -Name nuget.org -Location https://www.nuget.org/api/v2 -ProviderName NuGet -Force
+        shell: pwsh
+      
       - name: Install MS Speech SDK
-        run: Install-Package Microsoft.CognitiveServices.Speech -RequiredVersion 1.47.0 -Force
+        run: Install-Package Microsoft.CognitiveServices.Speech -ProviderName NuGet -RequiredVersion 1.47.0 -Force
         shell: pwsh
       
       - name: Debug MS Speech SDK Install

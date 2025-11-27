@@ -85,7 +85,7 @@ jobs:
         shell: bash
 
       - name: Build GUI
-        run: QT5_INSTALL_PATH=${QT_ROOT_DIR}; ./build_gui_dev.sh
+        run: env QT5_INSTALL_PATH=$QT_ROOT_DIR ./build_gui_dev.sh
         shell: bash
 
   build_ubuntu:

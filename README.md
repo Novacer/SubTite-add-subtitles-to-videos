@@ -103,9 +103,9 @@ Now you should be able to build the dev version of the GUI by running:
 
 If you want to build the production version of the GUI, you'll also need to install ResourceHacker (details below).
 
-#### Resource Hacker
+#### Resource Hacker or [Resource Cracker](https://www.pelock.com/products/resource-cracker)
 
-Note that production builds will require one more depedency: [ResourceHacker](https://www.angusj.com/resourcehacker/). We use ResourceHacker
+Note that production builds will require one more depedency: [ResourceHacker](https://www.angusj.com/resourcehacker/ or [Resource Cracker](https://www.pelock.com/products/resource-cracker)). We use ResourceHacker
 to set the icon for our binary. Download the ResourceHacker.exe and add it to your PATH variable.
 
 Now you can compile the release binary via:
@@ -170,7 +170,7 @@ $ bazel test --config=gcc-asan ...    # used for running on linux
 ## Deploying - Packaging Subtite with its dependencies.
 Since Subtite uses Dynamic Linking with QT and FFMPEG (so it can remain LGPL compliant with those projects), there is a need to package the dependencies of Subtite when deploying. A deploy script can be run `./deploy/deploy.sh` (IMPORTANT: script has to be run from the project root) which will package the dependecies automatically.
 
-In addition to the dependencies required to build Subtite, deploying also requires [Resource Hacker](http://www.angusj.com/resourcehacker/) on Windows, and [linuxdeployqt](https://github.com/probonopd/linuxdeployqt) on Linux.
+In addition to the dependencies required to build Subtite, deploying also requires [Resource Hacker](http://www.angusj.com/resourcehacker/) or [Resource Cracker](https://www.pelock.com/products/resource-cracker) on Windows, and [linuxdeployqt](https://github.com/probonopd/linuxdeployqt) on Linux.
 
 On Windows only, the script requires setting `QT5_INSTALL_PATH` env variable to the directory where QT 5 is installed. This should look something like `C:\\Qt\\5.15.2\\msvc2019_64\\`.
 
